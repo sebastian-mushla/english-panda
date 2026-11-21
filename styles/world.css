@@ -241,3 +241,7 @@ body.phone .mistband, body.phone #grain { display: none; }
   .mm-arrow { display: none; }
   .mm-go { padding: 0; width: 44px; } .mm-go span { display: none; }
 }
+/* Глава 3 «Осень» и зима в тумане */
+.fallA { fill: #e07a2a; opacity: .9; } .fallB { fill: #c4432a; opacity: .9; }
+.pumpkin { fill: #e8781f; stroke: #a04a0a; stroke-width: 2; } .stem { fill: #4a6a2a; }
+.winterD { fill: #c8d8dc; } .winterS { fill: #ffffff; }

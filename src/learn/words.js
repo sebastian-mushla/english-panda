@@ -1,6 +1,7 @@
 import { TARGET } from '../state.js';
 import { RIDDLES } from './words-i18n.js';
 import { THEMES2, RAW2, SENTENCES2 } from './words2.js';
+import { IRREGULAR, REGULAR, pastRegular } from './words3.js';
 
 // Банк слов A1. Формат строки: [en, emoji, ru, cz, загадка на простом английском, пример с пропуском ___].
 export const THEMES = {
@@ -191,6 +192,24 @@ for (const [theme, rows] of Object.entries(RAW2)) {
     BY_TARGET[w.t.toLowerCase()] = w;
     return (WORDS[en] = w);
   });
+}
+// Глава 3 «Осень · B1» — грамматика английского, есть только при изучении английского.
+// Глаголы становятся словами главы: t — первая форма, v2/v3 — прошедшее время и причастие. Id с префиксом «v:», чтобы не совпасть с A2.
+export const CH3_OPEN = TARGET === 'en';
+if (CH3_OPEN) {
+  const add = (theme, name, list) => {
+    THEMES[theme] = name;
+    CHAPTER[theme] = 3;
+    BY_THEME[theme] = list.map(([v1, v2, v3, ru, cz, emoji]) => {
+      const w = { en: 'v:' + v1, emoji, ru, cz, theme, cefr: 'B1', t: v1, v2, v3,
+        riddle: `Past: ${v2.split('/')[0]} · Participle: ${v3}`, ex: `I want to ___ today.` };
+      BY_TARGET[v1] ||= w;
+      return (WORDS[w.en] = w);
+    });
+  };
+  add('irr1', { ru: 'Неправильные глаголы I', cz: 'Nepravidelná slovesa I', en: 'Irregular verbs I' }, IRREGULAR.slice(0, 23));
+  add('irr2', { ru: 'Неправильные глаголы II', cz: 'Nepravidelná slovesa II', en: 'Irregular verbs II' }, IRREGULAR.slice(23));
+  add('reg', { ru: 'Правильные глаголы', cz: 'Pravidelná slovesa', en: 'Regular verbs' }, REGULAR.map(([v, ru, cz, e]) => [v, pastRegular(v), pastRegular(v), ru, cz, e]));
 }
 export const themesOf = (ch) => Object.keys(THEMES).filter((th) => CHAPTER[th] === ch);
 // Предложение темы: [на изучаемом языке, на родном]

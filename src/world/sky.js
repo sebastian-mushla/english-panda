@@ -19,7 +19,15 @@ const KEYS = [
   { x: 11700, name: 'golden', sky: ['#eba868', '#f7d08e', '#f6e8bc'], tint: [255, 170, 70, 0.16], glow: 0.4, stars: 0, rays: 0.9, sun: [0.74, 0.34] },
   { x: 12900, name: 'sunset', sky: ['#a8466a', '#ee7a4e', '#f8b86a'], tint: [215, 80, 60, 0.26], glow: 0.85, stars: 0.2, rays: 0.55, sun: [0.87, 0.74] },
   { x: 13900, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.5], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
-  { x: 15600, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.52], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
+  // Глава 3 «Осень»: туманный рассвет, золотой день
+  { x: 14300, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.5], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
+  { x: 14900, name: 'dawn', sky: ['#e8a890', '#f4cfae', '#e8e0cc'], tint: [240, 150, 110, 0.16], glow: 0.35, stars: 0.1, rays: 0.9, sun: [0.12, 0.62] },
+  { x: 16100, name: 'day', sky: ['#88b8cc', '#cfe0dc', '#f4ead4'], tint: [255, 230, 190, 0.06], glow: 0.08, stars: 0, rays: 0.6, sun: [0.38, 0.16] },
+  { x: 17600, name: 'noon', sky: ['#7ab0cc', '#c4dce0', '#f2e8cc'], tint: [255, 220, 170, 0.08], glow: 0.06, stars: 0, rays: 0.5, sun: [0.55, 0.1] },
+  { x: 18900, name: 'golden', sky: ['#e09a5a', '#f2c07e', '#f4dcae'], tint: [255, 150, 60, 0.2], glow: 0.45, stars: 0, rays: 0.95, sun: [0.74, 0.36] },
+  { x: 19900, name: 'sunset', sky: ['#8c3a52', '#e0663e', '#f2a85a'], tint: [210, 70, 50, 0.28], glow: 0.85, stars: 0.2, rays: 0.55, sun: [0.87, 0.74] },
+  { x: 20800, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.5], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
+  { x: 22200, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.52], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
 ];
 
 // Реальное время суток → ближайший ключ
@@ -97,7 +105,7 @@ export function applyPhase(centerX, viewW) {
 
 export const SEASONS = ['spring', 'summer', 'autumn', 'winter'];
 // «По главе»: весна в главе 1, лето в главе 2, осень в тумане главы 3
-const CH_SEASON = { 1: 'spring', 2: 'summer', 3: 'autumn' };
+const CH_SEASON = { 1: 'spring', 2: 'summer', 3: 'autumn', 4: 'winter' };
 export function seasonAt(x) {
   return state.view.season === 'auto' ? CH_SEASON[chapterAt(x)] || 'spring' : state.view.season;
 }

@@ -11,7 +11,7 @@ import { esc, fillEx } from '../games/kit.js';
 
 // Транскрипция: английский — IPA, русский — ударение, чешский — ударение на первом слоге
 function phon(w) {
-  if (TARGET === 'en' && IPA[w.en]) return `<i class="ipa">[${esc(IPA[w.en])}]</i>`;
+  if (TARGET === 'en' && (IPA[w.en] || IPA[w.t])) return `<i class="ipa">[${esc(IPA[w.en] || IPA[w.t])}]${w.v2 ? ` · ${esc(w.v2)} · ${esc(w.v3)}` : ''}</i>`;
   if (TARGET === 'ru' && RU_STRESS[w.en]) return `<i class="ipa">${esc(RU_STRESS[w.en])}</i>`;
   if (TARGET === 'cz') return `<i class="ipa">ˈ${esc(w.t)}</i>`;
   return '';

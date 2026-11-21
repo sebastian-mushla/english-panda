@@ -1,7 +1,8 @@
 // Лобби: горизонтальный мир с параллаксом, камень-уровень на тропе, панды-NPC, карта внизу.
 import { state, save, on, emit } from '../state.js';
 import { t } from '../i18n.js';
-import { W, ZONES, NODE_X, NPC_X, walkY, zoneAt, groundY, CH2_X, FOG_X } from './geo.js';
+import { W, ZONES, NODE_X, NPC_X, walkY, zoneAt, groundY, CH2_X, CH3_X, FOG_X } from './geo.js';
+import { CH3_OPEN } from '../learn/words.js';
 import { buildScene } from './scenery.js';
 import { applyPhase, applySeason } from './sky.js';
 import { setupRaster, updateRaster, rasterIdle } from './raster.js';
@@ -180,7 +181,7 @@ function renderOverlay() {
     const done = !!state.levels[l.n]?.stars?.[0], open = isUnlocked(l.n);
     const cls = done ? 'done' : open ? 'current' : 'locked';
     h += `<button class="node ${cls}${l.exam ? ' exam' : ''}" data-n="${l.n}" style="--x:${x};--y:${y}" aria-label="${t('level')} ${l.n}">
-      <span class="stone"><b>${l.exam ? (l.ch === 2 ? '夏' : '春') : l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}</span>
+      <span class="stone"><b>${l.exam ? ({ 1: '春', 2: '夏', 3: '秋' })[l.ch] : l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}</span>
       ${done ? `<span class="nstars">${stars(l.n)}</span>` : ''}</button>`;
   });
   const npc = [
@@ -194,10 +195,15 @@ function renderOverlay() {
       <span class="npcsign"><i>${icon}</i>${label}</span>${pandaSVG(look)}</button>`;
   }
   // туман закрывает следующую главу: лето — пока не пройдены Врата весны, потом осень
-  const ch2open = !!state.levels[10]?.stars?.[0];
-  const fx = ch2open ? FOG_X : CH2_X, fsx = fx + 300;
+  // Туман закрывает следующую главу: лето — до Врат весны, осень — до Врат лета (и всегда, если учишь не английский), зима — скоро
+  const done = (n) => !!state.levels[n]?.stars?.[0];
+  const [fx, label, sub, text] = !done(10) ? [CH2_X, 'zone.fog1', 'locked', 'fogText']
+    : !done(20) ? [CH3_X, 'zone.fog', 'locked', 'fogText2']
+      : !CH3_OPEN ? [CH3_X, 'zone.fog', 'soon', 'ch3Locked']
+        : [FOG_X, 'zone.fog2', 'soon', 'fogText3'];
+  const fsx = fx + 300;
   h += `<div class="fogwall" style="--x:${fx - 20};--fw:${W - fx + 200}"></div>
-    <div class="fogsign" style="--x:${fsx};--y:${groundY(fsx)}"><b>${t(ch2open ? 'zone.fog' : 'zone.fog1')}</b><span>${t(ch2open ? 'soon' : 'locked')}</span><small>${t(ch2open ? 'fogText2' : 'fogText')}</small></div>`;
+    <div class="fogsign" style="--x:${fsx};--y:${groundY(fsx)}"><b>${t(label)}</b><span>${t(sub)}</span><small>${t(text)}</small></div>`;
   const px = NODE_X[cur - 1];
   h += `<div class="player" style="--x:${px};--y:${walkY(px)}">${pandaSVG(state.equip)}</div>`;
   overlay.innerHTML = h;

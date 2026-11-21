@@ -51,13 +51,13 @@ export function openCertificate(c) {
   const m = openModal(`<div class="certificate" id="cert-print">
       <div class="cert-roll"></div>
       <div class="cert-body">
-        <div class="seal">${(c.ch || 1) === 1 ? '春' : '夏'}</div>
+        <div class="seal">${({ 1: '春', 2: '夏', 3: '秋' })[c.ch || 1]}</div>
         <h2>${t('certTitle')}</h2>
         <p>${t('certConfirms')}</p>
         <div class="cert-name">${c.name || state.name || '🐼'}</div>
         <p>${t('certText', { chn: L(CHAPTERS[c.ch || 1].name), cefr: c.cefr || 'A1' })}</p>
-        <div class="cert-level">CEFR <b>${c.cefr || 'A1'}</b> · ${(c.ch || 1) === 1 ? 'Starter' : 'Elementary'}</div>
-        <p class="cert-next">${t((c.ch || 1) === 1 ? 'certNext' : 'certNext2')}</p>
+        <div class="cert-level">CEFR <b>${c.cefr || 'A1'}</b> · ${({ 1: 'Starter', 2: 'Elementary', 3: 'Intermediate' })[c.ch || 1]}</div>
+        <p class="cert-next">${t({ 1: 'certNext', 2: 'certNext2', 3: 'certNext3' }[c.ch || 1])}</p>
         <p class="cert-off">${t('certOfficial')}</p>
         <div class="cert-foot"><span>English Panda</span><span>${c.date}</span></div>
       </div>

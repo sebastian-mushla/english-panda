@@ -216,4 +216,38 @@ Object.assign(MOBS, {
   },
 });
 
+// Духи главы 3 «Осень»
+Object.assign(MOBS, {
+  maple: { hp: 7, reward: 22, name: { ru: 'Кленовый дух', cz: 'Javorový duch' },
+    text: { ru: 'Каждое утро повторяет: «I go, he goes, she goes». Обижается, если забыть -s.', cz: 'Každé ráno opakuje: „I go, he goes, she goes“. Urazí se, když zapomeneš -s.' },
+    svg: `<path d="M50,8 L58,30 L80,24 L68,44 L90,52 L68,58 L74,80 L54,68 L50,92 L46,68 L26,80 L32,58 L10,52 L32,44 L20,24 L42,30Z" fill="#d9542a" stroke="#8a2a12" stroke-width="2"/><circle cx="42" cy="50" r="3" fill="#2a1408"/><circle cx="58" cy="50" r="3" fill="#2a1408"/><path d="M44,60 q6,5 12,0" stroke="#2a1408" stroke-width="2.5" fill="none"/>` },
+  scarecrow: { hp: 7, reward: 22, name: { ru: 'Пугало-летописец', cz: 'Strašák kronikář' },
+    text: { ru: 'Записывает всё, что было вчера: worked, played, stopped. Помнит каждое -ed.', cz: 'Zapisuje všechno, co bylo včera: worked, played, stopped. Pamatuje si každé -ed.' },
+    svg: `<path d="M50,30 V96 M18,50 H82" stroke="#8a6a32" stroke-width="6"/><circle cx="50" cy="28" r="15" fill="#e8d7a8"/><path d="M28,20 L50,0 L72,20Z" fill="#d9b66b" stroke="#8a6a32" stroke-width="2"/><path d="M34,44 h32 l-6,34 h-20z" fill="#c23a2b"/><circle cx="44" cy="27" r="2.5" fill="#222"/><circle cx="56" cy="27" r="2.5" fill="#222"/><path d="M44,34 l3,2 l3,-2 l3,2 l3,-2" stroke="#222" stroke-width="1.5" fill="none"/>` },
+  owl: { hp: 7, reward: 24, name: { ru: 'Сова неправильных глаголов', cz: 'Sova nepravidelných sloves' },
+    text: { ru: 'Знает наизусть go–went–gone и ещё сорок глаголов. Ухает: «went, went!»', cz: 'Zná nazpaměť go–went–gone a dalších čtyřicet sloves. Houká: „went, went!“' },
+    svg: `<ellipse cx="50" cy="58" rx="28" ry="32" fill="#8a5a32"/><ellipse cx="50" cy="66" rx="17" ry="20" fill="#e8c890"/><path d="M24,34 L32,18 L40,32Z M60,32 L68,18 L76,34Z" fill="#6a4224"/><circle cx="39" cy="44" r="10" fill="#fff"/><circle cx="61" cy="44" r="10" fill="#fff"/><circle cx="39" cy="44" r="5" fill="#2a1408"/><circle cx="61" cy="44" r="5" fill="#2a1408"/><path d="M46,52 L50,60 L54,52Z" fill="#f2c14e"/>` },
+  boar: { hp: 8, reward: 24, name: { ru: 'Каштановый кабан', cz: 'Kaštanový kanec' },
+    text: { ru: 'Бегает по лабиринтам и роняет то taken, то took. Лови правильную форму!', cz: 'Pobíhá po bludištích a ztrácí jednou taken, jindy took. Chyť správný tvar!' },
+    svg: `<ellipse cx="52" cy="60" rx="34" ry="22" fill="#6a4224"/><ellipse cx="24" cy="56" rx="14" ry="12" fill="#7a5030"/><ellipse cx="14" cy="58" rx="6" ry="5" fill="#e8a8a0"/><path d="M20,64 q-6,6 -4,10 M28,64 q4,8 2,12" stroke="#fff" stroke-width="3" fill="none"/><circle cx="26" cy="50" r="2.5" fill="#111"/><path d="M36,78 v12 M62,80 v12 M76,76 v12" stroke="#4a2a14" stroke-width="6"/><path d="M40,40 l4,-10 l4,10 M52,40 l4,-10 l4,10" stroke="#4a2a14" stroke-width="3" fill="none"/>` },
+  mooncake: { hp: 8, reward: 24, name: { ru: 'Лунный пряник', cz: 'Měsíční koláček' },
+    text: { ru: 'Предсказывает будущее: «It will rain. I am going to win». Всегда немного в будущем.', cz: 'Věští budoucnost: „It will rain. I am going to win.“ Vždycky je trochu v budoucnosti.' },
+    svg: `<circle cx="50" cy="52" r="34" fill="#d9a04a" stroke="#8a5a12" stroke-width="3"/><circle cx="50" cy="52" r="24" fill="none" stroke="#8a5a12" stroke-width="2" stroke-dasharray="6 4"/><text x="50" y="60" font-size="22" text-anchor="middle" fill="#8a5a12">月</text><circle cx="40" cy="44" r="2.5" fill="#3a2008"/><circle cx="60" cy="44" r="2.5" fill="#3a2008"/>` },
+  ferry: { hp: 8, reward: 26, name: { ru: 'Паромщик-цапля', cz: 'Volavka převozník' },
+    text: { ru: 'Перевозит слова in, on, at через реку и никогда не путает the и a.', cz: 'Převáží slova in, on, at přes řeku a nikdy nesplete the a a.' },
+    svg: `<path d="M10,76 Q50,92 90,76 L84,70 H16Z" fill="#8a5a32"/><path d="M58,70 V30 Q58,18 70,16" stroke="#cfd8dc" stroke-width="5" fill="none"/><ellipse cx="52" cy="58" rx="16" ry="11" fill="#cfd8dc"/><circle cx="72" cy="16" r="6" fill="#cfd8dc"/><path d="M78,16 l12,2 l-12,2z" fill="#f2c14e"/><path d="M30,70 V40" stroke="#5a3a1a" stroke-width="3"/>` },
+  chestnut: { hp: 8, reward: 26, name: { ru: 'Каштан-задира', cz: 'Kaštan rváč' },
+    text: { ru: 'Любит сравнивать: «Я больше! Я быстрее! Я самый лучший!»', cz: 'Rád porovnává: „Jsem větší! Jsem rychlejší! Jsem nejlepší!“' },
+    svg: `<path d="M50,14 Q88,30 82,66 Q74,92 50,92 Q26,92 18,66 Q12,30 50,14Z" fill="#7a3a1a"/><path d="M28,30 Q50,20 72,30" stroke="#e8c890" stroke-width="5" fill="none"/><circle cx="40" cy="54" r="4" fill="#fff"/><circle cx="60" cy="54" r="4" fill="#fff"/><circle cx="40" cy="55" r="2" fill="#111"/><circle cx="60" cy="55" r="2" fill="#111"/><path d="M34,46 l10,4 M66,46 l-10,4" stroke="#111" stroke-width="2.5"/><path d="M42,70 q8,-6 16,0" stroke="#111" stroke-width="2.5" fill="none"/>` },
+  inkbrush: { hp: 9, reward: 28, name: { ru: 'Кисть-письмоводитель', cz: 'Štětec písař' },
+    text: { ru: 'Пишет письма друзьям и отелям. Знает, когда писать «Hi», а когда «Dear Sir».', cz: 'Píše dopisy kamarádům i hotelům. Ví, kdy napsat „Hi“ a kdy „Dear Sir“.' },
+    svg: `<rect x="44" y="10" width="12" height="54" rx="4" fill="#8a3a22"/><path d="M42,62 h16 l-2,10 Q50,96 44,72Z" fill="#1d1d24"/><rect x="18" y="58" width="30" height="22" rx="2" fill="#efdcb0" stroke="#8a6a32"/><path d="M22,64 h22 M22,70 h16" stroke="#1d1d24" stroke-width="2"/><circle cx="46" cy="30" r="2" fill="#fff"/><circle cx="54" cy="30" r="2" fill="#fff"/>` },
+  lanternfox: { hp: 9, reward: 28, name: { ru: 'Лис с фонарём', cz: 'Liška s lucernou' },
+    text: { ru: 'Болтает в чате со всеми гостями долины. Отвечает быстро и всегда вежливо.', cz: 'Chatuje se všemi hosty údolí. Odpovídá rychle a vždycky zdvořile.' },
+    svg: `<path d="M30,44 L22,18 L40,32 M70,44 L78,18 L60,32" fill="#e8913c"/><ellipse cx="50" cy="56" rx="26" ry="22" fill="#e8913c"/><path d="M34,60 Q50,78 66,60 Q50,70 34,60Z" fill="#fff"/><circle cx="40" cy="50" r="3" fill="#111"/><circle cx="60" cy="50" r="3" fill="#111"/><path d="M80,62 v8" stroke="#3a2a1a" stroke-width="2"/><ellipse cx="80" cy="80" rx="9" ry="11" fill="#d8402e"/><ellipse cx="80" cy="80" rx="4" ry="6" fill="#ffd27a"/>` },
+  qilin: { hp: 12, reward: 50, name: { ru: 'Цилинь Врат осени', cz: 'Čchi-lin Brány podzimu' },
+    text: { ru: 'Мудрый страж уровня B1. Пропускает дальше только тех, кто сдал пробный тест.', cz: 'Moudrý strážce úrovně B1. Pustí dál jen ty, kdo složili zkušební test.' },
+    svg: `<path d="M24,70 Q20,40 44,34 L66,30 Q86,30 84,50 Q82,70 66,72Z" fill="#3f9b6e" stroke="#1d5a3a" stroke-width="2.5"/><circle cx="74" cy="34" r="14" fill="#4fb07e"/><path d="M70,20 l-4,-14 M80,20 l6,-12" stroke="#f2c14e" stroke-width="3"/><circle cx="78" cy="32" r="2.5" fill="#111"/><path d="M30,72 v20 M44,72 v20 M58,72 v20 M70,72 v20" stroke="#1d5a3a" stroke-width="5"/><path d="M24,56 q-14,-10 -10,-24" stroke="#f2c14e" stroke-width="5" fill="none"/><g fill="#f2c14e"><circle cx="40" cy="50" r="3"/><circle cx="52" cy="46" r="3"/><circle cx="62" cy="54" r="3"/></g>` },
+});
+
 export const mobSVG = (id, cls = '') => `<svg class="mob ${cls}" viewBox="0 0 100 100" aria-hidden="true">${MOBS[id].svg}</svg>`;

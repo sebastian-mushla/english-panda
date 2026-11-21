@@ -17,6 +17,7 @@ export const ACH = [
   { id: 'tea', icon: '🍵', name: { ru: 'Чайная церемония', cz: 'Čajový obřad' }, text: { ru: 'Загляни в чайный дом.', cz: 'Nahlédni do čajovny.' }, test: (s) => s.stats.teaVisited },
   { id: 'gate', icon: '🏮', name: { ru: 'Хранитель весны', cz: 'Strážce jara' }, text: { ru: 'Пройди Врата весны и получи свиток.', cz: 'Projdi Bránou jara a získej svitek.' }, test: (s) => s.certs.some((c) => (c.ch || 1) === 1) },
   { id: 'summer', icon: '🔥', name: { ru: 'Хранитель лета', cz: 'Strážce léta' }, text: { ru: 'Пройди Врата лета и получи свиток A2.', cz: 'Projdi Bránou léta a získej svitek A2.' }, test: (s) => s.certs.some((c) => c.ch === 2) },
+  { id: 'autumn', icon: '🍁', name: { ru: 'Хранитель осени', cz: 'Strážce podzimu' }, text: { ru: 'Сдай тест B1 у Врат осени.', cz: 'Slož test B1 u Brány podzimu.' }, test: (s) => s.certs.some((c) => c.ch === 3) },
   { id: 'fisher', icon: '🎣', name: { ru: 'Рыбак долины', cz: 'Rybář údolí' }, text: { ru: 'Поймай 30 нужных рыб.', cz: 'Chyť 30 správných ryb.' }, test: (s) => (s.stats.fish || 0) >= 30 },
   { id: 'words120', icon: '🏯', name: { ru: 'Мудрец библиотеки', cz: 'Mudrc knihovny' }, text: { ru: '120 слов в словаре.', cz: '120 slov ve slovníku.' }, test: () => knownCount() >= 120 },
 ];

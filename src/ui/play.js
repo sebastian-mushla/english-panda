@@ -19,6 +19,9 @@ const GAMES = {
   fishing: () => import('../games/fishing.js'), baskets: () => import('../games/baskets.js'), wordsearch: () => import('../games/wordsearch.js'),
   crossword: () => import('../games/crossword.js'), dialog: () => import('../games/dialog.js'), truefalse: () => import('../games/truefalse.js'),
   lantern: () => import('../games/lantern.js'), chain: () => import('../games/chain.js'),
+  maze: () => import('../games/maze.js'), letters: () => import('../games/letters.js'), sokoban: () => import('../games/sokoban.js'),
+  verbform: () => import('../games/verbform.js'), irregular: () => import('../games/irregular.js'), longsent: () => import('../games/longsent.js'),
+  email: () => import('../games/email.js'), chat: () => import('../games/chat.js'), b1test: () => import('../games/b1test.js'),
 };
 
 const root = document.getElementById('game');

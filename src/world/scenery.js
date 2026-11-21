@@ -2,7 +2,7 @@
 // размытие дальнего и переднего плана. Цвета сезона приходят из CSS-переменных.
 // Мелкие одинаковые детали (листья, трава, цветы) собираются в один <path> на цвет, чтобы DOM был лёгким.
 // Каждый источник света кладёт свечение в отдельный слой света (lights) с тем же параллаксом.
-import { W, H, lx, groundY, bridgeY, RIVER, TEA, LAKE, FOG_X } from './geo.js';
+import { W, H, lx, groundY, bridgeY, RIVER, TEA, LAKE, FERRY, CH3_X, FOG_X } from './geo.js';
 import { pandaG, PANDA_DEFS } from './panda.js';
 
 const P = (n) => Math.round(n * 10) / 10;
@@ -332,7 +332,7 @@ function layerMid(r, lights) {
     ink.add('leafA', ell(cx, cy, rx * 0.85, ry * 0.85));
     ink.add('leafC', ell(cx - rx * 0.3, cy - ry * 0.4, rx * 0.35, ry * 0.3));
   }
-  s += midSummer(f, r, ink, lights);
+  s += midSummer(f, r, ink, lights) + midAutumn(f, r, ink, lights);
   s += ink.out();
   s += `<rect x="0" y="830" width="${w}" height="130" fill="url(#gMist)" opacity=".3"/>`;
   return { f, w, svg: s };
@@ -437,6 +437,7 @@ function layerGround(r, lights) {
     if (x > TEA.x0 - 30 && x < TEA.x1 + 30) continue;
     if (x > RIVER.x0 + 20 && x < RIVER.x1 - 20) continue;
     if (x > LAKE.x0 + 20 && x < LAKE.x1 - 20) continue;
+    if (x > FERRY.x0 + 20 && x < FERRY.x1 - 20) continue;
     const y = groundY(x) + 4, hh = 10 + r() * 22, lean = (r() - 0.5) * 14;
     grass.add(r() < 0.5 ? 'blade' : 'blade2', `M${P(x - 2)},${P(y)}Q${P(x + lean * 0.4)},${P(y - hh * 0.6)} ${P(x + lean)},${P(y - hh)}Q${P(x + lean * 0.3 + 1)},${P(y - hh * 0.5)} ${P(x + 2)},${P(y)}Z`);
     if (r() < 0.06) { const fy = y - hh * 0.6; grass.add(r() < 0.5 ? 'flowerA' : 'flowerB', circ(x + lean * 0.6, fy, 3.2) + circ(x + lean * 0.6 + 5, fy + 2, 2.6)); }
@@ -464,13 +465,13 @@ function layerGround(r, lights) {
   for (let c = 0; c < W; c += 480) {
     let dp = '';
     for (let x = c; x <= c + 480; x += 30) {
-      if ((x > b0 - 20 && x < b1 + 20) || (x > TEA.x0 - 30 && x < TEA.x1 + 30) || (x > LAKE.x0 && x < LAKE.x1)) { dp += ' '; continue; }
+      if ((x > b0 - 20 && x < b1 + 20) || (x > TEA.x0 - 30 && x < TEA.x1 + 30) || (x > LAKE.x0 && x < LAKE.x1) || (x > FERRY.x0 && x < FERRY.x1)) { dp += ' '; continue; }
       dp += `${dp.endsWith(' ') || !dp ? 'M' : 'L'}${x},${P(groundY(x) + 20)}`;
     }
     if (dp.trim()) s += `<path class="dirt" d="${dp.trim()}"/>`;
   }
   for (let x = 30; x < W; x += 46 + r() * 20) {
-    if ((x > b0 - 20 && x < b1 + 20) || (x > TEA.x0 - 20 && x < TEA.x1 + 20) || (x > LAKE.x0 - 20 && x < LAKE.x1 + 20)) continue;
+    if ((x > b0 - 20 && x < b1 + 20) || (x > TEA.x0 - 20 && x < TEA.x1 + 20) || (x > LAKE.x0 - 20 && x < LAKE.x1 + 20) || (x > FERRY.x0 - 20 && x < FERRY.x1 + 20)) continue;
     const cy = groundY(x) + 18 + r() * 8, rx = 18 + r() * 10;
     s += `<ellipse cx="${P(x)}" cy="${P(cy + 2)}" rx="${P(rx)}" ry="${P(6 + r() * 3)}" fill="#000" opacity=".18"/><ellipse fill="url(#gStone)" cx="${P(x)}" cy="${P(cy)}" rx="${P(rx)}" ry="${P(6 + r() * 3)}"/>`;
   }
@@ -487,12 +488,13 @@ function layerGround(r, lights) {
   s += teaHouse(lights, r, ink);
   s += gate(6760, groundY(6760) + 4, lights);
   s += groundSummer(r, ink, lights);
-  // осень в тумане
+  s += groundAutumn(r, ink, lights);
+  // зима в тумане
   for (let x = FOG_X + 50; x < w; x += 110 + r() * 90) {
-    const cy = groundY(x) - 160, rx = 80 + r() * 50, ry = 130 + r() * 50;
+    const cy = groundY(x) - 160, rx = 70 + r() * 40, ry = 140 + r() * 50;
     s += `<rect fill="url(#gTrunk)" x="${P(x - 8)}" y="${P(groundY(x) - 60)}" width="16" height="80"/>`;
-    ink.add('autumnD', ell(x + 8, cy + 8, rx, ry));
-    ink.add('autumn', ell(x, cy, rx * 0.85, ry * 0.85));
+    ink.add('winterD', `M${P(x - rx)},${P(groundY(x) - 50)} L${P(x)},${P(cy - ry)} L${P(x + rx)},${P(groundY(x) - 50)}Z`);
+    ink.add('winterS', `M${P(x - rx * 0.6)},${P(cy - ry * 0.2)} L${P(x)},${P(cy - ry)} L${P(x + rx * 0.6)},${P(cy - ry * 0.2)} Q${P(x)},${P(cy - ry * 0.4)} ${P(x - rx * 0.6)},${P(cy - ry * 0.2)}Z`);
   }
   return { f, w, svg: s + ink.out() };
 }
@@ -500,7 +502,7 @@ function layerGround(r, lights) {
 function layerFront(r, lights) {
   const f = 1.4, w = layerW(f);
   let s = '';
-  for (const X of [-40, 120, 1880, 3260, 7150, 12150]) {
+  for (const X of [-40, 120, 1880, 3260, 7150, 12150, 14450, 18850]) {
     const x = lx(X, f), ink = new Ink();
     let g = '';
     for (let i = 0; i < 3; i++) g += bamboo(x + i * 48, 1050, 1120, 32 + r() * 10, r, ink, { grad: 'gBamFront', lf: ['leaffront', 'leaffront2', 'leaffront'], node: 'bamfrontn', lean: (r() - 0.5) * 6 });
@@ -615,7 +617,7 @@ function midSummer(f, r, ink, lights) {
   s += st + pagoda(h, 430, 1.3, lights);
   s += prayerFlags(h - 380, h - 90, 600, 30, ink) + prayerFlags(h + 90, h + 380, 600, 30, ink);
   // летние деревья вдоль главы 2
-  for (let x = lx(7150, f); x < lx(FOG_X, f); x += 160 + r() * 200) {
+  for (let x = lx(7150, f); x < lx(CH3_X, f); x += 160 + r() * 200) {
     if (x > c - 40 && x < d2 + 40) continue;
     const cy = 760 + r() * 60, rx = 60 + r() * 40, ry = 90 + r() * 50;
     s += `<rect fill="url(#gTrunk)" x="${P(x - 6)}" y="800" width="12" height="140"/>`;
@@ -672,6 +674,73 @@ function groundSummer(r, ink, lights) {
   for (const x of [12250, 13650]) s += stoneLantern(x, groundY(x) - 2, lights);
   // Врата лета
   s += gate(14050, groundY(14050) + 4, lights, '夏');
+  return s;
+}
+
+// ---------- Глава 3 «Осень» ----------
+function midAutumn(f, r, ink, lights) {
+  let s = '';
+  // кленовый лес вдали
+  for (let x = lx(14400, f); x < lx(15900, f); x += 90 + r() * 110) s += blossomTree(x, 900, 0.9 + r() * 0.5, r, ink);
+  s += pine(lx(15600, f), 900, 1.1, r, ink);
+  // деревня урожая: дома второго ряда
+  s += house(lx(16100, f), 860, 0.5, lights, ink) + house(lx(16700, f), 860, 0.55, lights, ink, { floors: 2 });
+  // переправа: широкая река с лодками
+  const a = lx(17300, f), b = lx(18850, f);
+  s += `<rect fill="url(#gLake)" x="${P(a)}" y="760" width="${P(b - a)}" height="180"/>`;
+  for (let i = 0; i < 12; i++) ink.add('shine', `M${P(a + 30 + r() * (b - a - 100))},${P(780 + r() * 140)}h${P(30 + r() * 70)}`);
+  for (const bx of [a + (b - a) * 0.3, a + (b - a) * 0.7]) s += `<path fill="#6a4424" d="M${P(bx - 60)},820 h120 l-16,18 h-88z"/><path stroke="#5a3a1a" stroke-width="4" d="M${P(bx)},820 V770"/><path fill="#f4f1ea" d="M${P(bx + 2)},772 L${P(bx + 40)},814 H${P(bx + 2)}Z" opacity=".9"/>`;
+  // академия на холме
+  const h = lx(19550, f);
+  const hill = `M${P(h - 380)},940 Q${P(h - 260)},560 ${P(h - 60)},470 L${P(h + 60)},470 Q${P(h + 260)},560 ${P(h + 380)},940Z`;
+  s += `<path d="${hill}" fill="url(#gCliff)"/><path d="${hill}" fill="url(#gLit)"/>`;
+  s += house(h, 480, 0.75, lights, ink, { floors: 3, deck: 30 });
+  for (let i = 0; i < 8; i++) ink.add('autumn', circ(h - 320 + r() * 640, 600 + r() * 300, 18 + r() * 14));
+  // осенние деревья вдоль главы
+  for (let x = lx(15900, f); x < lx(FOG_X, f); x += 170 + r() * 200) {
+    if (x > a - 40 && x < b + 40) continue;
+    const cy = 760 + r() * 60, rx = 60 + r() * 40, ry = 90 + r() * 50;
+    s += `<rect fill="url(#gTrunk)" x="${P(x - 6)}" y="800" width="12" height="140"/>`;
+    ink.add('autumnD', ell(x + 6, cy + 8, rx, ry)); ink.add('autumn', ell(x, cy, rx * 0.85, ry * 0.85));
+  }
+  return s;
+}
+
+function groundAutumn(r, ink, lights) {
+  let s = '';
+  // кленовый лес: клёны, опавшие листья, грибы
+  for (const x of [14520, 15000, 15300, 15700]) s += blossomTree(x, groundY(x) - 8, 1.1 + r() * 0.3, r, ink);
+  for (let x = 14400; x < 15800; x += 14 + r() * 10) ink.add(r() < 0.5 ? 'fallA' : 'fallB', ell(x, groundY(x) + 30 + r() * 40, 5 + r() * 4, 2.5));
+  for (const x of [14650, 15150, 15600]) s += `<path fill="#c23a2b" d="M${x - 16},${P(groundY(x) + 2)} Q${x},${P(groundY(x) - 26)} ${x + 16},${P(groundY(x) + 2)}Z"/><rect fill="#f4f1ea" x="${x - 4}" y="${P(groundY(x))}" width="8" height="12"/><circle fill="#fff" cx="${x - 5}" cy="${P(groundY(x) - 8)}" r="3"/>`;
+  s += decoPanda(15100, groundY(15100) - 4, 0.8, { hat: 'band', item: 'basket' });
+  for (const x of [14950, 15550]) s += stoneLantern(x, groundY(x) - 2, lights);
+  // деревня урожая: дома, стога, тыквы
+  s += house(16200, groundY(16200) + 6, 0.95, lights, ink) + house(16950, groundY(16950) + 6, 0.9, lights, ink, { sign: '秋' });
+  for (const x of [15950, 16550, 17150]) {
+    const y = groundY(x) + 6;
+    s += `<path fill="#d9b66b" stroke="#8a6a32" stroke-width="2" d="M${x - 50},${P(y)} Q${x - 50},${P(y - 90)} ${x},${P(y - 100)} Q${x + 50},${P(y - 90)} ${x + 50},${P(y)}Z"/><path stroke="#a88438" stroke-width="2" fill="none" d="M${x - 40},${P(y - 30)} q40,-12 80,0 M${x - 34},${P(y - 60)} q34,-10 68,0"/>`;
+  }
+  for (let i = 0; i < 9; i++) { const x = 15900 + i * 150 + r() * 60, y = groundY(x) + 22; ink.add('pumpkin', ell(x, y, 16 + r() * 6, 12 + r() * 4)); ink.add('stem', `M${P(x - 2)},${P(y - 12)}h4v-8h-4Z`); }
+  s += lanternString(16300, 16800, 450, 22, 4, lights);
+  s += decoPanda(16450, groundY(16450) - 4, 0.8, { hat: 'straw', robe: 'monk', item: 'broom' }, true) + decoPanda(17100, groundY(17100) - 4, 0.75, { hat: 'straw', item: 'basket' });
+  // переправа: вода перед тропой, мостки, паром с пандой
+  const { x0, x1 } = FERRY;
+  let wd = `M${x0},1000 `;
+  for (let x = x0; x <= x1; x += 20) wd += `L${x},${P(groundY(x) + 28)} `;
+  s += `<path fill="url(#gWater)" d="${wd}L${x1},1000Z"/>`;
+  for (let x = x0 + 10; x < x1; x += 22) s += `<rect fill="url(#gDeck)" x="${x}" y="${P(groundY(x) + 6)}" width="18" height="12" rx="2"/>`;
+  for (let x = x0 + 40; x < x1; x += 160) s += `<rect fill="url(#gTrunk)" x="${x - 5}" y="${P(groundY(x) + 14)}" width="10" height="${P(1000 - groundY(x))}"/>`;
+  for (let i = 0; i < 8; i++) fx(1, `<path class="ripple" d="M${x0 + 60 + i * 150},${930 + (i % 3) * 22} q20,-6 40,0" style="animation-delay:${-i * 0.4}s"/>`);
+  for (let i = 0; i < 14; i++) { const x = x0 + r() * (x1 - x0), y = groundY(x) + 60 + r() * 90; ink.add(r() < 0.5 ? 'fallA' : 'fallB', ell(x, y, 7, 3)); }
+  const fbx = 18000, fby = groundY(fbx) + 90;
+  s += `<path fill="#6a4424" stroke="#3a2010" stroke-width="2" d="M${fbx - 110},${fby} h220 l-26,30 h-168z"/>` + decoPanda(fbx - 20, fby + 2, 0.7, { hat: 'straw', robe: 'night', item: 'staff' });
+  // академия свитков: дом, ученики, баннеры
+  s += house(19300, groundY(19300) + 6, 1.1, lights, ink, { floors: 2, sign: '学' });
+  for (const x of [18950, 19650, 20050]) { const y = groundY(x); s += `<rect fill="url(#gTrunk)" x="${x - 4}" y="${P(y - 190)}" width="8" height="190"/><rect fill="#efdcb0" stroke="#8a3a22" stroke-width="3" x="${x + 4}" y="${P(y - 180)}" width="40" height="110" rx="3"/><text class="callig" x="${x + 24}" y="${P(y - 112)}" text-anchor="middle" style="font-size:34px">${['書', '言', '智'][[18950, 19650, 20050].indexOf(x)]}</text>`; }
+  s += decoPanda(19050, groundY(19050) - 4, 0.75, { hat: 'scholar', robe: 'night', item: 'book' }) + decoPanda(19900, groundY(19900) - 4, 0.75, { hat: 'scholar', item: 'scroll' }, true);
+  for (const x of [18900, 20200]) s += stoneLantern(x, groundY(x) - 2, lights);
+  // Врата осени
+  s += gate(20650, groundY(20650) + 4, lights, '秋');
   return s;
 }
 

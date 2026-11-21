@@ -2,7 +2,7 @@
 // Перед «Печатью» всегда идёт «Каллиграфия»: сначала увидеть написание из готовых букв, потом печатать по памяти.
 // Позже: генератор глав A2–C2 из банка слов и тем грамматики (≈3000 уровней).
 import { state } from '../state.js';
-import { BY_THEME, WORDS, themesOf } from './words.js';
+import { BY_THEME, WORDS, themesOf, CH3_OPEN } from './words.js';
 import { dueWords } from './srs.js';
 
 export const LEVELS = [
@@ -28,21 +28,43 @@ export const LEVELS = [
   { n: 18, ch: 2, theme: 'hobbies', stages: ['wordsearch', 'truefalse', 'duel'], mob: 'kitedragon' },
   { n: 19, ch: 2, theme: 'travel', stages: ['dialog', 'crossword', 'duel'], mob: 'firefly' },
   { n: 20, ch: 2, theme: 'gate', stages: ['truefalse', 'lantern', 'builder', 'fishing', 'duel'], mob: 'phoenix', exam: true },
+  // Глава 3 «Осень · B1» — грамматика английского
+  { n: 21, ch: 3, theme: 'reg', gram: 'present', stages: ['verbform', 'maze', 'duel'], mob: 'maple' },
+  { n: 22, ch: 3, theme: 'reg', gram: 'past', stages: ['verbform', 'sokoban', 'duel'], mob: 'scarecrow' },
+  { n: 23, ch: 3, theme: 'irr1', gram: 'past', stages: ['irregular', 'letters', 'duel'], mob: 'owl' },
+  { n: 24, ch: 3, theme: 'irr2', gram: 'past', stages: ['irregular', 'maze', 'duel'], mob: 'boar' },
+  { n: 25, ch: 3, theme: 'irr1', gram: 'future', stages: ['verbform', 'longsent', 'duel'], mob: 'mooncake' },
+  { n: 26, ch: 3, theme: 'reg', gram: 'article|prep', stages: ['verbform', 'sokoban', 'duel'], mob: 'ferry' },
+  { n: 27, ch: 3, theme: 'irr2', gram: 'compare', stages: ['verbform', 'letters', 'duel'], mob: 'chestnut' },
+  { n: 28, ch: 3, theme: 'reg', gram: 'past|present', stages: ['email', 'chat', 'duel'], mob: 'inkbrush' },
+  { n: 29, ch: 3, theme: 'irr1', gram: 'future|past', stages: ['chat', 'longsent', 'maze', 'duel'], mob: 'lanternfox' },
+  { n: 30, ch: 3, theme: 'gate', stages: ['b1test', 'irregular', 'longsent', 'email', 'duel'], mob: 'qilin', exam: true },
 ];
 export const CHAPTERS = {
   1: { season: 'spring', cefr: 'A1', name: { ru: 'Весна', cz: 'Jaro' } },
   2: { season: 'summer', cefr: 'A2', name: { ru: 'Лето', cz: 'Léto' } },
+  3: { season: 'autumn', cefr: 'B1', name: { ru: 'Осень', cz: 'Podzim' } },
 };
 
 export const levelDef = (n) => LEVELS[n - 1];
 
+// Слова уровня: в главе 3 темы большие (до 25 глаголов), поэтому каждому уровню — свои 8 подряд
+export function levelWords(def) {
+  const all = BY_THEME[def.theme] || [];
+  if (all.length <= 10) return all;
+  const off = (def.n * 8) % all.length;
+  return [...all, ...all].slice(off, off + 8);
+}
+
 export function isUnlocked(n) {
+  if (levelDef(n)?.ch === 3 && !CH3_OPEN) return false; // глава 3 — только для английского
   return n === 1 || !!state.levels[n - 1]?.stars?.[0];
 }
 
 export function currentLevel() {
-  for (const l of LEVELS) if (!state.levels[l.n]?.stars?.[0]) return l.n;
-  return LEVELS.length;
+  for (const l of LEVELS) if (!state.levels[l.n]?.stars?.[0] && isUnlocked(l.n)) return l.n;
+  // всё доступное пройдено: стоим на последнем открытом уровне
+  return [...LEVELS].reverse().find((l) => isUnlocked(l.n))?.n || 1;
 }
 
 const shuffle = (a) => {
@@ -62,7 +84,7 @@ export function buildPlay(n) {
       shuffle(BY_THEME[th]).sort((a, b) => (state.words[a.en]?.box || 0) - (state.words[b.en]?.box || 0)).slice(0, 2));
     return { def, words, review: [], themes: chThemes, others: chThemes };
   }
-  const words = BY_THEME[def.theme];
+  const words = levelWords(def);
   // соседние темы для «Корзин» и «Рыбалки»: сначала уже пройденные
   const done = LEVELS.filter((l) => l.n < n && !l.exam).map((l) => l.theme);
   const others = shuffle(done.length ? done.slice(-4) : chThemes.filter((th) => th !== def.theme)).filter((th) => th !== def.theme);
