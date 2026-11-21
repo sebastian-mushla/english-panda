@@ -1,6 +1,6 @@
 // Судоку слов 4×4: подсказанные клетки — картинки, игрок ставит слова изучаемого языка.
 import { t } from '../i18n.js';
-import { shuffle, esc, wait, flash } from './kit.js';
+import { shuffle, esc, wait, flash, pic } from './kit.js';
 import { wordHint } from '../learn/hints.js';
 
 function solution() {
@@ -18,14 +18,15 @@ function solution() {
 }
 
 export default function sudoku(el, ctx) {
-  const ws = shuffle(ctx.words).slice(0, 4);
+  // в судоку только картинки, поэтому сначала слова с однозначной картинкой
+  const ws = [...shuffle(ctx.words.filter((w) => !w.vague)), ...shuffle(ctx.words.filter((w) => w.vague))].slice(0, 4);
   const sol = solution().flat();
   const givens = new Set(shuffle([...Array(16).keys()]).slice(0, 7));
   const placed = new Map();
   let active = null, target = null;
 
   el.innerHTML = `<div class="sudoku">
-      <div class="sgrid">${sol.map((v, i) => `<button class="scell ${givens.has(i) ? 'given' : ''}" data-i="${i}">${givens.has(i) ? `<span class="emo">${ws[v].emoji}</span>` : ''}</button>`).join('')}</div>
+      <div class="sgrid">${sol.map((v, i) => `<button class="scell ${givens.has(i) ? 'given' : ''}" data-i="${i}">${givens.has(i) ? pic(ws[v]) : ''}</button>`).join('')}</div>
       <div class="palette">${ws.map((w, i) => `<button class="pword en" data-v="${i}">${esc(w.t)}</button>`).join('')}</div>
     </div>`;
   const cells = [...el.querySelectorAll('.scell')];

@@ -3,7 +3,7 @@ import { state, TARGET, setLanguages } from '../state.js';
 import { t } from '../i18n.js';
 import { NATIVES, TARGETS, LANG_NAME, FLAG } from '../learn/lang.js';
 
-const SELF = { ru: 'Русский', cz: 'Čeština', en: 'English' };
+const SELF = { ru: 'Русский', uk: 'Українська', cz: 'Čeština', en: 'English' };
 
 export function langPickHTML() {
   return `<div class="langpick">

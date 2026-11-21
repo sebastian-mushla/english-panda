@@ -2,34 +2,38 @@
 import { TARGET } from '../state.js';
 
 export { TARGET };
-export const NATIVES = ['ru', 'cz'];
-export const TARGETS = ['en', 'ru', 'cz'];
+export const NATIVES = ['ru', 'uk', 'cz'];
+export const TARGETS = ['en', 'ru', 'cz', 'hu'];
 
 export const LANG_NAME = {
-  en: { ru: 'Английский', cz: 'Angličtina' },
-  ru: { ru: 'Русский', cz: 'Ruština' },
-  cz: { ru: 'Чешский', cz: 'Čeština' },
+  en: { ru: 'Английский', uk: 'Англійська', cz: 'Angličtina' },
+  ru: { ru: 'Русский', uk: 'Російська', cz: 'Ruština' },
+  cz: { ru: 'Чешский', uk: 'Чеська', cz: 'Čeština' },
+  hu: { ru: 'Венгерский', uk: 'Угорська', cz: 'Maďarština' },
 };
 // «напечатай по-английски / anglicky»
 export const LANG_ADV = {
-  en: { ru: 'по-английски', cz: 'anglicky' },
-  ru: { ru: 'по-русски', cz: 'rusky' },
-  cz: { ru: 'по-чешски', cz: 'česky' },
+  en: { ru: 'по-английски', uk: 'англійською', cz: 'anglicky' },
+  ru: { ru: 'по-русски', uk: 'російською', cz: 'rusky' },
+  cz: { ru: 'по-чешски', uk: 'чеською', cz: 'česky' },
+  hu: { ru: 'по-венгерски', uk: 'угорською', cz: 'maďarsky' },
 };
-export const FLAG = { en: '🇬🇧', ru: '🇷🇺', cz: '🇨🇿' };
+export const FLAG = { en: '🇬🇧', ru: '🇷🇺', cz: '🇨🇿', uk: '🇺🇦', hu: '🇭🇺' };
 // Печать на карте дуэли
-export const SEAL = { en: '英', ru: '俄', cz: '捷' }[TARGET];
+export const SEAL = { en: '英', ru: '俄', cz: '捷', hu: '匈' }[TARGET];
 
 export const ROWS = {
   en: ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'],
   ru: ['йцукенгшщзхъ', 'фывапролджэ', 'ячсмитьбюё'],
   cz: ['ěščřžýáíéůú', 'qwertzuiop', 'asdfghjkl', 'yxcvbnmňďťó'],
+  hu: ['öüóőúéáűí', 'qwertzuiop', 'asdfghjkl', 'yxcvbnm'],
 }[TARGET];
 
 const ALPHA = {
   en: /^[a-z]$/,
   ru: /^[а-яё]$/,
   cz: /^[a-záčďéěíňóřšťúůýž]$/,
+  hu: /^[a-záéíóöőúüű]$/,
 }[TARGET];
 
 // Русские буквы по физическим клавишам (раскладка ЙЦУКЕН), если у ученика нет русской раскладки
@@ -55,4 +59,4 @@ export function keyLetter(e) {
 export const norm = (s) => s.toLowerCase().replace(/ё/g, 'е');
 
 // Случайные буквы-обманки для «Каллиграфии»
-export const DECOY = { en: 'abcdefghijklmnoprstuwy', ru: 'абвгдеиклмнопрстуя', cz: 'abcdeiklmnoprstuvyzáéíčřš' }[TARGET];
+export const DECOY = { en: 'abcdefghijklmnoprstuwy', ru: 'абвгдеиклмнопрстуя', cz: 'abcdeiklmnoprstuvyzáéíčřš', hu: 'abdefgiklmnoprstvzáéóöü' }[TARGET];

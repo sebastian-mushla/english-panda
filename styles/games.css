@@ -518,3 +518,8 @@
 .bt-q { font-size: clamp(1.1rem, 2.8dvh, 1.35rem); font-weight: 800; color: var(--cream); text-align: center; }
 .bt-score { font-family: var(--f-sign); font-size: 4rem; color: var(--gold); }
 .bt-opts { display: grid; gap: 8px; }
+/* подпись под неоднозначной картинкой и маска букв в подсказке */
+.pcap { display: block; font-size: .8rem; font-weight: 700; line-height: 1.1; margin-top: .2em; opacity: .85; }
+.scell .pcap { font-size: .55rem; }
+.hmask { font-size: 1.25em; font-weight: 800; letter-spacing: .08em; white-space: nowrap; }
+.gap-pic .emo { font-size: 3rem; }

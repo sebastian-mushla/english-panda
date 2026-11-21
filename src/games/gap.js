@@ -1,6 +1,7 @@
 // Вставь пропуск: предложение с пропуском, нужное слово впечатать. Смысл понятен из контекста.
 import { t } from '../i18n.js';
-import { shuffle, esc, wait, flash, meaning } from './kit.js';
+import { wordHint } from '../learn/hints.js';
+import { shuffle, esc, wait, flash, meaning, pic } from './kit.js';
 import { keyboard, typeLine } from './keyboard.js';
 
 export default function gap(el, ctx) {
@@ -23,7 +24,7 @@ export default function gap(el, ctx) {
     // заглавная буква, если слово стоит в начале предложения
     const word = w.ex.startsWith('___') ? w.t[0].toUpperCase() + w.t.slice(1) : w.t;
     const [a, b] = w.ex.split('___');
-    sent.innerHTML = `<span class="emo">${w.emoji}</span><p>${esc(a)}<span class="slots"></span>${esc(b)}</p>`;
+    sent.innerHTML = `<div class="gap-pic">${pic(w)}</div><p>${esc(a)}<span class="slots"></span>${esc(b)}</p>`;
     const slots = sent.querySelector('.slots');
     el.querySelector('.count').textContent = `${total - list.length} / ${total}`;
     line = typeLine(slots, word, {
@@ -37,12 +38,7 @@ export default function gap(el, ctx) {
         next();
       },
     });
-    ctx.setHint(w.en, (step) => {
-      if (step === 1) return { label: t('hint.1'), text: w.riddle, en: true };
-      if (step === 2) return { label: t('hint.mean'), text: `${w.emoji} <b>${esc(meaning(w))}</b>`, en: false };
-      line.reveal();
-      return { label: t('hint.3'), text: t('hint.act') };
-    });
+    ctx.setHint(w.en, (step) => wordHint({ ...w, ex: null }, step, () => { line.reveal(); return t('hint.act'); }));
     busy = false;
   }
   next();

@@ -11,6 +11,9 @@ export const pick = (a) => a[Math.floor(Math.random() * a.length)];
 export const meaning = (w) => L({ ru: w.ru, cz: w.cz });
 export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
+// Картинка слова; для неоднозначных картинок — ещё и значение на родном языке
+export const pic = (w) => `<span class="emo">${w.emoji}</span>${w.vague ? `<small class="pcap">${esc(meaning(w))}</small>` : ''}`;
+
 // Пример с подставленным словом
 export function fillEx(w, mark = true) {
   const word = w.ex.startsWith('___') ? w.t[0].toUpperCase() + w.t.slice(1) : w.t;

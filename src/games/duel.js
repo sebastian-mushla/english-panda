@@ -2,7 +2,7 @@
 import { t, L } from '../i18n.js';
 import { state, save } from '../state.js';
 import { MOBS, mobSVG } from '../learn/mobs.js';
-import { shuffle, meaning, esc, distractors, wait, flash } from './kit.js';
+import { shuffle, meaning, esc, distractors, wait, flash, pic } from './kit.js';
 import { wordHint } from '../learn/hints.js';
 import { SEAL } from '../learn/lang.js';
 
@@ -35,10 +35,10 @@ export default function duel(el, ctx) {
     if (!queue.length) queue = shuffle(pool);
     cur = queue.shift();
     type = types[turn++ % types.length];
-    if (type === 'riddle' && ctx.def.n < 3 && !ctx.def.exam) type = 'meaning';
+    if (type === 'riddle' && ((ctx.def.n < 3 && !ctx.def.exam) || !cur.riddle)) type = 'meaning';
     const ask = bubble.querySelector('.ask'), small = bubble.querySelector('small');
     if (type === 'meaning') { small.textContent = t('askMeaning'); ask.innerHTML = `<b>${esc(meaning(cur))}</b>`; }
-    if (type === 'pic') { small.textContent = t('askPic'); ask.innerHTML = `<span class="emo">${cur.emoji}</span>`; }
+    if (type === 'pic') { small.textContent = t('askPic'); ask.innerHTML = pic(cur); }
     if (type === 'riddle') { small.textContent = t('askRiddle'); ask.innerHTML = `<i class="en">${esc(cur.riddle)}</i>`; }
     flash(bubble, 'pop', 400);
     const cards = shuffle([cur, ...distractors(cur, 3, pool)]);

@@ -1,13 +1,13 @@
 // Сохранение прогресса игрока в localStorage (один игрок на браузер).
 // У каждого изучаемого языка своё сохранение: английский — ep.save.v1, русский — ep.save.v1.ru, чешский — ep.save.v1.cz.
 const read = (k, d) => { try { return localStorage.getItem(k) || d; } catch { return d; } };
-export const TARGET = ['en', 'ru', 'cz'].includes(read('ep.target', 'en')) ? read('ep.target', 'en') : 'en';
+export const TARGET = ['en', 'ru', 'cz', 'hu'].includes(read('ep.target', 'en')) ? read('ep.target', 'en') : 'en';
 const KEY = 'ep.save.v1' + (TARGET === 'en' ? '' : '.' + TARGET);
 
 const fresh = () => ({
   v: 1,
   name: read('ep.name', ''),
-  lang: read('ep.lang', TARGET === 'ru' || /^cs|^sk/i.test(navigator.language || '') ? 'cz' : 'ru'),
+  lang: read('ep.lang', TARGET === 'ru' || /^cs|^sk/i.test(navigator.language || '') ? 'cz' : /^uk/i.test(navigator.language || '') ? 'uk' : 'ru'),
   sound: true,
   coins: 60,
   levels: {},        // {n: {stars:[done, perfect, nohint], plays}}
@@ -49,7 +49,7 @@ export function save() {
 
 // Смена языка интерфейса и изучаемого языка: язык обучения = отдельное сохранение, поэтому перезагрузка
 export function setLanguages(native, target) {
-  if (native === target) target = native === 'ru' ? (TARGET === 'cz' ? 'cz' : 'en') : (TARGET === 'ru' ? 'ru' : 'en');
+  if (native === target) target = 'en';
   state.lang = native;
   try {
     localStorage.setItem(KEY, JSON.stringify(state));

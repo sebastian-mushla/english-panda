@@ -2,17 +2,17 @@
 import { t } from '../i18n.js';
 import { state, TARGET } from '../state.js';
 import { DIALOGS } from '../learn/words2.js';
+import { sentence } from '../learn/words.js';
 import { shuffle, esc, wait, flash } from './kit.js';
 import { pandaSVG } from '../world/panda.js';
 
-const TI = { en: 0, ru: 1, cz: 2 };
 
 export default function dialog(el, ctx) {
   const tagged = shuffle(DIALOGS.filter((d) => d.tags.some((tg) => ctx.themes.includes(tg))));
   const rest = shuffle(DIALOGS.filter((d) => !tagged.includes(d)));
   const list = [...tagged, ...rest].slice(0, 4);
   const total = list.length;
-  const ti = TI[TARGET], ni = TI[state.lang];
+  const tl = (x) => sentence(x, state.lang)[0], nl = (x) => sentence(x, state.lang)[1];
   let cur, busy;
 
   el.innerHTML = `<div class="dialog">
@@ -28,15 +28,15 @@ export default function dialog(el, ctx) {
     cur = list.shift();
     busy = false;
     const key = 'dlg:' + cur.q[0];
-    el.querySelector('.dl-say p').textContent = cur.q[ti];
-    tr.textContent = cur.q[ni]; tr.hidden = true;
+    el.querySelector('.dl-say p').textContent = tl(cur.q);
+    tr.textContent = nl(cur.q); tr.hidden = true;
     flash(el.querySelector('.dl-say'), 'pop', 400);
     el.querySelector('.count').textContent = `${total - list.length} / ${total}`;
-    const answers = shuffle([{ text: cur.a[ti], ok: true }, ...cur.w.map((w) => ({ text: w[ti], ok: false }))]);
+    const answers = shuffle([{ text: tl(cur.a), ok: true }, ...cur.w.map((w) => ({ text: tl(w), ok: false }))]);
     opts.innerHTML = answers.map((a, i) => `<button class="dl-opt en" data-i="${i}">${esc(a.text)}</button>`).join('');
     opts.querySelectorAll('.dl-opt').forEach((b) => b.addEventListener('click', () => choose(b, answers[+b.dataset.i], key)));
     ctx.setHint(key, (step) => {
-      if (step === 1) { tr.hidden = false; return { label: t('hint.mean'), text: esc(cur.q[ni]), en: false }; }
+      if (step === 1) { tr.hidden = false; return { label: t('hint.mean'), text: esc(nl(cur.q)), en: false }; }
       const wrong = [...opts.querySelectorAll('.dl-opt')].filter((b) => !answers[+b.dataset.i].ok && !b.disabled);
       if (step === 2 && wrong[0]) { wrong[0].disabled = true; wrong[0].classList.add('gone'); return { label: t('hint.3'), text: t('hint.act') }; }
       opts.querySelectorAll('.dl-opt').forEach((b) => { if (answers[+b.dataset.i].ok) b.classList.add('glow'); });

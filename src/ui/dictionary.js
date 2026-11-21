@@ -13,7 +13,7 @@ import { esc, fillEx } from '../games/kit.js';
 function phon(w) {
   if (TARGET === 'en' && (IPA[w.en] || IPA[w.t])) return `<i class="ipa">[${esc(IPA[w.en] || IPA[w.t])}]${w.v2 ? ` · ${esc(w.v2)} · ${esc(w.v3)}` : ''}</i>`;
   if (TARGET === 'ru' && RU_STRESS[w.en]) return `<i class="ipa">${esc(RU_STRESS[w.en])}</i>`;
-  if (TARGET === 'cz') return `<i class="ipa">ˈ${esc(w.t)}</i>`;
+  if (TARGET === 'cz' || TARGET === 'hu') return `<i class="ipa">ˈ${esc(w.t)}</i>`;
   return '';
 }
 
@@ -36,11 +36,11 @@ export function openDict(onReview) {
       const list = panel.querySelector('.dict-list');
       const draw = () => {
         const rows = known.map((en) => WORDS[en]).filter((w) => (theme === 'all' || w.theme === theme) &&
-          (!q || w.t.toLowerCase().includes(q) || w.ru.includes(q) || w.cz.toLowerCase().includes(q)));
+          (!q || w.t.toLowerCase().includes(q) || meaning(w).toLowerCase().includes(q)));
         list.innerHTML = rows.map((w) => {
           const r = state.words[w.en];
           return `<div class="drow"><span class="emo">${w.emoji}</span>
-            <div class="dw"><b class="en">${esc(w.t)}</b>${phon(w)}<span>${esc(L({ ru: w.ru, cz: w.cz }))}</span><small class="en">${fillEx(w)}</small></div>
+            <div class="dw"><b class="en">${esc(w.t)}</b>${phon(w)}<span>${esc(meaning(w))}</span><small class="en">${fillEx(w)}</small></div>
             <div class="know" title="${t('knowledge')}">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= r.box ? 'on' : ''}"></i>`).join('')}</div>
             ${canSpeak() ? `<button class="spk" data-en="${esc(w.en)}" aria-label="${t('listen')}">🔊</button>` : ''}</div>`;
         }).join('');

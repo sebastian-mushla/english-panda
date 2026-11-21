@@ -89,7 +89,7 @@ export function setSound(on) {
 
 // Озвучка слова в словаре — только по нажатию на 🔊 (в играх голоса нет).
 // Голос берётся под изучаемый язык: английский, русский или чешский.
-const VOICE_LANG = { en: ['en-GB', 'en-US', 'en'], ru: ['ru-RU', 'ru'], cz: ['cs-CZ', 'cs'] };
+const VOICE_LANG = { en: ['en-GB', 'en-US', 'en'], ru: ['ru-RU', 'ru'], cz: ['cs-CZ', 'cs'], hu: ['hu-HU', 'hu'] };
 export const canSpeak = () => 'speechSynthesis' in window;
 export function speakWord(text, lang, slow = false) {
   if (!canSpeak()) return false;

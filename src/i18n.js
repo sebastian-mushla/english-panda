@@ -1,8 +1,9 @@
 // Тексты интерфейса: русский и чешский. Задания в играх — на изучаемом языке ({tl} = «по-английски» и т. п.).
 import { state, TARGET } from './state.js';
 import { LANG_ADV, LANG_NAME } from './learn/lang.js';
+import { UK } from './learn/uk.js';
 
-const OFFICIAL = { en: 'Cambridge English, EF SET, Oxford Test of English', ru: 'ТРКИ / TORFL', cz: 'CCE — Certifikát z češtiny pro cizince' };
+const OFFICIAL = { en: 'Cambridge English, EF SET, Oxford Test of English', ru: 'ТРКИ / TORFL', cz: 'CCE — Certifikát z češtiny pro cizince', hu: 'ECL, Origó' };
 
 const S = {
   ru: {
@@ -32,7 +33,7 @@ const S = {
     ready: 'Я готов', check: 'Проверить', next: 'Дальше', retry: 'Ещё раз', toLobby: 'В долину',
     close: 'Закрыть', replay: 'Ещё раз', slow: 'Медленно', buy: 'Купить', equip: 'Надеть', equipped: 'Надето',
     upgrade: 'Улучшить', max: 'Максимум', print: 'Печать',
-    hint: 'Подсказка', hintTitle: 'Свиток подсказки', 'hint.1': 'Загадка', 'hint.2': 'Пример', 'hint.3': 'Помощь',
+    hint: 'Подсказка', hintTitle: 'Свиток подсказки', 'hint.1': 'Перевод и буквы', 'hint.2': 'Половина слова', 'hint.letters': 'букв: {n}', 'hint.ex': 'Пример', 'hint.3': 'Помощь',
     noCoins: 'Не хватает монет', hintNote: 'Подсказка стоит монет и снимает звезду «Без подсказок».',
     hintNothing: 'Тут подсказывать нечего.',
     win: 'Уровень пройден!', lose: 'Дух оказался сильнее', loseText: 'Слова, где ты ошибся, вернутся на повторение. Попробуй ещё раз!',
@@ -89,7 +90,7 @@ const S = {
     b1Reading: 'Чтение', b1Grammar: 'Грамматика', b1Pass: 'Отлично! Ты готов к уровню B1.', b1Fail: 'Почти! Повтори грамматику и попробуй ещё раз.',
     'zone.maple': 'Кленовый лес', 'zone.harvest': 'Деревня урожая', 'zone.ferry': 'Речная переправа', 'zone.academy': 'Академия свитков', 'zone.agate': 'Врата осени',
     'zone.fog2': 'Зима · B2', fogText3: 'Туман рассеется, когда пройдёшь Врата осени.', chapter4: 'Глава 4 · Зима · B2',
-    ch3Locked: 'Глава «Осень · B1» с грамматикой пока есть только для английского. Для русского и чешского — скоро.',
+    ch3Locked: 'Глава «Осень · B1» с грамматикой пока есть только для английского. Для других языков — скоро.',
     certNext3: 'Следующая глава: Зима · B2 — скоро',
     'g.fishing': 'Рыбалка', 'g.baskets': 'Корзины', 'g.wordsearch': 'Поиск слов', 'g.crossword': 'Кроссворд',
     'g.dialog': 'Разговор', 'g.truefalse': 'Верно или нет', 'g.lantern': 'Фонарь', 'g.chain': 'Цепочка памяти',
@@ -131,7 +132,7 @@ const S = {
     ready: 'Jdu na to', check: 'Zkontrolovat', next: 'Dál', retry: 'Znovu', toLobby: 'Do údolí',
     close: 'Zavřít', replay: 'Znovu', slow: 'Pomalu', buy: 'Koupit', equip: 'Obléct', equipped: 'Oblečeno',
     upgrade: 'Vylepšit', max: 'Maximum', print: 'Tisk',
-    hint: 'Nápověda', hintTitle: 'Svitek nápovědy', 'hint.1': 'Hádanka', 'hint.2': 'Příklad', 'hint.3': 'Pomoc',
+    hint: 'Nápověda', hintTitle: 'Svitek nápovědy', 'hint.1': 'Překlad a písmena', 'hint.2': 'Polovina slova', 'hint.letters': 'písmen: {n}', 'hint.ex': 'Příklad', 'hint.3': 'Pomoc',
     noCoins: 'Nemáš dost mincí', hintNote: 'Nápověda stojí mince a bere hvězdu „Bez nápověd“.',
     hintNothing: 'Tady není co napovídat.',
     win: 'Úroveň splněna!', lose: 'Duch byl silnější', loseText: 'Slova, ve kterých jsi chyboval(a), půjdou znovu na opakování. Zkus to znovu!',
@@ -188,7 +189,7 @@ const S = {
     b1Reading: 'Čtení', b1Grammar: 'Gramatika', b1Pass: 'Výborně! Jsi připraven na úroveň B1.', b1Fail: 'Skoro! Zopakuj gramatiku a zkus to znovu.',
     'zone.maple': 'Javorový les', 'zone.harvest': 'Vesnice sklizně', 'zone.ferry': 'Říční přívoz', 'zone.academy': 'Akademie svitků', 'zone.agate': 'Brána podzimu',
     'zone.fog2': 'Zima · B2', fogText3: 'Mlha se rozplyne, až projdeš Bránou podzimu.', chapter4: 'Kapitola 4 · Zima · B2',
-    ch3Locked: 'Kapitola „Podzim · B1“ s gramatikou je zatím jen pro angličtinu. Pro ruštinu a češtinu — brzy.',
+    ch3Locked: 'Kapitola „Podzim · B1“ s gramatikou je zatím jen pro angličtinu. Pro ostatní jazyky už brzy.',
     certNext3: 'Další kapitola: Zima · B2 — brzy',
     'g.fishing': 'Rybaření', 'g.baskets': 'Košíky', 'g.wordsearch': 'Hledání slov', 'g.crossword': 'Křížovka',
     'g.dialog': 'Rozhovor', 'g.truefalse': 'Pravda, nebo ne', 'g.lantern': 'Lucerna', 'g.chain': 'Řetízek paměti',
@@ -203,6 +204,106 @@ const S = {
     listen: 'Poslechnout', fishOnly: 'Chytej jen:', tfTrue: 'Pravda', tfFalse: 'Nepravda', chainLook: 'Zapamatuj si…', chainRepeat: 'Zopakuj popořadě',
     'hint.act': 'Podívej se na hrací plochu: nápověda už tam je.', iSpeak: 'Mluvím', iLearn: 'Chci se učit', learning: 'Učím se', 'hint.pattern': 'Vzor věty', shieldSaved: 'Nefritový štít zachránil lucernu!', reviewDone: 'Opakování hotovo!',
   },
+  uk: {
+    book: 'Книга духів', shop: 'Крамниця', dict: 'Словник', settings: 'Налаштування',
+    toCurrent: 'До рівня', sound: 'Звук', coins: 'Монети', stars: 'Зірки',
+    chapter: 'Розділ 1 · Весна · A1', chapter1: 'Розділ 1 · Весна · A1', chapter2: 'Розділ 2 · Літо · A2', chapter3: 'Розділ 3 · Осінь · B1',
+    'zone.bamboo': 'Бамбуковий гай', 'zone.falls': 'Водоспад', 'zone.village': 'Село',
+    'zone.tea': 'Чайний дім', 'zone.gate': 'Брама весни', 'zone.fog1': 'Літо · A2', 'zone.fog': 'Осінь · B1',
+    'zone.terraces': 'Рисові тераси', 'zone.lake': 'Озеро лотосів', 'zone.market': 'Літній ринок', 'zone.monastery': 'Гірський монастир', 'zone.sgate': 'Брама літа',
+    fogText2: 'Туман розвіється, коли пройдеш Браму літа.',
+    soon: 'незабаром', fogText: 'Туман розвіється, коли пройдеш Браму весни.',
+    level: 'Рівень', start: 'Старт', locked: 'Закрито', lockedText: 'Спочатку пройди рівень {n}.',
+    'star.done': 'Пройти рівень', 'star.perfect': 'Не більше 1 помилки', 'star.nohint': 'Без підказок',
+    newWords: 'Нові слова', reviewWords: 'Повторення', spirit: 'Дух рівня', stages: 'Випробування',
+    'g.intro': 'Знайомство', 'g.cards': 'Пари', 'g.type': 'Друк', 'g.gap': 'Встав пропуск', 'g.rush': 'Скоропис', 'g.spell': 'Каліграфія',
+    'g.sudoku': 'Судоку слів', 'g.builder': 'Збирач фраз', 'g.duel': 'Дуель з духом',
+    'gi.intro': 'Подивися нові слова. Натисни на картку: там переклад і приклад.',
+    'gi.cards': 'Відкривай картки й знаходь пари: слово і його значення.',
+    'gi.type': 'Надрукуй слово {tl} з пам\'яті. Можна на своїй клавіатурі, розкладка не важлива.',
+    'gi.gap': 'Впиши слово, якого бракує в реченні.',
+    'gi.rush': 'Листя падає! Друкуй слово {tl}, поки лист не торкнувся землі.',
+    'hint.mean': 'Переклад',
+    'gi.spell': 'Склади слово з літер. Можна друкувати на клавіатурі.',
+    'gi.sudoku': 'У кожному рядку, стовпці й квадраті 2×2 кожне слово рівно один раз.',
+    'gi.builder': 'Склади речення {tl}. Натискай слова по черзі.',
+    'gi.duel': 'Дух загадує значення. Кинь потрібну карту-слово!',
+    ready: 'Я готовий', check: 'Перевірити', next: 'Далі', retry: 'Ще раз', toLobby: 'У долину',
+    close: 'Закрити', replay: 'Ще раз', slow: 'Повільно', buy: 'Купити', equip: 'Вдягнути', equipped: 'Вдягнено',
+    upgrade: 'Покращити', max: 'Максимум', print: 'Друк',
+    hint: 'Підказка', hintTitle: 'Сувій підказки', 'hint.1': 'Переклад і літери', 'hint.2': 'Половина слова', 'hint.3': 'Допомога',
+    noCoins: 'Бракує монет', hintNote: 'Підказка коштує монет і знімає зірку «Без підказок».',
+    hintNothing: 'Тут нема що підказувати.',
+    win: 'Рівень пройдено!', lose: 'Дух виявився сильнішим', loseText: 'Слова, де ти помилився, повернуться на повторення. Спробуй ще раз!',
+    mistakes: 'Помилки', hintsUsed: 'Підказки', reward: 'Нагорода', caught: 'Духа записано до Книги!',
+    wordsInDict: 'Слів у словнику', lives: 'Ліхтарі',
+    combo: 'Комбо ×{n}', crit: 'Крит!', askMeaning: 'Яке слово означає:', askRiddle: 'Відгадай загадку:', askPic: 'Що на картинці?',
+    'tab.spirits': 'Духи', 'tab.ach': 'Досягнення', 'tab.certs': 'Сувої',
+    beaten: 'Переможено: {n}', unknownSpirit: 'Невідомий дух', unknownText: 'Переможи духа на рівні {n}, і він з\'явиться тут.',
+    'tab.skins': 'Вбрання', 'tab.upgrades': 'Покращення',
+    'slot.hat': 'Капелюх', 'slot.robe': 'Одяг', 'slot.item': 'Предмет',
+    search: 'Пошук…', allThemes: 'Усі теми', dictEmpty: 'Слова з\'являться після першого рівня.',
+    knowledge: 'Знання', reviewWeak: 'Повторити слабкі слова', due: 'час повторити', reviewTitle: 'Повторення',
+    name: 'Ім\'я учня', language: 'Мова', season: 'Сезон', 'season.auto': 'За розділом',
+    'season.spring': 'Весна', 'season.summer': 'Літо', 'season.autumn': 'Осінь', 'season.winter': 'Зима',
+    dayTime: 'Час доби', 'time.scroll': 'За прокручуванням', 'time.real': 'Як на годиннику',
+    reset: 'Скинути прогрес', resetConfirm: 'Видалити весь прогрес, монети й вбрання?',
+    daily: 'Завдання дня', 'daily.levels': 'Пройди 2 рівні', 'daily.right': 'Дай 25 правильних відповідей',
+    dailyDone: 'Завдання дня виконано!',
+    achNew: 'Нове досягнення', bought: 'Куплено', coinsPlus: '+{n} монет',
+    welcome: 'Ласкаво просимо до долини!',
+    welcomeText: 'Тут панди вчать мови. Крути коліщатко миші або тягни світ пальцем праворуч. Натисни на камінь з номером, щоб почати рівень.',
+    yourName: 'Як тебе звати? (для сертифікатів)', go: 'Уперед',
+    certTitle: 'Сувій майстра', certConfirms: 'Цим підтверджується, що',
+    certText: 'пройшов(-ла) розділ «{chn}» і опанував(-ла) рівень {cefr}. Мова: {tln}.', certNext2: 'Наступний розділ: Осінь · B1 — незабаром',
+    certNext: 'Наступний розділ: Літо · A2',
+    certOfficial: 'Коли дійдеш до B1, гра запропонує офіційний тест: {off}.',
+    noCerts: 'Пройди Браму весни (рівень 10), щоб отримати перший сувій.',
+    newCert: 'Отримано сувій майстра!',
+    learnedWord: 'вивчено', progress: 'Прогрес',
+    'npc.shop': 'Крамниця тітоньки Бао', 'npc.book': 'Чернець із Книгою духів', 'npc.dict': 'Учений зі словником',
+    level10: 'Брама', exam: 'Іспит розділу',
+    'g.maze': 'Лабіринт', 'g.letters': 'Збір літер', 'g.sokoban': 'Сокобан слів', 'g.verbform': 'Форми слова', 'g.irregular': 'Неправильні дієслова',
+    'g.longsent': 'Довгі речення', 'g.email': 'Лист', 'g.chat': 'Чат-квест', 'g.b1test': 'Пробний тест B1',
+    'gi.maze': 'Стрілки, WASD або свайп. Дійди до плитки з правильною формою й не потрап до духа.',
+    'gi.letters': 'Стрілки, WASD або свайп. Збери літери слова по черзі.',
+    'gi.sokoban': 'Стрілки, WASD або свайп. Заштовхни блок із правильним словом на зірку.',
+    'gi.verbform': 'Впиши правильну форму слова в дужках.',
+    'gi.irregular': 'Впиши другу й третю форму дієслова.',
+    'gi.longsent': 'Склади довге речення англійською.',
+    'gi.email': 'Склади лист: для кожної частини вибери фразу правильного стилю.',
+    'gi.chat': 'Листуйся: вибирай відповіді й додруковуй слова.',
+    'gi.b1test': 'Прочитай текст і дай відповіді на питання, потім граматика.',
+    'hint.rule': 'Правило', again: 'Заново', emailSent: '✉️ Лист надіслано!',
+    irregTip: 'Неправильні дієслова треба запам\'ятати: у них немає закінчення -ed (go → went → gone).',
+    lettersPast: 'Збери минулий час (V2)', lettersWord: 'Збери англійське слово',
+    'rule.present': 'Present Simple: he / she / it + -s (goes, plays, watches). Питання й заперечення з do / does.',
+    'rule.past': 'Past Simple: правильні дієслова + -ed (played, stopped, studied), неправильні — своя форма (went, saw). Після did — перша форма.',
+    'rule.future': 'Майбутнє: will + дієслово (I will call). Плани: am / is / are going to + дієслово.',
+    'rule.article': 'a — перед приголосним звуком, an — перед голосним (an apple). the — коли зрозуміло, про що мова.',
+    'rule.prep': 'at — точний час і місце-точка (at 8, at the bus stop); on — дні й поверхня (on Monday, on the table); in — місяці й усередині (in May, in the bag).',
+    'rule.compare': 'Короткі: -er / -est (bigger, the biggest). Довгі: more / the most. Винятки: good → better → best, bad → worse → worst.',
+    'rule.informal': 'Лист другові: Hi …, короткі дружні фрази, Best wishes.',
+    'rule.formal': 'Офіційний лист: Dear Sir or Madam / Dear Mr …, ввічливі фрази (I would like…, Could you…), Yours faithfully / Kind regards.',
+    b1Reading: 'Читання', b1Grammar: 'Граматика', b1Pass: 'Чудово! Ти готовий до рівня B1.', b1Fail: 'Майже! Повтори граматику й спробуй ще раз.',
+    'zone.maple': 'Кленовий ліс', 'zone.harvest': 'Село врожаю', 'zone.ferry': 'Річкова переправа', 'zone.academy': 'Академія сувоїв', 'zone.agate': 'Брама осені',
+    'zone.fog2': 'Зима · B2', fogText3: 'Туман розвіється, коли пройдеш Браму осені.', chapter4: 'Розділ 4 · Зима · B2',
+    ch3Locked: 'Розділ «Осінь · B1» з граматикою поки є лише для англійської. Для інших мов — незабаром.',
+    certNext3: 'Наступний розділ: Зима · B2 — незабаром',
+    'g.fishing': 'Риболовля', 'g.baskets': 'Кошики', 'g.wordsearch': 'Пошук слів', 'g.crossword': 'Кросворд',
+    'g.dialog': 'Розмова', 'g.truefalse': 'Правда чи ні', 'g.lantern': 'Ліхтар', 'g.chain': 'Ланцюжок пам\'яті',
+    'gi.fishing': 'Лови лише риб зі словами потрібної теми. Чужих відпускай!',
+    'gi.baskets': 'Розклади слова по кошиках: до якої теми належить слово?',
+    'gi.wordsearch': 'Знайди сховані слова: натисни першу й останню літеру слова.',
+    'gi.crossword': 'Вибери слово за картинкою і впиши його {tl}. Слова перетинаються!',
+    'gi.dialog': 'Панда щось каже. Вибери відповідну відповідь.',
+    'gi.truefalse': 'Картинка чи загадка збігається зі словом? Відповідай швидко!',
+    'gi.lantern': 'Вгадай слово по літерах. Помилка гасить ліхтар, після трьох помилок з\'явиться картинка.',
+    'gi.chain': 'Запам\'ятай слова по черзі. Вони сховаються — натисни їх у тому ж порядку.',
+    listen: 'Послухати', fishOnly: 'Лови лише:', tfTrue: 'Правда', tfFalse: 'Неправда', chainLook: 'Запам\'ятовуй…', chainRepeat: 'Повтори по черзі',
+    'hint.act': 'Дивись на поле: підказка вже там.', iSpeak: 'Я розмовляю', iLearn: 'Хочу вчити', learning: 'Вчу', 'hint.pattern': 'Візерунок фрази', shieldSaved: 'Нефритовий щит урятував ліхтар!', reviewDone: 'Повторення завершено!',
+    'hint.letters': 'літер: {n}', 'hint.ex': 'Приклад',
+  },
 };
 
 export function t(key, vars) {
@@ -214,12 +315,14 @@ export function t(key, vars) {
 }
 
 // Объект {ru, cz} → текст на текущем языке
-export const L = (o) => (o ? o[state.lang] ?? o.ru : '');
+// украинский: свой ключ uk, иначе перевод из UK по русскому тексту
+export const L = (o) => (!o ? '' : state.lang === 'uk' ? o.uk ?? UK[o.ru] ?? o.ru : o[state.lang] ?? o.ru);
 
 // Количество слов с правильным окончанием
 export function nWords(n) {
   if (state.lang === 'cz') return n + ' ' + (n === 1 ? 'slovo' : n >= 2 && n <= 4 ? 'slova' : 'slov');
   const m10 = n % 10, m100 = n % 100;
+  if (state.lang === 'uk') return n + ' ' + (m10 === 1 && m100 !== 11 ? 'слово' : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? 'слова' : 'слів');
   const w = m10 === 1 && m100 !== 11 ? 'слово' : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? 'слова' : 'слов';
   return n + ' ' + w;
 }

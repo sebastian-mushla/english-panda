@@ -1,6 +1,6 @@
 // Верно или неверно: быстрые утверждения «картинка = слово» и «загадка = слово», на время.
 import { t } from '../i18n.js';
-import { shuffle, pick, esc, wait, flash, distractors } from './kit.js';
+import { shuffle, pick, esc, wait, flash, distractors, pic } from './kit.js';
 import { wordHint } from '../learn/hints.js';
 
 const ROUNDS = 10, TIME = 8000;
@@ -10,7 +10,7 @@ export default function truefalse(el, ctx) {
   const items = words.map((w, i) => {
     const truth = Math.random() < 0.5;
     const shown = truth ? w : pick(distractors(w, 3, ctx.pool));
-    return { w, shown, truth, kind: i % 3 === 2 ? 'riddle' : 'pic' };
+    return { w, shown, truth, kind: i % 3 === 2 && w.riddle ? 'riddle' : 'pic' };
   });
   let cur = null, busy = false, timer = 0, started = 0, raf = 0, n = 0;
 
@@ -35,7 +35,7 @@ export default function truefalse(el, ctx) {
     n++;
     busy = false;
     card.classList.remove('ok', 'bad');
-    el.querySelector('.tf-left').innerHTML = cur.kind === 'pic' ? `<span class="emo">${cur.w.emoji}</span>` : `<i class="en">${esc(cur.w.riddle)}</i>`;
+    el.querySelector('.tf-left').innerHTML = cur.kind === 'pic' ? pic(cur.w) : `<i class="en">${esc(cur.w.riddle)}</i>`;
     el.querySelector('.tf-word').textContent = cur.shown.t;
     el.querySelector('.count').textContent = `${n} / ${ROUNDS}`;
     flash(card, 'pop', 400);

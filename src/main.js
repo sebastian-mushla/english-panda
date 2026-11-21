@@ -15,7 +15,7 @@ import { checkAch } from './progress.js';
 import { pandaSVG } from './world/panda.js';
 import { langPickHTML, bindLangPick } from './ui/langpick.js';
 
-document.documentElement.lang = state.lang === 'cz' ? 'cs' : 'ru';
+document.documentElement.lang = ({ cz: 'cs', uk: 'uk' })[state.lang] || 'ru';
 
 let pendingWalk = null;
 

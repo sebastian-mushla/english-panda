@@ -2,6 +2,8 @@ import { TARGET } from '../state.js';
 import { RIDDLES } from './words-i18n.js';
 import { THEMES2, RAW2, SENTENCES2 } from './words2.js';
 import { IRREGULAR, REGULAR, pastRegular } from './words3.js';
+import { HU, HU_SENT } from './hu.js';
+import { UK } from './uk.js';
 
 // Банк слов A1. Формат строки: [en, emoji, ru, cz, загадка на простом английском, пример с пропуском ___].
 export const THEMES = {
@@ -176,9 +178,9 @@ for (const [theme, rows] of Object.entries(RAW)) {
   BY_THEME[theme] = rows.map(([en, emoji, ru, cz, riddle, ex]) => {
     const tr = RIDDLES[en];
     const w = { en, emoji, ru, cz, theme, cefr: 'A1',
-      t: { en, ru, cz }[TARGET],
-      riddle: TARGET === 'ru' ? tr[0] : TARGET === 'cz' ? tr[2] : riddle,
-      ex: TARGET === 'ru' ? tr[1] : TARGET === 'cz' ? tr[3] : ex };
+      t: { en, ru, cz, hu: HU[en]?.[0] }[TARGET],
+      riddle: TARGET === 'ru' ? tr[0] : TARGET === 'cz' ? tr[2] : TARGET === 'hu' ? null : riddle,
+      ex: TARGET === 'ru' ? tr[1] : TARGET === 'cz' ? tr[3] : TARGET === 'hu' ? HU[en][1] : ex };
     BY_TARGET[w.t.toLowerCase()] = w;
     return (WORDS[en] = w);
   });
@@ -186,9 +188,9 @@ for (const [theme, rows] of Object.entries(RAW)) {
 for (const [theme, rows] of Object.entries(RAW2)) {
   BY_THEME[theme] = rows.map(([en, emoji, ru, cz, rEn, exEn, rRu, exRu, rCz, exCz]) => {
     const w = { en, emoji, ru, cz, theme, cefr: 'A2',
-      t: { en, ru, cz }[TARGET],
-      riddle: { en: rEn, ru: rRu, cz: rCz }[TARGET],
-      ex: { en: exEn, ru: exRu, cz: exCz }[TARGET] };
+      t: { en, ru, cz, hu: HU[en]?.[0] }[TARGET],
+      riddle: { en: rEn, ru: rRu, cz: rCz }[TARGET] ?? null,
+      ex: { en: exEn, ru: exRu, cz: exCz, hu: HU[en]?.[1] }[TARGET] };
     BY_TARGET[w.t.toLowerCase()] = w;
     return (WORDS[en] = w);
   });
@@ -211,6 +213,23 @@ if (CH3_OPEN) {
   add('irr2', { ru: 'Неправильные глаголы II', cz: 'Nepravidelná slovesa II', en: 'Irregular verbs II' }, IRREGULAR.slice(23));
   add('reg', { ru: 'Правильные глаголы', cz: 'Pravidelná slovesa', en: 'Regular verbs' }, REGULAR.map(([v, ru, cz, e]) => [v, pastRegular(v), pastRegular(v), ru, cz, e]));
 }
+// Понятнее картинки: эмодзи, которые сами по себе не читались (банк, школа, «большой» = слон)
+const EMOJI = {
+  goodbye: '👋🚪', 'good night': '🌙😴', 'thank you': '🎁🙏', sorry: '🙇', sunny: '🌞', warm: '🌡️🙂',
+  today: '📅👇', tomorrow: '📅➡️', week: '🗓️', hour: '🕐', school: '🏫🎒', shop: '🏪🛒', park: '🌳⛲',
+  street: '🏘️🚦', bank: '🏦💰', hospital: '🏥🚑', market: '🧺🍎', fast: '🐆💨', new: '✨🎁', old: '🏚️',
+  driver: '🚕🧑', nurse: '👩‍⚕️💉',
+};
+// Слова, которые по одной картинке не угадать: рядом с картинкой всегда показываем значение на родном языке
+const VAGUE = new Set(['thank you', 'sorry', 'please', 'head', 'table', 'warm', 'sunny', 'today', 'tomorrow', 'week', 'hour', 'minute',
+  'evening', 'night', 'morning', 'big', 'small', 'fast', 'slow', 'new', 'old', 'driver', 'nurse', 'cook', 'farmer', 'game', 'street',
+  'bank', 'hospital', 'school', 'shop', 'market', 'park', 'road', 'family', 'baby', 'hair', 'cup', 'happy', 'sad', 'hot', 'cold']);
+for (const w of Object.values(WORDS)) {
+  if (EMOJI[w.en]) w.emoji = EMOJI[w.en];
+  if (VAGUE.has(w.en) || w.en.startsWith('v:') || w.theme === 'verbs') w.vague = true;
+}
 export const themesOf = (ch) => Object.keys(THEMES).filter((th) => CHAPTER[th] === ch);
 // Предложение темы: [на изучаемом языке, на родном]
-export const sentence = (s, native) => [s[TI[TARGET]], s[TI[native]]];
+// Венгерский берём из HU_SENT, украинский — из UK по русскому тексту
+const inLang = (s, l) => (l === 'hu' ? HU_SENT[s[0]] : l === 'uk' ? UK[s[1]] ?? s[1] : s[TI[l]]);
+export const sentence = (s, native) => [inLang(s, TARGET), inLang(s, native)];
