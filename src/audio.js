@@ -79,51 +79,90 @@ export function startAmbient() {
   startFlute();
 }
 
-// Тихая флейта: короткие фразы по пентатонике ре-минор с долгими паузами, мягкое эхо
-const FLUTE = [293.66, 349.23, 392, 440, 523.25, 587.33, 698.46];
-let fluteBus = null;
+// Фоновая музыка (генеративная, без файлов): тихий гул-бурдон, щипки гучжэна и флейта
+// с плавными подъездами между нотами. Всё идёт через общий ревербератор.
+const SCALE = [146.83, 174.61, 196, 220, 261.63, 293.66, 349.23, 392, 440, 523.25, 587.33, 698.46]; // ре-минорная пентатоника
+let musicBus = null, verb = null;
 function startFlute() {
   const c = ac;
-  fluteBus = c.createGain(); fluteBus.gain.value = 0.05;
-  const echo = c.createDelay(); echo.delayTime.value = 0.42;
-  const fb = c.createGain(); fb.gain.value = 0.38;
-  const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1800;
-  fluteBus.connect(master); fluteBus.connect(echo); echo.connect(lp).connect(fb).connect(echo); lp.connect(master);
-  const phrase = () => {
+  musicBus = c.createGain(); musicBus.gain.value = 0.55;
+  // ревербератор: импульс из затухающего шума (большой зал / долина)
+  verb = c.createConvolver();
+  const len = c.sampleRate * 3.5, ir = c.createBuffer(2, len, c.sampleRate);
+  for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
+  verb.buffer = ir;
+  const wet = c.createGain(); wet.gain.value = 0.55;
+  musicBus.connect(master); musicBus.connect(verb); verb.connect(wet).connect(master);
+  drone();
+  // темп: одна «доля» 0.75 с; фразы флейты чередуются с паузами, гучжэн звучит всегда редкими щипками
+  let deg = 7;
+  const bar = () => {
     if (state.sound && !document.hidden) {
-      let i = 2 + Math.floor(Math.random() * 3), t = c.currentTime + 0.1;
-      const n = 3 + Math.floor(Math.random() * 4);
-      for (let k = 0; k < n; k++) {
-        i = Math.max(0, Math.min(FLUTE.length - 1, i + [-2, -1, -1, 1, 1, 2][Math.floor(Math.random() * 6)]));
-        const dur = k === n - 1 ? 2.4 : [0.6, 0.9, 1.2][Math.floor(Math.random() * 3)];
-        fluteNote(FLUTE[i], t, dur);
-        t += dur * 0.92;
+      const t0 = c.currentTime + 0.05;
+      // гучжэн: 2–4 щипка на такт, иногда быстрая «рябь» вниз
+      for (let k = 0; k < 4; k++) if (Math.random() < 0.6) pluck(SCALE[Math.floor(Math.random() * 8)], t0 + k * 0.75 + Math.random() * 0.05);
+      if (Math.random() < 0.15) for (let k = 0; k < 4; k++) pluck(SCALE[9 - k], t0 + 2.6 + k * 0.11, 0.6);
+      // флейта: фраза примерно в каждом втором такте
+      if (Math.random() < 0.55) {
+        let t = t0 + 0.4;
+        const n = 2 + Math.floor(Math.random() * 3);
+        for (let k = 0; k < n; k++) {
+          const prev = SCALE[deg];
+          deg = Math.max(5, Math.min(11, deg + [-2, -1, -1, 0, 1, 1, 2][Math.floor(Math.random() * 7)]));
+          const dur = k === n - 1 ? 2.2 : [0.75, 1.1, 1.5][Math.floor(Math.random() * 3)];
+          fluteNote(SCALE[deg], t, dur, prev);
+          t += dur;
+        }
       }
     }
-    setTimeout(phrase, 9000 + Math.random() * 9000);
+    setTimeout(bar, 3000);
   };
-  setTimeout(phrase, 3000);
+  setTimeout(bar, 1500);
 }
-function fluteNote(f, t, dur) {
+// бурдон: ре и ля в низу, медленно дышит
+function drone() {
+  const c = ac, g = c.createGain(), lp = c.createBiquadFilter();
+  lp.type = 'lowpass'; lp.frequency.value = 420; g.gain.value = 0.05;
+  for (const [f, det] of [[73.42, -4], [73.42, 5], [110, 0], [146.83, 3]]) { const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = det; o.connect(lp); o.start(); }
+  const lfo = c.createOscillator(), ld = c.createGain(); lfo.frequency.value = 0.06; ld.gain.value = 0.025;
+  lfo.connect(ld).connect(g.gain); lfo.start();
+  lp.connect(g).connect(musicBus);
+}
+// щипок струны: Karplus-Strong в буфере (звучит как гучжэн)
+const pluckCache = {};
+function pluck(f, t, vol = 1) {
+  const c = ac, key = Math.round(f);
+  if (!pluckCache[key]) {
+    const len = Math.floor(c.sampleRate * 2.5), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+    const p = Math.round(c.sampleRate / f);
+    for (let i = 0; i < p; i++) d[i] = Math.random() * 2 - 1;
+    for (let i = p; i < len; i++) d[i] = 0.996 * 0.5 * (d[i - p] + d[i - p + 1]);
+    pluckCache[key] = buf;
+  }
+  const src = c.createBufferSource(), g = c.createGain();
+  src.buffer = pluckCache[key]; g.gain.value = 0.22 * vol;
+  src.connect(g).connect(musicBus); src.start(t);
+}
+// нота флейты с подъездом от предыдущей, вибрато и дыханием
+function fluteNote(f, t, dur, from = f) {
   const c = ac, o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), g2 = c.createGain();
-  o.type = 'sine'; o.frequency.value = f;
-  o2.type = 'sine'; o2.frequency.value = f * 2; g2.gain.value = 0.12;
-  // вибрато вступает к середине ноты
+  o.type = 'sine'; o2.type = 'sine'; g2.gain.value = 0.1;
+  o.frequency.setValueAtTime(from, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.09);
+  o2.frequency.setValueAtTime(from * 2, t); o2.frequency.exponentialRampToValueAtTime(f * 2, t + 0.09);
   const lfo = c.createOscillator(), ld = c.createGain();
-  lfo.frequency.value = 5; ld.gain.setValueAtTime(0, t); ld.gain.linearRampToValueAtTime(f * 0.006, t + dur * 0.6);
+  lfo.frequency.value = 4.8; ld.gain.setValueAtTime(0, t); ld.gain.linearRampToValueAtTime(f * 0.008, t + dur * 0.7);
   lfo.connect(ld); ld.connect(o.frequency); ld.connect(o2.frequency);
   g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(1, t + 0.12);
-  g.gain.setTargetAtTime(0.75, t + 0.12, 0.3);
-  g.gain.setTargetAtTime(0, t + dur - 0.15, 0.12);
-  o.connect(g); o2.connect(g2).connect(g); g.connect(fluteBus);
-  // дыхание в начале ноты
-  const nb = c.createBuffer(1, c.sampleRate * 0.25, c.sampleRate), d = nb.getChannelData(0);
+  g.gain.linearRampToValueAtTime(0.16, t + 0.15);
+  g.gain.setTargetAtTime(0.12, t + 0.15, 0.4);
+  g.gain.setTargetAtTime(0, t + dur - 0.1, 0.15);
+  o.connect(g); o2.connect(g2).connect(g); g.connect(musicBus);
+  const nb = c.createBuffer(1, c.sampleRate * 0.3, c.sampleRate), d = nb.getChannelData(0);
   for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
   const ns = c.createBufferSource(), nf = c.createBiquadFilter(), ng = c.createGain();
-  ns.buffer = nb; nf.type = 'bandpass'; nf.frequency.value = f * 3; nf.Q.value = 1.5; ng.gain.value = 0.18;
-  ns.connect(nf).connect(ng).connect(fluteBus);
-  for (const x of [o, o2, lfo]) { x.start(t); x.stop(t + dur + 0.6); }
+  ns.buffer = nb; nf.type = 'bandpass'; nf.frequency.value = f * 2.5; nf.Q.value = 1.2; ng.gain.value = 0.025;
+  ns.connect(nf).connect(ng).connect(musicBus);
+  for (const x of [o, o2, lfo]) { x.start(t); x.stop(t + dur + 0.8); }
   ns.start(t);
 }
 
