@@ -2,7 +2,7 @@
 import { t, L } from '../i18n.js';
 import { shuffle, esc, flash } from './kit.js';
 import { field, makeMaze } from './field.js';
-import { gramPool, gramOptions } from './gram.js';
+import { gramPool, gramOptions, ruleBox } from './gram.js';
 
 const W = 11, H = 11, ROUNDS = 3;
 
@@ -40,7 +40,7 @@ export default function maze(el, ctx) {
     }
     tiles = gramOptions(it).map((text, i) => ({ text, ok: text === it.a, x: spots[i][0], y: spots[i][1] }));
     [gx, gy] = spots[3];
-    el.querySelector('.fg-task').innerHTML = `<p class="en">${esc(it.s).replace('___', '<u>____</u>')} <i>(${esc(it.base)})</i></p><small>${esc(L(it))}</small>`;
+    el.querySelector('.fg-task').innerHTML = `<p class="en">${esc(it.s).replace('___', '<u>____</u>')} <i>(${esc(it.base)})</i></p><small>${esc(L(it))}</small>${ruleBox(it.kind)}`;
     el.querySelector('.count').textContent = `${round} / ${items.length}`;
     ctx.setHint('mz' + round, (step) => {
       if (step === 1) return { label: t('hint.mean'), text: esc(L(it)), en: false };

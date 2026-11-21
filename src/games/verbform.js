@@ -2,7 +2,7 @@
 import { t, L } from '../i18n.js';
 import { shuffle, esc, wait, flash } from './kit.js';
 import { keyboard, typeLine } from './keyboard.js';
-import { gramPool } from './gram.js';
+import { gramPool, ruleBox } from './gram.js';
 
 export default function verbform(el, ctx) {
   // задания, где ответ совпадает со словом в скобках (They ___ (live) → live), путают: в печати их не даём
@@ -15,6 +15,7 @@ export default function verbform(el, ctx) {
   el.innerHTML = `<div class="typer gapper vform">
       <div class="sentence en"></div>
       <small class="vf-tr"></small>
+      <div class="vf-rule"></div>
       <div class="count"></div>
       <div class="kb"></div>
     </div>`;
@@ -28,6 +29,8 @@ export default function verbform(el, ctx) {
     const [a, b] = it.s.split('___');
     sent.innerHTML = `<p>${esc(a)}<span class="slots"></span>${esc(b)}</p><i class="vf-base">(${esc(it.base)})</i>`;
     el.querySelector('.vf-tr').textContent = L(it);
+    const rb = el.querySelector('.vf-rule');
+    if (rb.dataset.k !== it.kind) { rb.dataset.k = it.kind; rb.innerHTML = ruleBox(it.kind); }
     el.querySelector('.count').textContent = `${total - list.length} / ${total}`;
     const slots = sent.querySelector('.slots');
     line = typeLine(slots, it.a, {
