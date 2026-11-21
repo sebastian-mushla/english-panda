@@ -3,6 +3,7 @@ import { RIDDLES } from './words-i18n.js';
 import { THEMES2, RAW2, SENTENCES2 } from './words2.js';
 import { IRREGULAR, REGULAR, pastRegular } from './words3.js';
 import * as CZ3 from './words3cz.js';
+import * as CZ4 from './words4cz.js';
 import { HU, HU_SENT } from './hu.js';
 import { UK } from './uk.js';
 
@@ -231,6 +232,29 @@ if (TARGET === 'cz') {
   add('reg', { ru: 'Глаголы на -at', uk: 'Дієслова на -at', cz: 'Slovesa na -at', en: 'Verbs in -at' },
     CZ3.REGULAR.map(([v, ru, uk, e]) => [v, CZ3.pastRegular(v), CZ3.presentRegular(v), ru, uk, e]));
 }
+// Глава 4 «Зима · B2» — только для чешского: глаголы-пары видов, существительные с падежами, трудные буквы, se / si, официальная речь
+export const CH4_OPEN = TARGET === 'cz';
+if (CH4_OPEN) {
+  const add = (theme, name, list) => {
+    THEMES[theme] = name;
+    CHAPTER[theme] = 4;
+    BY_THEME[theme] = list.map((w) => {
+      Object.assign(w, { theme, cefr: 'B2', riddle: null, cz: w.t });
+      BY_TARGET[w.t.toLowerCase()] ||= w;
+      return (WORDS[w.en] = w);
+    });
+  };
+  add('aspect', { ru: 'Виды глагола', uk: 'Види дієслова', cz: 'Vid sloves', en: 'Verb aspect' },
+    CZ4.ASPECT.map(([a, b, ru, uk, emoji]) => ({ en: 'a:' + a, t: a, v2: b, ru, uk, emoji, ex: '___ → ' + b })));
+  add('nouns', { ru: 'Семь падежей', uk: 'Сім відмінків', cz: 'Sedm pádů', en: 'Seven cases' },
+    CZ4.NOUNS.map(([forms, ru, uk, emoji]) => ({ en: 'n:' + forms[0], t: forms[0], forms, ru, uk, emoji, ex: 'To je ___.' })));
+  add('spell', { ru: 'Буквы ř, ě, ů, ú', uk: 'Літери ř, ě, ů, ú', cz: 'Písmena ř, ě, ů, ú', en: 'Czech letters' },
+    CZ4.SPELL.map(([t, ru, uk, emoji]) => ({ en: 'sp:' + t, t, ru, uk, emoji, ex: '___' })));
+  add('refl', { ru: 'Возвратные se / si', uk: 'Зворотні se / si', cz: 'Zvratná slovesa', en: 'Reflexive verbs' },
+    CZ4.REFL.map(([t, ru, uk, emoji]) => ({ en: 'r:' + t, t, ru, uk, emoji, ex: '___' })));
+  add('office', { ru: 'Официальная речь', uk: 'Офіційне мовлення', cz: 'Úřední čeština', en: 'Formal Czech' },
+    CZ4.OFFICE.map(([t, ru, uk, emoji]) => ({ en: 'o:' + t, t, ru, uk, emoji, ex: 'To je ___.' })));
+}
 // Понятнее картинки: эмодзи, которые сами по себе не читались (банк, школа, «большой» = слон)
 const EMOJI = {
   goodbye: '👋🚪', 'good night': '🌙😴', 'thank you': '🎁🙏', sorry: '🙇', sunny: '🌞', warm: '🌡️🙂',
@@ -244,7 +268,7 @@ const VAGUE = new Set(['thank you', 'sorry', 'please', 'head', 'table', 'warm', 
   'bank', 'hospital', 'school', 'shop', 'market', 'park', 'road', 'family', 'baby', 'hair', 'cup', 'happy', 'sad', 'hot', 'cold']);
 for (const w of Object.values(WORDS)) {
   if (EMOJI[w.en]) w.emoji = EMOJI[w.en];
-  if (VAGUE.has(w.en) || w.en.startsWith('v:') || w.theme === 'verbs') w.vague = true;
+  if (VAGUE.has(w.en) || w.en.startsWith('v:') || ['verbs', 'aspect', 'refl', 'office'].includes(w.theme)) w.vague = true;
 }
 export const themesOf = (ch) => Object.keys(THEMES).filter((th) => CHAPTER[th] === ch);
 // Предложение темы: [на изучаемом языке, на родном]

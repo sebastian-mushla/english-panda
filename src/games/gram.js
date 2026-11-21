@@ -4,12 +4,13 @@ import { shuffle, esc } from './kit.js';
 import { t, L } from '../i18n.js';
 import { TARGET } from '../state.js';
 import { LESSONS } from '../learn/lessons.js';
+import * as CZ4 from '../learn/words4cz.js';
 import { CH3 } from '../learn/ch3.js';
 
 // Задания уровня: по виду грамматики (def.gram = 'past' | 'present|future' ...); экзамен — всё вперемешку
 export function gramPool(ctx) {
   const kinds = (ctx.def.gram || 'present|past|future|article|prep|compare').split('|');
-  return CH3.GRAMMAR.filter((g) => kinds.includes(g.kind));
+  return [...CH3.GRAMMAR, ...(TARGET === 'cz' ? CZ4.GRAMMAR : [])].filter((g) => kinds.includes(g.kind));
 }
 
 // Неверная, но правдоподобная форма

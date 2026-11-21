@@ -2,7 +2,7 @@
 // Перед «Печатью» всегда идёт «Каллиграфия»: сначала увидеть написание из готовых букв, потом печатать по памяти.
 // Позже: генератор глав A2–C2 из банка слов и тем грамматики (≈3000 уровней).
 import { state } from '../state.js';
-import { BY_THEME, WORDS, themesOf, CH3_OPEN } from './words.js';
+import { BY_THEME, WORDS, themesOf, CH3_OPEN, CH4_OPEN } from './words.js';
 import { dueWords } from './srs.js';
 
 export const LEVELS = [
@@ -39,11 +39,23 @@ export const LEVELS = [
   { n: 28, ch: 3, theme: 'reg', gram: 'past|present', stages: ['email', 'chat', 'duel'], mob: 'inkbrush' },
   { n: 29, ch: 3, theme: 'irr1', gram: 'future|past', stages: ['chat', 'longsent', 'maze', 'duel'], mob: 'lanternfox' },
   { n: 30, ch: 3, theme: 'gate', stages: ['b1test', 'irregular', 'longsent', 'email', 'duel'], mob: 'qilin', exam: true },
+  // Глава 4 «Зима · B2» — только для чешского: механики самого языка
+  { n: 31, ch: 4, theme: 'aspect', gram: 'aspect', stages: ['aspect', 'maze', 'duel'], mob: 'snowhare' },
+  { n: 32, ch: 4, theme: 'nouns', gram: 'cases', stages: ['cases', 'verbform', 'duel'], mob: 'icecarp' },
+  { n: 33, ch: 4, theme: 'spell', gram: 'spell', stages: ['diacritics', 'spell', 'duel'], mob: 'frostbrush' },
+  { n: 34, ch: 4, theme: 'refl', gram: 'refl', stages: ['sesi', 'sokoban', 'duel'], mob: 'mirrorcat' },
+  { n: 35, ch: 4, theme: 'office', gram: 'tyvy', stages: ['tyvy', 'email', 'duel'], mob: 'sealclerk' },
+  { n: 36, ch: 4, theme: 'aspect', gram: 'aspect', stages: ['aspect', 'longsent', 'duel'], mob: 'yeti' },
+  { n: 37, ch: 4, theme: 'nouns', gram: 'cases', stages: ['cases', 'sokoban', 'duel'], mob: 'snowlion' },
+  { n: 38, ch: 4, theme: 'spell', gram: 'spell', stages: ['diacritics', 'crossword', 'duel'], mob: 'icicle' },
+  { n: 39, ch: 4, theme: 'office', gram: 'tyvy|refl', stages: ['tyvy', 'sesi', 'chat', 'duel'], mob: 'teacrane' },
+  { n: 40, ch: 4, theme: 'gate', stages: ['cases', 'aspect', 'diacritics', 'tyvy', 'sesi', 'duel'], mob: 'icedragon', exam: true },
 ];
 export const CHAPTERS = {
   1: { season: 'spring', cefr: 'A1', name: { ru: 'Весна', cz: 'Jaro' } },
   2: { season: 'summer', cefr: 'A2', name: { ru: 'Лето', cz: 'Léto' } },
   3: { season: 'autumn', cefr: 'B1', name: { ru: 'Осень', cz: 'Podzim' } },
+  4: { season: 'winter', cefr: 'B2', name: { ru: 'Зима', uk: 'Зима', cz: 'Zima' } },
 };
 
 export const levelDef = (n) => LEVELS[n - 1];
@@ -58,6 +70,7 @@ export function levelWords(def) {
 
 export function isUnlocked(n) {
   if (levelDef(n)?.ch === 3 && !CH3_OPEN) return false; // глава 3 — только для английского и чешского
+  if (levelDef(n)?.ch === 4 && !CH4_OPEN) return false; // глава 4 — пока только для чешского
   return n === 1 || !!state.levels[n - 1]?.stars?.[0];
 }
 

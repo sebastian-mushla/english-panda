@@ -534,3 +534,27 @@
 .vtable th { text-align: left; font-size: .7rem; opacity: .7; padding: 0 6px 4px; }
 .vtable td { padding: 4px 6px; border-top: 1px solid rgba(58,42,24,.15); }
 .vtable .vt-m { font-size: .8rem; opacity: .8; }
+/* глава 4: падежное колесо, пары видов, háčky a čárky, se / si, ты → Вы */
+.cwheel { gap: 10px; }
+.cw-head { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; }
+.cw-head small { font-size: .85rem; opacity: .8; }
+.cw-rows { display: grid; gap: 4px; width: 100%; max-width: 520px; }
+.cw-row { display: grid; grid-template-columns: 22px 88px 1fr; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 10px; background: rgba(246,236,212,.12); font-size: .95rem; }
+.cw-row i { font-style: normal; font-weight: 800; opacity: .7; } .cw-row small { font-size: .7rem; opacity: .75; }
+.cw-row.known { opacity: .6; } .cw-row.active { background: var(--paper, #f6ecd4); color: #3a2a18; opacity: 1; } .cw-row.ok { background: rgba(80,160,90,.35); opacity: 1; }
+.cw-row .slots { display: inline-flex; vertical-align: middle; }
+.aspect, .diacr, .sesi { width: min(560px, 100%); display: grid; gap: 14px; justify-items: center; }
+.as-title { font-weight: 800; text-align: center; margin: 0; }
+.as-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+.as-l, .as-r { display: grid; gap: 8px; }
+.aspect .dl-opt.sel { outline: 3px solid #f2c14e; }
+.dc-card { display: grid; justify-items: center; gap: 4px; } .dc-card .emo { font-size: 3rem; }
+.dc-word { font-size: 2.6rem; font-weight: 800; letter-spacing: .06em; margin: 0; }
+.dc-gap { text-decoration: none; display: inline-block; min-width: .8em; border-bottom: 4px solid #f2c14e; color: #f2c14e; }
+.dc-ok { color: #8fd49a; }
+.dc-opts, .ss-opts { display: flex; gap: 12px; } .dc-opts .dl-opt, .ss-opts .dl-opt { font-size: 1.8rem; min-width: 72px; }
+.ty-pair { display: grid; gap: 8px; width: min(520px, 100%); }
+.ty-pair .msg { padding: 10px 14px; border-radius: 14px; } .ty-pair .msg p { margin: 2px 0 0; font-size: 1.15rem; font-weight: 700; }
+.ty-pair .msg.npc { background: rgba(246,236,212,.15); } .ty-pair .msg.me { background: var(--paper, #f6ecd4); color: #3a2a18; }
+.ty-pair .slots { display: inline-flex; vertical-align: middle; }
+@media (max-height: 860px) { .cw-row { padding: 2px 8px; font-size: .85rem; } .cw-head { font-size: 1.1rem; } }

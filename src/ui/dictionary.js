@@ -7,7 +7,7 @@ import { board } from './modal.js';
 import { sfx, speakWord, canSpeak } from '../audio.js';
 import { IPA, RU_STRESS } from '../learn/phonetics.js';
 import { TARGET } from '../state.js';
-import { esc, fillEx } from '../games/kit.js';
+import { esc, fillEx, meaning } from '../games/kit.js';
 
 // Транскрипция: английский — IPA, русский — ударение, чешский — ударение на первом слоге
 function phon(w) {

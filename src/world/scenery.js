@@ -2,7 +2,7 @@
 // размытие дальнего и переднего плана. Цвета сезона приходят из CSS-переменных.
 // Мелкие одинаковые детали (листья, трава, цветы) собираются в один <path> на цвет, чтобы DOM был лёгким.
 // Каждый источник света кладёт свечение в отдельный слой света (lights) с тем же параллаксом.
-import { W, H, lx, groundY, bridgeY, RIVER, TEA, LAKE, FERRY, CH3_X, FOG_X } from './geo.js';
+import { W, H, lx, groundY, bridgeY, RIVER, TEA, LAKE, FERRY, ICE, CH3_X, CH4_X, FOG_X } from './geo.js';
 import { pandaG, PANDA_DEFS } from './panda.js';
 
 const P = (n) => Math.round(n * 10) / 10;
@@ -332,7 +332,7 @@ function layerMid(r, lights) {
     ink.add('leafA', ell(cx, cy, rx * 0.85, ry * 0.85));
     ink.add('leafC', ell(cx - rx * 0.3, cy - ry * 0.4, rx * 0.35, ry * 0.3));
   }
-  s += midSummer(f, r, ink, lights) + midAutumn(f, r, ink, lights);
+  s += midSummer(f, r, ink, lights) + midAutumn(f, r, ink, lights) + midWinter(f, r, ink, lights);
   s += ink.out();
   s += `<rect x="0" y="830" width="${w}" height="130" fill="url(#gMist)" opacity=".3"/>`;
   return { f, w, svg: s };
@@ -489,7 +489,8 @@ function layerGround(r, lights) {
   s += gate(6760, groundY(6760) + 4, lights);
   s += groundSummer(r, ink, lights);
   s += groundAutumn(r, ink, lights);
-  // зима в тумане
+  s += groundWinter(r, ink, lights);
+  // туман следующей главы: бледные заснеженные ели
   for (let x = FOG_X + 50; x < w; x += 110 + r() * 90) {
     const cy = groundY(x) - 160, rx = 70 + r() * 40, ry = 140 + r() * 50;
     s += `<rect fill="url(#gTrunk)" x="${P(x - 8)}" y="${P(groundY(x) - 60)}" width="16" height="80"/>`;
@@ -697,7 +698,7 @@ function midAutumn(f, r, ink, lights) {
   s += house(h, 480, 0.75, lights, ink, { floors: 3, deck: 30 });
   for (let i = 0; i < 8; i++) ink.add('autumn', circ(h - 320 + r() * 640, 600 + r() * 300, 18 + r() * 14));
   // осенние деревья вдоль главы
-  for (let x = lx(15900, f); x < lx(FOG_X, f); x += 170 + r() * 200) {
+  for (let x = lx(15900, f); x < lx(CH4_X, f); x += 170 + r() * 200) {
     if (x > a - 40 && x < b + 40) continue;
     const cy = 760 + r() * 60, rx = 60 + r() * 40, ry = 90 + r() * 50;
     s += `<rect fill="url(#gTrunk)" x="${P(x - 6)}" y="800" width="12" height="140"/>`;
@@ -741,6 +742,64 @@ function groundAutumn(r, ink, lights) {
   for (const x of [18900, 20200]) s += stoneLantern(x, groundY(x) - 2, lights);
   // Врата осени
   s += gate(20650, groundY(20650) + 4, lights, '秋');
+  return s;
+}
+
+// Ель в снегу: тёмная крона и белые шапки на ярусах
+function snowPine(x, base, s, ink) {
+  let g = `<rect fill="url(#gTrunk)" x="${P(x - 6 * s)}" y="${P(base - 40 * s)}" width="${P(12 * s)}" height="${P(44 * s)}"/>`;
+  for (let i = 0; i < 4; i++) {
+    const y = base - 30 * s - i * 46 * s, hw = (70 - i * 14) * s, h = 70 * s;
+    ink.add('wpine', `M${P(x - hw)},${P(y)} L${P(x)},${P(y - h)} L${P(x + hw)},${P(y)}Z`);
+    ink.add('wsnow', `M${P(x - hw * 0.55)},${P(y - h * 0.45)} L${P(x)},${P(y - h)} L${P(x + hw * 0.55)},${P(y - h * 0.45)} Q${P(x)},${P(y - h * 0.62)} ${P(x - hw * 0.55)},${P(y - h * 0.45)}Z`);
+  }
+  return g;
+}
+
+function midWinter(f, r, ink, lights) {
+  let s = '';
+  // заснеженный бор вдали
+  for (let x = lx(21000, f); x < lx(22700, f); x += 70 + r() * 90) s += snowPine(x, 900, 0.8 + r() * 0.5, ink);
+  // ледяное озеро
+  const a = lx(ICE.x0, f), b = lx(ICE.x1 + 150, f);
+  s += `<rect fill="#cfe6f0" x="${P(a)}" y="790" width="${P(b - a)}" height="150"/>`;
+  for (let i = 0; i < 10; i++) ink.add('shine', `M${P(a + 30 + r() * (b - a - 100))},${P(800 + r() * 120)}h${P(40 + r() * 80)}`);
+  // праздник фонарей: дома второго ряда
+  s += house(lx(24500, f), 860, 0.5, lights, ink) + house(lx(25200, f), 860, 0.55, lights, ink, { floors: 2 });
+  // гора отшельника с пагодой
+  const h = lx(26300, f);
+  const hill = `M${P(h - 420)},940 Q${P(h - 280)},520 ${P(h - 60)},430 L${P(h + 60)},430 Q${P(h + 280)},520 ${P(h + 420)},940Z`;
+  s += `<path d="${hill}" fill="url(#gCliff)"/><path d="${hill}" fill="#fff" opacity=".35"/>`;
+  s += pagoda(h, 440, 0.8, lights, 4);
+  for (let x = lx(25600, f); x < lx(FOG_X, f); x += 120 + r() * 160) if (Math.abs(x - h) > 420) s += snowPine(x, 900, 0.7 + r() * 0.4, ink);
+  return s;
+}
+
+function groundWinter(r, ink, lights) {
+  let s = '';
+  // снежный бор
+  for (let x = CH4_X + 60; x < 22650; x += 140 + r() * 120) s += snowPine(x, groundY(x) + 4, 1 + r() * 0.5, ink);
+  s += decoPanda(21800, groundY(21800) - 4, 0.8, { hat: 'fox', robe: 'red', item: 'lantern' }) + stoneLantern(22300, groundY(22300) - 2, lights);
+  // ледяное озеро перед тропой, панда на коньках
+  const { x0, x1 } = ICE;
+  let d = `M${x0},1000 `;
+  for (let x = x0; x <= x1; x += 20) d += `L${x},${P(groundY(x) + 30)} `;
+  s += `<path fill="#d6eef6" d="${d}L${x1},1000Z"/>`;
+  for (let i = 0; i < 18; i++) { const x = x0 + 40 + r() * (x1 - x0 - 80); ink.add('shine', `M${P(x)},${P(groundY(x) + 60 + r() * 100)}l${P(30 + r() * 50)},-6`); }
+  s += decoPanda(23300, groundY(23300) + 40, 0.7, { hat: 'band', robe: 'night' }, true);
+  // праздник фонарей: дома, гирлянды, фонари на шестах
+  s += house(24400, groundY(24400) + 6, 0.95, lights, ink, { sign: '福' }) + house(25150, groundY(25150) + 6, 1.05, lights, ink, { floors: 2, sign: '冬' });
+  s += lanternString(24150, 24750, 440, 28, 6, lights) + lanternString(24800, 25500, 430, 30, 6, lights);
+  for (const x of [24200, 24800, 25500]) s += `<rect fill="url(#gTrunk)" x="${x - 4}" y="${P(groundY(x) - 240)}" width="8" height="240"/>` + lantern(x, groundY(x) - 250, 1, lights, true);
+  s += decoPanda(24650, groundY(24650) - 4, 0.8, { hat: 'lotus', robe: 'gold', item: 'fan' }) + decoPanda(25350, groundY(25350) - 4, 0.75, { hat: 'straw', robe: 'red', item: 'lantern' }, true);
+  // хижина отшельника и ели
+  s += house(26350, groundY(26350) + 6, 0.85, lights, ink, { sign: '禅' });
+  for (const x of [25700, 25980, 26750]) s += snowPine(x, groundY(x) + 4, 1.2, ink);
+  s += decoPanda(26600, groundY(26600) - 4, 0.8, { hat: 'scholar', robe: 'monk', item: 'staff' }, true) + stoneLantern(26150, groundY(26150) - 2, lights);
+  // снег на земле всей главы
+  for (let x = CH4_X; x < FOG_X; x += 24 + r() * 30) if (x < x0 - 20 || x > x1 + 20) ink.add('wsnow', ell(x, groundY(x) + 6, 30 + r() * 30, 7 + r() * 4));
+  // Врата зимы
+  s += gate(27350, groundY(27350) + 4, lights, '冬');
   return s;
 }
 

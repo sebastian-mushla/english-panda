@@ -20,7 +20,8 @@ const GAMES = {
   crossword: () => import('../games/crossword.js'), dialog: () => import('../games/dialog.js'), truefalse: () => import('../games/truefalse.js'),
   lantern: () => import('../games/lantern.js'), chain: () => import('../games/chain.js'),
   maze: () => import('../games/maze.js'), letters: () => import('../games/letters.js'), sokoban: () => import('../games/sokoban.js'),
-  rule: () => import('../games/rule.js'), verbform: () => import('../games/verbform.js'), irregular: () => import('../games/irregular.js'), longsent: () => import('../games/longsent.js'),
+  rule: () => import('../games/rule.js'), cases: () => import('../games/cases.js'), aspect: () => import('../games/aspect.js'),
+  diacritics: () => import('../games/diacritics.js'), sesi: () => import('../games/sesi.js'), tyvy: () => import('../games/tyvy.js'), verbform: () => import('../games/verbform.js'), irregular: () => import('../games/irregular.js'), longsent: () => import('../games/longsent.js'),
   email: () => import('../games/email.js'), chat: () => import('../games/chat.js'), b1test: () => import('../games/b1test.js'),
 };
 
@@ -30,7 +31,7 @@ export function runPlay(play, { onExit, onNext }) {
   const { def } = play;
   const stages = def.exam || def.review ? [...def.stages] : ['intro', ...def.stages];
   // перед играми на формы слова сначала урок: игра не должна требовать того, чему ещё не учили
-  if (!def.exam && !def.review && def.gram && stages.some((g) => ['verbform', 'maze', 'sokoban', 'irregular', 'letters'].includes(g))) stages.splice(1, 0, 'rule');
+  if (!def.exam && !def.review && def.gram && stages.some((g) => ['verbform', 'maze', 'sokoban', 'irregular', 'letters', 'cases', 'aspect', 'diacritics', 'sesi', 'tyvy'].includes(g))) stages.splice(1, 0, 'rule');
   const session = newSession();
   const pool = [...play.words, ...play.review];
   let si = 0, mistakes = 0, hints = 0, mounted = null, hintKey = null, hintFn = null, stageWrong = new Set();

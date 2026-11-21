@@ -27,7 +27,17 @@ const KEYS = [
   { x: 18900, name: 'golden', sky: ['#e09a5a', '#f2c07e', '#f4dcae'], tint: [255, 150, 60, 0.2], glow: 0.45, stars: 0, rays: 0.95, sun: [0.74, 0.36] },
   { x: 19900, name: 'sunset', sky: ['#8c3a52', '#e0663e', '#f2a85a'], tint: [210, 70, 50, 0.28], glow: 0.85, stars: 0.2, rays: 0.55, sun: [0.87, 0.74] },
   { x: 20800, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.5], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
-  { x: 22200, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.52], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
+  // Глава 4 «Зима»: морозный рассвет, белый день, ранний вечер с фонарями
+  { x: 21300, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.5], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
+  { x: 21900, name: 'dawn', sky: ['#d8a8c0', '#ecd0dc', '#e4eef6'], tint: [220, 170, 200, 0.14], glow: 0.35, stars: 0.1, rays: 0.8, sun: [0.12, 0.62] },
+  { x: 23000, name: 'day', sky: ['#9cc8e4', '#d4e8f4', '#f4f8fc'], tint: [220, 235, 255, 0.06], glow: 0.08, stars: 0, rays: 0.5, sun: [0.38, 0.18] },
+  { x: 24000, name: 'golden', sky: ['#d8a080', '#f0c8a8', '#f4e4d8'], tint: [255, 180, 140, 0.14], glow: 0.4, stars: 0, rays: 0.8, sun: [0.7, 0.4] },
+  { x: 24700, name: 'sunset', sky: ['#5a3a6a', '#b0607a', '#e8a090'], tint: [150, 70, 110, 0.26], glow: 0.9, stars: 0.3, rays: 0.4, sun: [0.88, 0.78] },
+  { x: 25600, name: 'night', sky: ['#0b1430', '#1b2b55', '#334a7c'], tint: [12, 22, 64, 0.48], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
+  { x: 26400, name: 'dawn', sky: ['#c8b0d0', '#e6d4e0', '#eef2f8'], tint: [210, 180, 220, 0.12], glow: 0.3, stars: 0.1, rays: 0.7, sun: [0.15, 0.6] },
+  { x: 27000, name: 'day', sky: ['#a4cce6', '#d8eaf6', '#f6f9fc'], tint: [220, 235, 255, 0.05], glow: 0.08, stars: 0, rays: 0.5, sun: [0.4, 0.2] },
+  { x: 27600, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.5], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
+  { x: 28900, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.52], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
 ];
 
 // Реальное время суток → ближайший ключ
