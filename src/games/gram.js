@@ -5,13 +5,13 @@ import { t, L } from '../i18n.js';
 import { TARGET } from '../state.js';
 import { LESSONS } from '../learn/lessons.js';
 import * as CZ4 from '../learn/words4cz.js';
-import * as ENA1 from '../learn/en_a1.js';
+import { TOPIC_GRAMMAR } from '../learn/curriculum.js';
 import { CH3 } from '../learn/ch3.js';
 
 // Задания уровня: по виду грамматики (def.gram = 'past' | 'present|future' ...); экзамен — всё вперемешку
 export function gramPool(ctx) {
   const kinds = (ctx.def.gram || 'present|past|future|article|prep|compare').split('|');
-  return [...CH3.GRAMMAR, ...(TARGET === 'cz' ? CZ4.GRAMMAR : []), ...(TARGET === 'en' ? ENA1.GRAMMAR : [])].filter((g) => kinds.includes(g.kind));
+  return [...CH3.GRAMMAR, ...(TARGET === 'cz' ? CZ4.GRAMMAR : []), ...TOPIC_GRAMMAR].filter((g) => kinds.includes(g.kind));
 }
 
 // Неверная, но правдоподобная форма

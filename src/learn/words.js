@@ -232,9 +232,10 @@ if (TARGET === 'cz') {
   add('reg', { ru: 'Глаголы на -at', uk: 'Дієслова на -at', cz: 'Slovesa na -at', en: 'Verbs in -at' },
     CZ3.REGULAR.map(([v, ru, uk, e]) => [v, CZ3.pastRegular(v), CZ3.presentRegular(v), ru, uk, e]));
 }
-// Глава 4 «Зима · B2» — только для чешского: глаголы-пары видов, существительные с падежами, трудные буквы, se / si, официальная речь
-export const CH4_OPEN = TARGET === 'cz';
-if (CH4_OPEN) {
+// Глава 4 «Зима · B2»: у английского — темы грамматики B2; у чешского ещё и слова:
+// глаголы-пары видов, существительные с падежами, трудные буквы, se / si, официальная речь
+export const CH4_OPEN = TARGET === 'cz' || TARGET === 'en';
+if (TARGET === 'cz') {
   const add = (theme, name, list) => {
     THEMES[theme] = name;
     CHAPTER[theme] = 4;

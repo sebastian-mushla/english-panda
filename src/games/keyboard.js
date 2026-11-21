@@ -40,9 +40,11 @@ export function keyboard(el, onKey) {
 export function typeLine(el, word, { onRight, onWrong, onDone }) {
   const letters = [...word];
   let pos = 0;
-  el.innerHTML = letters.map((c) => (c === ' ' ? '<i class="gap"></i>' : '<i class="slot"></i>')).join('');
+  // пробел — промежуток, апостроф, дефис и точка вписаны заранее: их нет на клавиатуре
+  const auto = (c) => c !== undefined && !/[\p{L}\d]/u.test(c);
+  el.innerHTML = letters.map((c) => (c === ' ' ? '<i class="gap"></i>' : auto(c) ? `<i class="slot filled">${c}</i>` : '<i class="slot"></i>')).join('');
   el.style.setProperty('--n', letters.length);
-  const skip = () => { while (letters[pos] === ' ') pos++; };
+  const skip = () => { while (auto(letters[pos])) pos++; };
   skip();
   const put = () => {
     const s = el.children[pos];

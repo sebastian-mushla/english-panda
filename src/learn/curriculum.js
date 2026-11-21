@@ -1,11 +1,18 @@
 // Программа обучения: камни на карте = темы. Словарная тема — уровень с мини-играми и дуэлью.
 // Тема грамматики — «Правило» → узнавание → печать → «Найди ошибку» → проверка (80 %).
 // Большая тема — вход в место (дом, пещера, гора…): внутри свои камни-фазы, каждая со своей проверкой.
-import { state, TARGET } from '../state.js';
+import { state, TARGET, save } from '../state.js';
 import { BY_THEME, WORDS, themesOf, CH3_OPEN, CH4_OPEN } from './words.js';
 import { dueWords } from './srs.js';
 import { LESSONS } from './lessons.js';
 import { GRAMMAR as EN_A1 } from './en_a1.js';
+import { GRAMMAR as EN_A2 } from './en_a2.js';
+import { GRAMMAR as EN_B1 } from './en_b1.js';
+import { GRAMMAR as EN_B2 } from './en_b2.js';
+import { GRAMMAR as CZ_AB } from './cz_ab.js';
+
+// Задания тем грамматики изучаемого языка (для английского A1–B2, для чешского A1–B1)
+export const TOPIC_GRAMMAR = TARGET === 'en' ? [...EN_A1, ...EN_A2, ...EN_B1, ...EN_B2] : TARGET === 'cz' ? CZ_AB : [];
 
 // Старые уровни-образцы: словарные темы берут отсюда игры и духа
 const LEGACY = [
@@ -55,32 +62,41 @@ const LEGACY = [
   { n: 40, ch: 4, theme: 'gate', stages: ['cases', 'aspect', 'diacritics', 'tyvy', 'sesi', 'duel'], mob: 'icedragon', exam: true },
 ];
 
-// Грамматика главы 1 для английского: { g: id, kinds | phases, place, mob }
-const EN_CH1 = [
-  { v: 'greet' },
-  { g: 'be', place: 'house', phases: [['be'], ['beneg']], mob: 'g_be' },
-  { v: 'numbers' },
-  { g: 'possess', kinds: ['pronouns', 'possess'], mob: 'g_poss' },
-  { v: 'colors' },
-  { g: 'plural', kinds: ['plural'], mob: 'g_plural' },
-  { v: 'family' },
-  { g: 'havegot', kinds: ['havegot'], mob: 'g_have' },
-  { v: 'animals' },
-  { g: 'thereis', kinds: ['thereis'], mob: 'g_there' },
-  { v: 'food' },
-  { g: 'can', kinds: ['can'], mob: 'g_can' },
-  { v: 'body' },
-  { g: 'ps', place: 'cave', phases: [['psA'], ['psS'], ['psNeg'], ['psQ']], mob: 'g_ps' },
-  { v: 'nature' },
-  { g: 'prepPlace', kinds: ['prepPlace'], mob: 'g_prep' },
-  { v: 'home' },
-  { g: 'wh', kinds: ['wh'], mob: 'g_wh' },
-];
+// Программы по главам: { L: номер старого уровня } — словарная тема или старая игра,
+// { g, kinds, mob } — тема грамматики, { g, place, phases, mob } — большая тема-место с фазами,
+// { exam: [виды] } — экзамен главы из тем грамматики. Глава без программы берёт старые уровни.
+const T_ = (g, kinds, mob) => ({ g, kinds, mob });
+const P_ = (g, place, phases, mob) => ({ g, place, phases, mob });
+const PROGRAM = {
+  en: {
+    1: [{ L: 1 }, P_('be', 'house', [['be'], ['beneg']], 'g_be'), { L: 2 }, T_('possess', ['pronouns', 'possess'], 'g_poss'), { L: 3 }, T_('plural', ['plural'], 'g_plural'),
+      { L: 4 }, T_('havegot', ['havegot'], 'g_have'), { L: 5 }, T_('thereis', ['thereis'], 'g_there'), { L: 6 }, T_('can', ['can'], 'g_can'),
+      { L: 7 }, P_('ps', 'cave', [['psA'], ['psS'], ['psNeg'], ['psQ']], 'g_ps'), { L: 8 }, T_('prepPlace', ['prepPlace'], 'g_prep'), { L: 9 }, T_('wh', ['wh'], 'g_wh'), { L: 10 }],
+    2: [{ L: 11 }, P_('pc', 'fountain', [['pc'], ['pcVs']], 'g_pc'), { L: 12 }, T_('was', ['wasWere'], 'g_was'), { L: 13 }, P_('past', 'mountain', [['pastReg'], ['pastIrr'], ['pastNQ']], 'g_past'),
+      { L: 14 }, T_('quant', ['quant'], 'g_quant'), { L: 15 }, T_('cmp', ['cmp'], 'g_cmp'), { L: 16 }, T_('fut', ['fut'], 'g_fut'),
+      { L: 17 }, T_('modal', ['modal'], 'g_modal'), { L: 18 }, T_('adv', ['adv'], 'g_adv'), { L: 19 }, T_('obj', ['objPron'], 'g_obj'), { L: 20 }],
+    3: [{ L: 23 }, P_('pp', 'temple', [['pp'], ['ppEver'], ['ppFor'], ['ppVsPast']], 'g_pp'), T_('pastCont', ['pastCont'], 'g_pcont'), { L: 24 }, T_('usedTo', ['usedTo'], 'g_used'),
+      P_('cond', 'library', [['cond1'], ['cond2']], 'g_cond'), T_('passive', ['passive'], 'g_pass'), T_('relative', ['relative'], 'g_rel'), { L: 28 },
+      T_('gerInf', ['gerInf'], 'g_ger'), T_('phrasal1', ['phrasal1'], 'g_phr1'), T_('linkers1', ['linkers1'], 'g_link1'), { L: 30 }],
+    4: [P_('time', 'mountain', [['ppc'], ['pastPerf'], ['futCont']], 'g_time'), T_('deduct', ['deduct'], 'g_deduct'), P_('cond3', 'library', [['cond3'], ['mixed'], ['wish']], 'g_cond3'),
+      T_('passive2', ['passive2'], 'g_pass2'), P_('rep', 'house', [['repS'], ['repQ'], ['repC']], 'g_rep'), T_('rel2', ['rel2'], 'g_rel2'),
+      T_('phrasal2', ['phrasal2'], 'g_phr2'), T_('linkers2', ['linkers2'], 'g_link2'), T_('tags', ['tags'], 'g_tags'),
+      { exam: ['ppc', 'pastPerf', 'futCont', 'deduct', 'cond3', 'mixed', 'wish', 'passive2', 'repS', 'repQ', 'repC', 'rel2', 'phrasal2', 'linkers2', 'tags'], mob: 'icedragon' }],
+  },
+  cz: {
+    1: [{ L: 1 }, P_('cz_byt', 'house', [['cz_byt'], ['cz_mit']], 'g_cz_byt'), { L: 2 }, T_('cz_rod', ['cz_rod'], 'g_cz_rod'), { L: 3 }, T_('cz_konj', ['cz_konj'], 'g_cz_konj'),
+      { L: 4 }, T_('cz_priv', ['cz_priv'], 'g_cz_priv'), { L: 5 }, T_('cz_akuz', ['cz_akuz'], 'g_cz_akuz'), { L: 6 }, T_('cz_neg', ['cz_neg'], 'g_cz_neg'), { L: 7 }, { L: 8 }, { L: 9 }, { L: 10 }],
+    2: [{ L: 11 }, P_('cz_time', 'mountain', [['cz_minuly'], ['cz_budouci']], 'g_cz_time'), { L: 12 }, T_('cz_lokal', ['cz_lokal'], 'g_cz_lokal'), { L: 13 }, T_('cz_plural', ['cz_plural'], 'g_cz_plural'),
+      { L: 14 }, T_('cz_adj', ['cz_adj'], 'g_cz_adj'), { L: 15 }, T_('cz_imper', ['cz_imper'], 'g_cz_imper'), { L: 16 }, T_('cz_pohyb', ['cz_pohyb'], 'g_cz_pohyb'), { L: 17 }, { L: 18 }, { L: 19 }, { L: 20 }],
+    3: [{ L: 21 }, { L: 22 }, P_('cz_modal', 'library', [['cz_modal'], ['cz_kdyby']], 'g_cz_modal'), { L: 23 }, { L: 24 }, T_('cz_cmp', ['cz_cmp'], 'g_cz_cmp'), { L: 25 }, { L: 26 }, { L: 27 }, { L: 28 }, { L: 29 }, { L: 30 }],
+  },
+};
+const EXAM_TITLE = { ru: 'Экзамен главы', uk: 'Іспит розділу', cz: 'Zkouška kapitoly' };
 
 // Этапы одной фазы грамматики: правило → узнавание → печать (если форма меняется) → найди ошибку → проверка
 export function grammarStages(kinds, i = 0) {
   // печатать имеет смысл, только если форма в ответе отличается от слова в скобках
-  const changed = EN_A1.filter((g) => kinds.includes(g.kind) && g.a.toLowerCase() !== g.base.toLowerCase()).length >= 4;
+  const changed = TOPIC_GRAMMAR.filter((g) => kinds.includes(g.kind) && g.a.toLowerCase() !== g.base.toLowerCase()).length >= 4;
   const recog = i % 2 ? 'sokoban' : 'maze';
   return ['rule', recog, changed ? 'verbform' : (recog === 'maze' ? 'sokoban' : 'maze'), 'errorspot', 'check'];
 }
@@ -88,20 +104,29 @@ export function grammarStages(kinds, i = 0) {
 function buildLevels() {
   const out = [];
   const push = (d) => out.push({ ...d, n: out.length + 1 });
-  const legacy = (ch) => LEGACY.filter((l) => l.ch === ch);
   for (const ch of [1, 2, 3, 4]) {
-    if (ch === 1 && TARGET === 'en') {
-      for (const it of EN_CH1) {
-        if (it.v) { const l = LEGACY.find((x) => x.theme === it.v); push({ ...l }); continue; }
-        if (it.place) push({ ch, topic: it.g, place: it.place, mob: it.mob, built: true, phases: it.phases.map((k, i) => ({ gram: k.join('|'), stages: grammarStages(k, i) })) });
-        else push({ ch, topic: it.g, gram: it.kinds.join('|'), mob: it.mob, built: true, stages: grammarStages(it.kinds) });
-      }
-      push({ ...legacy(1).find((l) => l.exam) });
-    } else for (const l of legacy(ch)) push({ ...l });
+    const prog = PROGRAM[TARGET]?.[ch];
+    if (!prog) { for (const l of LEGACY.filter((x) => x.ch === ch)) push({ ...l }); continue; }
+    for (const it of prog) {
+      if (it.L) push({ ...LEGACY[it.L - 1] });
+      else if (it.exam) push({ ch, theme: 'gate', exam: true, built: true, gram: it.exam.join('|'), title: EXAM_TITLE, mob: it.mob, stages: ['errorspot', 'check'] });
+      else if (it.place) push({ ch, topic: it.g, place: it.place, mob: it.mob, built: true, phases: it.phases.map((k, i) => ({ gram: k.join('|'), stages: grammarStages(k, i) })) });
+      else push({ ch, topic: it.g, gram: it.kinds.join('|'), mob: it.mob, built: true, stages: grammarStages(it.kinds) });
+    }
   }
   return out;
 }
 export const LEVELS = buildLevels();
+
+// Переход на программу до B2: номера уровней сдвинулись (у английского после главы 1, у чешского везде),
+// поэтому сдвинутый прогресс сбрасываем, а пойманные духи и слова остаются
+if (state.prog !== 3 && (TARGET === 'en' || TARGET === 'cz')) {
+  const from = TARGET === 'en' ? 20 : 2;
+  for (const k of Object.keys(state.levels || {})) if (+k >= from) delete state.levels[k];
+  for (const k of Object.keys(state.phases || {})) if (+k.split(':')[0] >= from) delete state.phases[k];
+  state.prog = 3;
+  save();
+}
 // Номер экзамена каждой главы (для тумана и свитков)
 export const EXAM_N = Object.fromEntries(LEVELS.filter((l) => l.exam).map((l) => [l.ch, l.n]));
 

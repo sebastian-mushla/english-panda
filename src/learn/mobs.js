@@ -297,4 +297,13 @@ Object.assign(MOBS, {
   g_wh: em('🦉', '#5a4a8a', 'Сова-почемучка', 'Сова-чомучка', 'Sova zvědavka', 'What? Where? Why? Задаёт вопросы до самого утра.', 'What? Where? Why? Ставить питання до самого ранку.', 'What? Where? Why? Ptá se až do rána.'),
 });
 
+// Духи тем A2–B2 и чешской грамматики: эмодзи на цветном круге, общий текст
+import { MOBS as M_A2 } from './en_a2.js';
+import { MOBS as M_B1 } from './en_b1.js';
+import { MOBS as M_B2 } from './en_b2.js';
+import { MOBS as M_CZ } from './cz_ab.js';
+for (const [id, e, c, ru, uk, cz] of [...M_A2, ...M_B1, ...M_B2, ...M_CZ]) {
+  MOBS[id] = em(e, c, ru, uk, cz || ru, 'Хранитель темы. Отпустит, только если ты знаешь правило.', 'Хранитель теми. Відпустить, лише якщо ти знаєш правило.', 'Strážce tématu. Pustí tě, jen když znáš pravidlo.');
+}
+
 export const mobSVG = (id, cls = '') => `<svg class="mob ${cls}" viewBox="0 0 100 100" aria-hidden="true">${MOBS[id].svg}</svg>`;

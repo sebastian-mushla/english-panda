@@ -1,0 +1,253 @@
+// Английский A2: грамматика по темам. Формат заданий и уроков — как в en_a1.js.
+const G = (kind, rows) => rows.map(([s, base, a, w, ru, uk, cz]) => ({ kind, s, base, a, w, ru, uk, cz }));
+const T = (ru, uk, cz) => ({ ru, uk, cz });
+
+export const GRAMMAR = [
+  ...G('pc', [
+    ['I ___ a book now.', 'read', 'am reading', ['read', 'is reading'], 'Я сейчас читаю книгу.', 'Я зараз читаю книжку.', 'Teď čtu knihu.'],
+    ['She ___ TV at the moment.', 'watch', 'is watching', ['watches', 'are watching'], 'Она сейчас смотрит телевизор.', 'Вона зараз дивиться телевізор.', 'Právě se dívá na televizi.'],
+    ['They ___ football in the park.', 'play', 'are playing', ['is playing', 'plays'], 'Они играют в футбол в парке.', 'Вони грають у футбол у парку.', 'Hrají fotbal v parku.'],
+    ['Look! It ___.', 'rain', 'is raining', ['rains', 'are raining'], 'Смотри! Идёт дождь.', 'Дивись! Іде дощ.', 'Podívej! Prší.'],
+    ['We ___ dinner right now.', 'cook', 'are cooking', ['cook', 'is cooking'], 'Мы сейчас готовим ужин.', 'Ми зараз готуємо вечерю.', 'Právě vaříme večeři.'],
+    ['He ___ to music.', 'listen', 'is listening', ['listens', 'are listening'], 'Он слушает музыку.', 'Він слухає музику.', 'Poslouchá hudbu.'],
+    ['Why are you ___?', 'cry', 'crying', ['cry', 'cries'], 'Почему ты плачешь?', 'Чому ти плачеш?', 'Proč pláčeš?'],
+    ['I am not ___ now.', 'work', 'working', ['work', 'works'], 'Я сейчас не работаю.', 'Я зараз не працюю.', 'Teď nepracuju.'],
+    ['The children ___ in the garden.', 'run', 'are running', ['runs', 'is running'], 'Дети бегают в саду.', 'Діти бігають у саду.', 'Děti běhají na zahradě.'],
+  ]),
+  ...G('pcVs', [
+    ['I usually ___ tea, but today I am drinking coffee.', 'drink', 'drink', ['am drinking', 'drinks'], 'Обычно я пью чай, но сегодня пью кофе.', 'Зазвичай я п\'ю чай, але сьогодні п\'ю каву.', 'Obvykle piju čaj, ale dnes piju kávu.'],
+    ['Listen! The baby ___.', 'cry', 'is crying', ['cries', 'cry'], 'Слушай! Малыш плачет.', 'Слухай! Малюк плаче.', 'Poslouchej! Miminko pláče.'],
+    ['She ___ to school every day.', 'walk', 'walks', ['is walking', 'walk'], 'Она каждый день ходит в школу пешком.', 'Вона щодня ходить до школи пішки.', 'Každý den chodí do školy pěšky.'],
+    ['Where is Tom? He ___ a shower.', 'have', 'is having', ['has', 'have'], 'Где Том? Он принимает душ.', 'Де Том? Він приймає душ.', 'Kde je Tom? Sprchuje se.'],
+    ['We ___ English on Mondays.', 'study', 'study', ['are studying', 'studies'], 'По понедельникам у нас английский.', 'По понеділках у нас англійська.', 'V pondělí se učíme angličtinu.'],
+    ['Be quiet! I ___.', 'think', 'am thinking', ['think', 'thinks'], 'Тихо! Я думаю.', 'Тихо! Я думаю.', 'Ticho! Přemýšlím.'],
+    ['My dad ___ in a bank.', 'work', 'works', ['is working', 'work'], 'Мой папа работает в банке.', 'Мій тато працює в банку.', 'Můj táta pracuje v bance.'],
+    ['Right now they ___ lunch.', 'eat', 'are eating', ['eat', 'eats'], 'Прямо сейчас они обедают.', 'Саме зараз вони обідають.', 'Právě teď obědvají.'],
+    ['It often ___ in autumn.', 'rain', 'rains', ['is raining', 'rain'], 'Осенью часто идёт дождь.', 'Восени часто йде дощ.', 'Na podzim často prší.'],
+  ]),
+  ...G('wasWere', [
+    ['I ___ at home yesterday.', 'be', 'was', ['were', 'am'], 'Вчера я был дома.', 'Учора я був вдома.', 'Včera jsem byl doma.'],
+    ['They ___ in London last week.', 'be', 'were', ['was', 'are'], 'На прошлой неделе они были в Лондоне.', 'Минулого тижня вони були в Лондоні.', 'Minulý týden byli v Londýně.'],
+    ['She ___ tired after work.', 'be', 'was', ['were', 'is'], 'После работы она была уставшей.', 'Після роботи вона була втомлена.', 'Po práci byla unavená.'],
+    ['We ___ not hungry.', 'be', 'were', ['was', 'are'], 'Мы не были голодны.', 'Ми не були голодні.', 'Neměli jsme hlad.'],
+    ['___ you at school on Monday?', 'be ?', 'Were', ['Was', 'Are'], 'Ты был в школе в понедельник?', 'Ти був у школі в понеділок?', 'Byl jsi v pondělí ve škole?'],
+    ['___ he happy?', 'be ?', 'Was', ['Were', 'Is'], 'Он был счастлив?', 'Він був щасливий?', 'Byl šťastný?'],
+    ['The film ___ very good.', 'be', 'was', ['were', 'are'], 'Фильм был очень хорошим.', 'Фільм був дуже гарний.', 'Film byl moc dobrý.'],
+    ['My parents ___ at the party.', 'be', 'were', ['was', 'is'], 'Мои родители были на вечеринке.', 'Мої батьки були на вечірці.', 'Moji rodiče byli na večírku.'],
+  ]),
+  ...G('pastReg', [
+    ['I ___ my grandma yesterday.', 'visit', 'visited', ['visit', 'visits'], 'Вчера я навестил бабушку.', 'Учора я відвідав бабусю.', 'Včera jsem navštívil babičku.'],
+    ['She ___ the window.', 'open', 'opened', ['opens', 'open'], 'Она открыла окно.', 'Вона відчинила вікно.', 'Otevřela okno.'],
+    ['We ___ football after school.', 'play', 'played', ['plaied', 'play'], 'После школы мы играли в футбол.', 'Після школи ми грали у футбол.', 'Po škole jsme hráli fotbal.'],
+    ['He ___ for the bus.', 'wait', 'waited', ['waits', 'waitd'], 'Он ждал автобус.', 'Він чекав на автобус.', 'Čekal na autobus.'],
+    ['They ___ in Paris for a year.', 'live', 'lived', ['liveed', 'live'], 'Они жили в Париже год.', 'Вони жили в Парижі рік.', 'Rok žili v Paříži.'],
+    ['The baby ___ all night.', 'cry', 'cried', ['cryed', 'cries'], 'Малыш плакал всю ночь.', 'Малюк плакав усю ніч.', 'Miminko plakalo celou noc.'],
+    ['I ___ the bus to work.', 'stop', 'stopped', ['stoped', 'stops'], 'Я остановил автобус до работы.', 'Я зупинив автобус до роботи.', 'Zastavil jsem autobus do práce.'],
+    ['She ___ English at school.', 'study', 'studied', ['studyed', 'studies'], 'Она учила английский в школе.', 'Вона вчила англійську в школі.', 'Ve škole se učila angličtinu.'],
+  ]),
+  ...G('pastIrr', [
+    ['I ___ to the cinema last night.', 'go', 'went', ['goed', 'gone'], 'Вчера вечером я ходил в кино.', 'Учора ввечері я ходив у кіно.', 'Včera večer jsem šel do kina.'],
+    ['She ___ a new dress.', 'buy', 'bought', ['buyed', 'buys'], 'Она купила новое платье.', 'Вона купила нову сукню.', 'Koupila si nové šaty.'],
+    ['We ___ pizza for dinner.', 'eat', 'ate', ['eated', 'eaten'], 'На ужин мы ели пиццу.', 'На вечерю ми їли піцу.', 'K večeři jsme jedli pizzu.'],
+    ['He ___ me a letter.', 'write', 'wrote', ['writed', 'written'], 'Он написал мне письмо.', 'Він написав мені листа.', 'Napsal mi dopis.'],
+    ['They ___ a big dog.', 'see', 'saw', ['seed', 'seen'], 'Они увидели большую собаку.', 'Вони побачили великого собаку.', 'Viděli velkého psa.'],
+    ['I ___ my keys.', 'lose', 'lost', ['losed', 'lose'], 'Я потерял ключи.', 'Я загубив ключі.', 'Ztratil jsem klíče.'],
+    ['She ___ a cake.', 'make', 'made', ['maked', 'makes'], 'Она испекла торт.', 'Вона спекла торт.', 'Upekla dort.'],
+    ['We ___ to the sea by car.', 'drive', 'drove', ['drived', 'driven'], 'Мы поехали к морю на машине.', 'Ми поїхали до моря машиною.', 'Jeli jsme k moři autem.'],
+    ['He ___ the answer.', 'know', 'knew', ['knowed', 'known'], 'Он знал ответ.', 'Він знав відповідь.', 'Znal odpověď.'],
+  ]),
+  ...G('pastNQ', [
+    ['I ___ like the film.', 'not', 'did not', ['was not', 'do not'], 'Мне не понравился фильм.', 'Мені не сподобався фільм.', 'Film se mi nelíbil.'],
+    ['___ you see Anna yesterday?', '?', 'Did', ['Do', 'Were'], 'Ты видел Анну вчера?', 'Ти бачив Анну вчора?', 'Viděl jsi včera Annu?'],
+    ['She did not ___ the bus.', 'catch', 'catch', ['caught', 'catches'], 'Она не успела на автобус.', 'Вона не встигла на автобус.', 'Nestihla autobus.'],
+    ['Did he ___ the door?', 'close', 'close', ['closed', 'closes'], 'Он закрыл дверь?', 'Він зачинив двері?', 'Zavřel dveře?'],
+    ['Where ___ you go on holiday?', '?', 'did', ['do', 'were'], 'Куда ты ездил в отпуск?', 'Куди ти їздив у відпустку?', 'Kam jsi jel na dovolenou?'],
+    ['We did not ___ anything.', 'buy', 'buy', ['bought', 'buys'], 'Мы ничего не купили.', 'Ми нічого не купили.', 'Nic jsme nekoupili.'],
+    ['What did she ___?', 'say', 'say', ['said', 'says'], 'Что она сказала?', 'Що вона сказала?', 'Co řekla?'],
+    ['They ___ come to the party.', 'not', 'did not', ['were not', 'does not'], 'Они не пришли на вечеринку.', 'Вони не прийшли на вечірку.', 'Nepřišli na večírek.'],
+  ]),
+  ...G('quant', [
+    ['I have ___ apples.', 'some / any', 'some', ['any', 'much'], 'У меня есть немного яблок.', 'У мене є трохи яблук.', 'Mám nějaká jablka.'],
+    ['Do you have ___ milk?', 'some / any', 'any', ['many', 'a'], 'У тебя есть молоко?', 'У тебе є молоко?', 'Máš nějaké mléko?'],
+    ['There is not ___ sugar.', 'much / many', 'much', ['many', 'some'], 'Сахара немного.', 'Цукру небагато.', 'Není tu moc cukru.'],
+    ['How ___ books do you have?', 'much / many', 'many', ['much', 'any'], 'Сколько у тебя книг?', 'Скільки в тебе книжок?', 'Kolik máš knih?'],
+    ['How ___ money is it?', 'much / many', 'much', ['many', 'some'], 'Сколько это денег?', 'Скільки це грошей?', 'Kolik je to peněz?'],
+    ['We do not have ___ bread.', 'some / any', 'any', ['some', 'many'], 'У нас нет хлеба.', 'У нас немає хліба.', 'Nemáme žádný chléb.'],
+    ['She has ___ friends.', 'much / a lot of', 'a lot of', ['much', 'any'], 'У неё много друзей.', 'У неї багато друзів.', 'Má hodně přátel.'],
+    ['There are not ___ people here.', 'much / many', 'many', ['much', 'some'], 'Здесь немного людей.', 'Тут небагато людей.', 'Není tu moc lidí.'],
+  ]),
+  ...G('cmp', [
+    ['My brother is ___ than me.', 'tall', 'taller', ['more tall', 'tallest'], 'Мой брат выше меня.', 'Мій брат вищий за мене.', 'Můj bratr je vyšší než já.'],
+    ['This is the ___ day of the year.', 'hot', 'hottest', ['hotest', 'most hot'], 'Это самый жаркий день в году.', 'Це найспекотніший день року.', 'To je nejteplejší den v roce.'],
+    ['English is ___ than Chinese.', 'easy', 'easier', ['easyer', 'more easy'], 'Английский легче китайского.', 'Англійська легша за китайську.', 'Angličtina je snazší než čínština.'],
+    ['This book is ___ than that one.', 'interesting', 'more interesting', ['interestinger', 'most interesting'], 'Эта книга интереснее той.', 'Ця книжка цікавіша за ту.', 'Tahle kniha je zajímavější než tamta.'],
+    ['She is the ___ student in class.', 'good', 'best', ['goodest', 'better'], 'Она лучшая ученица в классе.', 'Вона найкраща учениця в класі.', 'Je nejlepší studentka ve třídě.'],
+    ['Today is ___ than yesterday.', 'bad', 'worse', ['badder', 'worst'], 'Сегодня хуже, чем вчера.', 'Сьогодні гірше, ніж учора.', 'Dnes je hůř než včera.'],
+    ['It is the ___ beautiful place.', 'most / more', 'most', ['more', 'much'], 'Это самое красивое место.', 'Це найгарніше місце.', 'Je to nejkrásnější místo.'],
+    ['A car is ___ than a bike.', 'fast', 'faster', ['more fast', 'fastest'], 'Машина быстрее велосипеда.', 'Машина швидша за велосипед.', 'Auto je rychlejší než kolo.'],
+  ]),
+  ...G('fut', [
+    ['Look at the clouds! It ___ rain.', 'be going to', 'is going to', ['will', 'are going to'], 'Посмотри на тучи! Сейчас пойдёт дождь.', 'Подивись на хмари! Зараз піде дощ.', 'Podívej na mraky! Bude pršet.'],
+    ['I think she ___ win.', 'will / going to', 'will', ['is going', 'wills'], 'Я думаю, она выиграет.', 'Я думаю, вона виграє.', 'Myslím, že vyhraje.'],
+    ['We ___ visit Rome next summer. We have tickets.', 'be going to', 'are going to', ['will', 'is going to'], 'Следующим летом мы едем в Рим. Билеты есть.', 'Наступного літа ми їдемо до Рима. Квитки є.', 'Příští léto pojedeme do Říma. Máme lístky.'],
+    ['The phone is ringing. I ___ answer it.', 'will / going to', 'will', ['am going to', 'going'], 'Телефон звонит. Я отвечу.', 'Телефон дзвонить. Я відповім.', 'Zvoní telefon. Vezmu to.'],
+    ['He ___ be a doctor one day.', 'will', 'will', ['wills', 'is will'], 'Однажды он станет врачом.', 'Колись він стане лікарем.', 'Jednou bude lékař.'],
+    ['I ___ buy a new bike. I saved money.', 'be going to', 'am going to', ['will', 'is going to'], 'Я собираюсь купить новый велосипед. Я накопил.', 'Я збираюся купити новий велосипед. Я накопичив.', 'Koupím si nové kolo. Ušetřil jsem.'],
+    ['Do not worry, I ___ help you.', 'will', 'will', ['am', 'going to'], 'Не волнуйся, я помогу тебе.', 'Не хвилюйся, я тобі допоможу.', 'Neboj, pomůžu ti.'],
+    ['They ___ not come tomorrow.', 'will', 'will', ['are', 'do'], 'Они не придут завтра.', 'Вони не прийдуть завтра.', 'Zítra nepřijdou.'],
+  ]),
+  ...G('modal', [
+    ['You ___ wear a seat belt. It is the law.', 'must / should', 'must', ['should', 'can'], 'Ты обязан пристегнуться. Это закон.', 'Ти мусиш пристебнутися. Це закон.', 'Musíš se připoutat. Je to zákon.'],
+    ['You look tired. You ___ go to bed.', 'should', 'should', ['must', 'have'], 'Ты выглядишь уставшим. Тебе стоит лечь спать.', 'Ти виглядаєш втомленим. Тобі варто лягти спати.', 'Vypadáš unaveně. Měl bys jít spát.'],
+    ['I ___ get up at six for work.', 'have to', 'have to', ['has to', 'must to'], 'Мне приходится вставать в шесть на работу.', 'Мені доводиться вставати о шостій на роботу.', 'Musím vstávat v šest do práce.'],
+    ['She ___ wear a uniform at school.', 'have to', 'has to', ['have to', 'must to'], 'Ей нужно носить форму в школе.', 'Їй треба носити форму в школі.', 'Ve škole musí nosit uniformu.'],
+    ['You ___ smoke here. It is forbidden.', 'must not', 'must not', ['do not have to', 'should'], 'Здесь нельзя курить. Это запрещено.', 'Тут не можна курити. Це заборонено.', 'Tady se nesmí kouřit. Je to zakázané.'],
+    ['It is Sunday. We ___ go to school.', 'not have to', 'do not have to', ['must not', 'have not to'], 'Сегодня воскресенье. Нам не нужно в школу.', 'Сьогодні неділя. Нам не треба до школи.', 'Je neděle. Nemusíme do školy.'],
+    ['You ___ eat more vegetables.', 'should', 'should', ['must to', 'have'], 'Тебе стоит есть больше овощей.', 'Тобі варто їсти більше овочів.', 'Měl bys jíst víc zeleniny.'],
+    ['Do you ___ work on Saturday?', 'have to', 'have to', ['must', 'should to'], 'Тебе нужно работать в субботу?', 'Тобі треба працювати в суботу?', 'Musíš pracovat v sobotu?'],
+  ]),
+  ...G('adv', [
+    ['She sings ___.', 'beautiful', 'beautifully', ['beautiful', 'beautifuly'], 'Она красиво поёт.', 'Вона гарно співає.', 'Krásně zpívá.'],
+    ['He drives very ___.', 'careful', 'carefully', ['careful', 'carefuly'], 'Он водит очень осторожно.', 'Він водить дуже обережно.', 'Řídí velmi opatrně.'],
+    ['Please speak ___.', 'slow', 'slowly', ['slow', 'slowy'], 'Пожалуйста, говори медленно.', 'Будь ласка, говори повільно.', 'Mluv prosím pomalu.'],
+    ['You did it very ___.', 'good', 'well', ['good', 'goodly'], 'Ты сделал это очень хорошо.', 'Ти зробив це дуже добре.', 'Udělal jsi to moc dobře.'],
+    ['The children played ___.', 'happy', 'happily', ['happy', 'happyly'], 'Дети весело играли.', 'Діти весело гралися.', 'Děti si vesele hrály.'],
+    ['He runs very ___.', 'fast', 'fast', ['fastly', 'faster'], 'Он бегает очень быстро.', 'Він бігає дуже швидко.', 'Běhá velmi rychle.'],
+    ['She works ___.', 'hard', 'hard', ['hardly', 'hardy'], 'Она много работает.', 'Вона багато працює.', 'Tvrdě pracuje.'],
+    ['Open the door ___.', 'quiet', 'quietly', ['quiet', 'quietely'], 'Открой дверь тихо.', 'Відчини двері тихо.', 'Otevři dveře potichu.'],
+  ]),
+  ...G('objPron', [
+    ['I love ___. (she)', 'she', 'her', ['she', 'hers'], 'Я люблю её.', 'Я кохаю її.', 'Miluju ji.'],
+    ['Can you help ___? (I)', 'I', 'me', ['I', 'my'], 'Ты можешь мне помочь?', 'Ти можеш мені допомогти?', 'Můžeš mi pomoct?'],
+    ['Call ___ tomorrow. (he)', 'he', 'him', ['he', 'his'], 'Позвони ему завтра.', 'Подзвони йому завтра.', 'Zavolej mu zítra.'],
+    ['She sees ___ every day. (we)', 'we', 'us', ['we', 'our'], 'Она видит нас каждый день.', 'Вона бачить нас щодня.', 'Vidí nás každý den.'],
+    ['I do not know ___. (they)', 'they', 'them', ['they', 'their'], 'Я их не знаю.', 'Я їх не знаю.', 'Neznám je.'],
+    ['This is for ___. (you)', 'you', 'you', ['your', 'yours'], 'Это для тебя.', 'Це для тебе.', 'To je pro tebe.'],
+    ['Where is my phone? I cannot find ___.', 'it', 'it', ['its', 'him'], 'Где мой телефон? Не могу его найти.', 'Де мій телефон? Не можу його знайти.', 'Kde je můj telefon? Nemůžu ho najít.'],
+    ['Tell ___ the truth. (she)', 'she', 'her', ['she', 'hers'], 'Скажи ей правду.', 'Скажи їй правду.', 'Řekni jí pravdu.'],
+  ]),
+];
+
+export const LESSONS = {
+  pc: {
+    title: T('Present Continuous: «сейчас»', 'Present Continuous: «зараз»', 'Present Continuous: „právě teď“'),
+    pts: {
+      ru: ['То, что происходит прямо сейчас: am / is / are + глагол с -ing.', 'I am reading. She is reading. They are reading.', 'Подсказки: now, right now, at the moment, Look!, Listen!'],
+      uk: ['Те, що відбувається саме зараз: am / is / are + дієслово з -ing.', 'I am reading. She is reading. They are reading.', 'Підказки: now, right now, at the moment, Look!, Listen!'],
+      cz: ['Co se děje právě teď: am / is / are + sloveso s -ing.', 'I am reading. She is reading. They are reading.', 'Nápověda: now, right now, at the moment, Look!, Listen!'],
+    },
+    ex: [['I', 'am reading'], ['he / she / it', 'is reading'], ['we / you / they', 'are reading'], ['run', 'running'], ['make', 'making']],
+  },
+  pcVs: {
+    title: T('Simple или Continuous?', 'Simple чи Continuous?', 'Simple, nebo Continuous?'),
+    pts: {
+      ru: ['Simple — обычно, всегда, каждый день: She walks to school every day.', 'Continuous — именно сейчас: Look! She is walking.', 'Слова usually, often, every… → Simple. now, Look!, Listen! → Continuous.'],
+      uk: ['Simple — зазвичай, завжди, щодня: She walks to school every day.', 'Continuous — саме зараз: Look! She is walking.', 'Слова usually, often, every… → Simple. now, Look!, Listen! → Continuous.'],
+      cz: ['Simple — obvykle, vždy, každý den: She walks to school every day.', 'Continuous — právě teď: Look! She is walking.', 'Slova usually, often, every… → Simple. now, Look!, Listen! → Continuous.'],
+    },
+    ex: [['every day', 'I drink tea'], ['now', 'I am drinking tea']],
+  },
+  wasWere: {
+    title: T('was / were — «был»', 'was / were — «був»', 'was / were — „byl“'),
+    pts: {
+      ru: ['Прошедшее от to be: am / is → was, are → were.', 'I / he / she / it → was. you / we / they → were.', 'Вопрос: Was he…? Were you…? «Не»: was not, were not.'],
+      uk: ['Минулий час від to be: am / is → was, are → were.', 'I / he / she / it → was. you / we / they → were.', 'Питання: Was he…? Were you…? «Не»: was not, were not.'],
+      cz: ['Minulý čas od to be: am / is → was, are → were.', 'I / he / she / it → was. you / we / they → were.', 'Otázka: Was he…? Were you…? Zápor: was not, were not.'],
+    },
+    ex: [['I am', 'I was'], ['she is', 'she was'], ['they are', 'they were']],
+  },
+  pastReg: {
+    title: T('Past Simple: правильные глаголы', 'Past Simple: правильні дієслова', 'Past Simple: pravidelná slovesa'),
+    pts: {
+      ru: ['Прошлое, которое закончилось: yesterday, last week, in 2020.', 'Правильные глаголы: + -ed, одинаково для всех: I played, she played.', 'live → lived, cry → cried, stop → stopped (короткий: согласная удваивается).'],
+      uk: ['Минуле, що закінчилося: yesterday, last week, in 2020.', 'Правильні дієслова: + -ed, однаково для всіх: I played, she played.', 'live → lived, cry → cried, stop → stopped (короткий: приголосна подвоюється).'],
+      cz: ['Minulost, která skončila: yesterday, last week, in 2020.', 'Pravidelná slovesa: + -ed, pro všechny stejně: I played, she played.', 'live → lived, cry → cried, stop → stopped (krátké: souhláska se zdvojí).'],
+    },
+    ex: [['play', 'played'], ['live', 'lived'], ['cry', 'cried'], ['stop', 'stopped']],
+  },
+  pastIrr: {
+    title: T('Past Simple: неправильные глаголы', 'Past Simple: неправильні дієслова', 'Past Simple: nepravidelná slovesa'),
+    pts: {
+      ru: ['У частых глаголов своя форма прошедшего — её надо запомнить.', 'go → went, see → saw, eat → ate, buy → bought, make → made.', 'Форма одинаковая для всех: I went, she went, they went.'],
+      uk: ['Частi дієслова мають свою форму минулого — її треба запам\'ятати.', 'go → went, see → saw, eat → ate, buy → bought, make → made.', 'Форма однакова для всіх: I went, she went, they went.'],
+      cz: ['Častá slovesa mají vlastní tvar minulého času — ten se musíš naučit.', 'go → went, see → saw, eat → ate, buy → bought, make → made.', 'Tvar je pro všechny stejný: I went, she went, they went.'],
+    },
+    ex: [['go', 'went'], ['see', 'saw'], ['eat', 'ate'], ['buy', 'bought'], ['write', 'wrote'], ['know', 'knew']],
+  },
+  pastNQ: {
+    title: T('Past Simple: «не» и вопросы (did)', 'Past Simple: «не» і питання (did)', 'Past Simple: zápor a otázky (did)'),
+    pts: {
+      ru: ['«Не» в прошлом: did not + обычный глагол: I did not go.', 'Вопрос: Did + кто + обычный глагол: Did you see him?', 'После did глагол без -ed и не в прошлой форме: did she buy (не bought).'],
+      uk: ['«Не» в минулому: did not + звичайне дієслово: I did not go.', 'Питання: Did + хто + звичайне дієслово: Did you see him?', 'Після did дієслово без -ed і не в минулій формі: did she buy (не bought).'],
+      cz: ['Zápor v minulosti: did not + základní tvar: I did not go.', 'Otázka: Did + kdo + základní tvar: Did you see him?', 'Po did je sloveso bez -ed a ne v minulém tvaru: did she buy (ne bought).'],
+    },
+    ex: [['I went', 'I did not go'], ['you saw', 'Did you see…?'], ['she bought', 'What did she buy?']],
+  },
+  quant: {
+    title: T('some, any, much, many', 'some, any, much, many', 'some, any, much, many'),
+    pts: {
+      ru: ['some — «немного, несколько» в утверждении. any — в вопросе и с «не».', 'many — с тем, что можно посчитать (books). much — с тем, что нельзя (milk, money).', 'a lot of — «много» для всего. How many…? How much…? — «сколько?»'],
+      uk: ['some — «трохи, кілька» у ствердженні. any — у питанні та із «не».', 'many — з тим, що можна порахувати (books). much — з тим, що не можна (milk, money).', 'a lot of — «багато» для всього. How many…? How much…? — «скільки?»'],
+      cz: ['some — „trochu, několik“ v kladné větě. any — v otázce a v záporu.', 'many — s tím, co se dá spočítat (books). much — s tím, co ne (milk, money).', 'a lot of — „hodně“ pro všechno. How many…? How much…? — „kolik?“'],
+    },
+    ex: [['some', 'I have some'], ['any', 'Do you have any…?'], ['many', 'books, friends'], ['much', 'milk, money, time']],
+  },
+  cmp: {
+    title: T('Сравнение: -er / the -est', 'Порівняння: -er / the -est', 'Stupňování: -er / the -est'),
+    pts: {
+      ru: ['Короткие слова: + -er (больше), the + -est (самый): tall → taller → the tallest.', 'Длинные слова: more / the most: more interesting.', 'Исключения: good → better → best, bad → worse → worst. «чем» = than.'],
+      uk: ['Короткі слова: + -er (більше), the + -est (найбільший): tall → taller → the tallest.', 'Довгі слова: more / the most: more interesting.', 'Винятки: good → better → best, bad → worse → worst. «ніж» = than.'],
+      cz: ['Krátká slova: + -er (víc), the + -est (nej-): tall → taller → the tallest.', 'Dlouhá slova: more / the most: more interesting.', 'Výjimky: good → better → best, bad → worse → worst. „než“ = than.'],
+    },
+    ex: [['tall', 'taller', 'the tallest'], ['easy', 'easier', 'the easiest'], ['good', 'better', 'the best'], ['beautiful', 'more beautiful', 'the most beautiful']],
+  },
+  fut: {
+    title: T('Будущее: will и going to', 'Майбутнє: will і going to', 'Budoucnost: will a going to'),
+    pts: {
+      ru: ['will — решение прямо сейчас, обещание, мнение: I will help you. I think it will rain.', 'be going to — план, уже решено: I am going to buy a bike.', 'going to — и когда видно, что будет: Look at the clouds! It is going to rain.'],
+      uk: ['will — рішення просто зараз, обіцянка, думка: I will help you. I think it will rain.', 'be going to — план, уже вирішено: I am going to buy a bike.', 'going to — і коли видно, що буде: Look at the clouds! It is going to rain.'],
+      cz: ['will — rozhodnutí hned teď, slib, názor: I will help you. I think it will rain.', 'be going to — plán, už rozhodnuto: I am going to buy a bike.', 'going to — i když je vidět, co bude: Look at the clouds! It is going to rain.'],
+    },
+    ex: [['will', 'I will help you'], ['going to', 'I am going to travel']],
+  },
+  modal: {
+    title: T('must, have to, should', 'must, have to, should', 'must, have to, should'),
+    pts: {
+      ru: ['must / have to — «надо, обязан». have to: he has to.', 'must not — «нельзя». do not have to — «не нужно» (можно не делать).', 'should — «стоит, лучше бы» (совет): You should sleep.'],
+      uk: ['must / have to — «треба, мушу». have to: he has to.', 'must not — «не можна». do not have to — «не треба» (можна не робити).', 'should — «варто, краще б» (порада): You should sleep.'],
+      cz: ['must / have to — „musím“. have to: he has to.', 'must not — „nesmíš“. do not have to — „nemusíš“.', 'should — „měl bys“ (rada): You should sleep.'],
+    },
+    ex: { ru: [['must', 'обязан'], ['must not', 'нельзя'], ['do not have to', 'не нужно'], ['should', 'стоит']], uk: [['must', 'мушу'], ['must not', 'не можна'], ['do not have to', 'не треба'], ['should', 'варто']], cz: [['must', 'musím'], ['must not', 'nesmím'], ['do not have to', 'nemusím'], ['should', 'měl bych']] },
+  },
+  adv: {
+    title: T('Наречия: как? (-ly)', 'Прислівники: як? (-ly)', 'Příslovce: jak? (-ly)'),
+    pts: {
+      ru: ['Прилагательное говорит «какой», наречие — «как»: a slow car, he drives slowly.', 'Обычно + -ly: quick → quickly, happy → happily, careful → carefully.', 'Исключения: good → well, fast → fast, hard → hard.'],
+      uk: ['Прикметник каже «який», прислівник — «як»: a slow car, he drives slowly.', 'Зазвичай + -ly: quick → quickly, happy → happily, careful → carefully.', 'Винятки: good → well, fast → fast, hard → hard.'],
+      cz: ['Přídavné jméno říká „jaký“, příslovce „jak“: a slow car, he drives slowly.', 'Obvykle + -ly: quick → quickly, happy → happily, careful → carefully.', 'Výjimky: good → well, fast → fast, hard → hard.'],
+    },
+    ex: [['slow', 'slowly'], ['happy', 'happily'], ['good', 'well'], ['fast', 'fast']],
+  },
+  objPron: {
+    title: T('me, him, her, us, them', 'me, him, her, us, them', 'me, him, her, us, them'),
+    pts: {
+      ru: ['После глагола и предлога — другая форма: «меня, ему, их».', 'I → me, he → him, she → her, we → us, they → them. you и it не меняются.', 'Help me. Call him. This is for them.'],
+      uk: ['Після дієслова й прийменника — інша форма: «мене, йому, їх».', 'I → me, he → him, she → her, we → us, they → them. you та it не змінюються.', 'Help me. Call him. This is for them.'],
+      cz: ['Po slovese a předložce je jiný tvar: „mě, mu, je“.', 'I → me, he → him, she → her, we → us, they → them. you a it se nemění.', 'Help me. Call him. This is for them.'],
+    },
+    ex: [['I', 'me'], ['he', 'him'], ['she', 'her'], ['we', 'us'], ['they', 'them']],
+  },
+};
+
+// Духи тем A2: [id, эмодзи, цвет, имя ru/uk/cz]
+export const MOBS = [
+  ['g_pc', '🐝', '#d9a43a', 'Пчела-сейчас', 'Бджола-зараз', 'Včela teď'],
+  ['g_past', '🏔️', '#6a7a8a', 'Горный летописец', 'Гірський літописець', 'Horský kronikář'],
+  ['g_was', '🦕', '#5a8a5a', 'Древний ящер', 'Давній ящір', 'Dávný ještěr'],
+  ['g_quant', '🍚', '#c8b48a', 'Дух рисовой миски', 'Дух рисової миски', 'Duch misky rýže'],
+  ['g_cmp', '🦒', '#d9a43a', 'Жираф-сравнитель', 'Жираф-порівнювач', 'Žirafa srovnávačka'],
+  ['g_fut', '🔮', '#7a5ac8', 'Хрустальный предсказатель', 'Кришталевий віщун', 'Křišťálový věštec'],
+  ['g_modal', '📏', '#8a3a22', 'Строгий наставник', 'Суворий наставник', 'Přísný rádce'],
+  ['g_adv', '🐢', '#4a8a6a', 'Черепаха-как', 'Черепаха-як', 'Želva jak'],
+  ['g_obj', '🎁', '#d8402e', 'Дух подарков', 'Дух подарунків', 'Duch dárků'],
+];
