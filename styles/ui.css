@@ -287,3 +287,5 @@ img.pl-bg { object-fit: cover; }
 #adm .adm-h span { margin-left: auto; display: flex; gap: 4px; }
 #adm .adm-st { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 0 18px; }
 #adm .adm-st .chip { font-size: 11px; padding: 2px 6px; background: #f1ead6; }
+#adm-tog { position: fixed; left: 56px; bottom: 80px; z-index: 9000; border: 0; border-radius: 14px; padding: 6px 12px; font: 900 12px Nunito, sans-serif; background: #6a6a6a; color: #fff; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,.35); }
+#adm-tog.on { background: #2f9a4a; }

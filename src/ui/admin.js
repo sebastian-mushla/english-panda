@@ -15,7 +15,13 @@ export function initAdmin({ start, startPhase, runStage, focus }) {
   btn.id = 'adm-btn';
   btn.textContent = '🛠';
   btn.title = 'Админка (только localhost)';
-  document.body.append(btn);
+  // переключатель режима админа: ON — все уровни и фазы открыты, OFF — обычная игра
+  const tog = document.createElement('button');
+  tog.id = 'adm-tog';
+  tog.className = ADMIN_OPEN ? 'on' : '';
+  tog.textContent = ADMIN_OPEN ? 'ADMIN ON' : 'ADMIN OFF';
+  tog.addEventListener('click', () => { try { localStorage.setItem('ep.admin.open', ADMIN_OPEN ? '0' : '1'); } catch { /* */ } location.reload(); });
+  document.body.append(btn, tog);
   let panel = null;
   btn.addEventListener('click', () => (panel ? close() : openPanel()));
   const close = () => { panel?.remove(); panel = null; };
