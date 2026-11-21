@@ -37,8 +37,8 @@
 .g-hintpop small { color: var(--ink-soft); font-weight: 700; }
 
 /* Знакомство */
-.intro-grid { display: grid; grid-template-columns: repeat(4, minmax(140px, 190px)); gap: 14px; justify-content: center; }
-.icard { perspective: 800px; aspect-ratio: .82; animation: pop .4s backwards; }
+.intro-grid { display: grid; width: min(820px, 100%); grid-template-columns: repeat(4, minmax(0, 190px)); gap: 14px; justify-content: center; }
+.icard { display: block; width: 100%; perspective: 800px; aspect-ratio: .82; animation: pop .4s backwards; }
 .icard-in { position: relative; display: block; width: 100%; height: 100%; transition: transform .5s; transform-style: preserve-3d; }
 .icard.flip .icard-in { transform: rotateY(180deg); }
 .face { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 8px; padding: 10px; text-align: center;
@@ -51,8 +51,8 @@
 .icard .back b { color: var(--gold); }
 
 /* Пары */
-.mem-grid { display: grid; grid-template-columns: repeat(4, minmax(110px, 160px)); gap: 12px; }
-.mcard { perspective: 700px; aspect-ratio: .85; }
+.mem-grid { display: grid; width: min(680px, 100%); grid-template-columns: repeat(4, minmax(0, 160px)); gap: 12px; justify-content: center; }
+.mcard { display: block; width: 100%; perspective: 700px; aspect-ratio: .85; }
 .mcard-in { position: relative; display: block; width: 100%; height: 100%; transition: transform .4s; transform-style: preserve-3d; }
 .mcard.flip .mcard-in, .mcard.peek .mcard-in { transform: rotateY(180deg); }
 .mcard .back { background: radial-gradient(circle, #d8402e, var(--red-d)); border: 4px solid #4e120c; box-shadow: inset 0 0 0 4px rgba(242,193,78,.6), 0 5px 0 #4e120c; }
@@ -207,7 +207,10 @@
   .g-head { gap: 8px; flex-wrap: wrap; } .g-title b { font-size: 1.4rem; } .g-dots { order: 5; width: 100%; justify-content: center; }
   .g-hint span { display: none; } .g-hint::before { content: '📜'; }
   .g-bg::before, .g-bg::after { display: none; }
-  .intro-grid { grid-template-columns: repeat(2, 1fr); } .mem-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .intro-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .mem-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .icard { aspect-ratio: 1.25; } .icard .back .ex { font-size: .78rem; }
+  .icard .front .emo { font-size: 2.2rem; } .icard .front .en { font-size: 1.2rem; } .icard .back .mean { font-size: 1.6rem; }
+  .mcard .front.en .en { font-size: 1.2rem; } .mcard .front .emo { font-size: 2rem; } .mcard .front .mean { font-size: .9rem; }
   .key { height: 44px; font-size: 1.05rem; } .krow { gap: 4px; }
   .sentence p { font-size: 1.25rem; } .sentence .slot { width: 22px; height: 32px; font-size: 1.1rem; }
   .field { min-height: 200px; } .leaf { width: 100px; }
