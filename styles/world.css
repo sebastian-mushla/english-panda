@@ -300,3 +300,10 @@ body.phone .mistband, body.phone #grain { display: none; }
 .node.entrance .ent-img { margin-bottom: calc(var(--s) * -105px);
   -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 92%); mask-image: linear-gradient(180deg, #000 78%, transparent 92%); }
 .node.entrance .ent-n { bottom: calc(var(--s) * 30px); }
+
+/* Телефон: без масок и теней-фильтров на больших картинках — они требуют отдельных буферов и роняли вкладку */
+body.phone .layer.artbg img, body.phone .layer.artbg img.first { -webkit-mask-image: none; mask-image: none; }
+body.phone .node .stone, body.phone .node.current .stone, body.phone .node.locked .stone, body.phone .node.exam .stone,
+body.phone .node.entrance .ent-img, body.phone .node.entrance.current .ent-img, body.phone .node.entrance .ent { filter: none; }
+body.phone .node.locked .stone, body.phone .node.entrance.locked .ent-img { opacity: .7; }
+body.phone .node.entrance .ent-img { -webkit-mask-image: none; mask-image: none; }

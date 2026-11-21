@@ -17,7 +17,8 @@ const toData = (url) => fetch(url).then((r) => (r.ok ? r.blob() : null)).then((b
 async function sheet() {
   if (css === null) {
     css = await fetch('styles/world.css').then((r) => r.text()).catch(() => '');
-    await Promise.all(['spring', 'summer', 'autumn', 'winter'].map(async (k) => { TEX[k] = (await toData('assets/ground/' + k + '.webp')) || ''; }));
+    // на телефоне текстуры не встраиваем: каждый кусок слоя земли нёс бы их в себе, и памяти не хватало
+    if (!document.body.classList.contains('phone')) await Promise.all(['spring', 'summer', 'autumn', 'winter'].map(async (k) => { TEX[k] = (await toData('assets/ground/' + k + '.jpg')) || ''; }));
   }
   return css;
 }

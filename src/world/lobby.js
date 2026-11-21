@@ -22,7 +22,7 @@ const ART_ZONES = ['bamboo', 'falls', 'village', 'tea', 'gate', 'terraces', 'lak
 const ART_BG = ZONES.filter((z) => ART_ZONES.includes(z.id)).map((z) => (z.x0 === 0
   ? { src: 'assets/zones/' + z.id + '.webp', f: 0.6, x: 0, w: 2900, first: true }
   : { src: 'assets/zones/' + z.id + '.webp', f: 0.6, x: Math.round(z.x0 * 0.6 - 500), w: Math.round((z.x1 - z.x0) * 0.6 + 2000) }));
-let layerEls = [], rasterLayers = [], rasterS = 0, overlay, playerEl, handlers = {}, zoneId = '', lastPhaseCam = -1e9, season = 'spring', lastPhase = null;
+let artImgs = [], layerEls = [], rasterLayers = [], rasterS = 0, overlay, playerEl, handlers = {}, zoneId = '', lastPhaseCam = -1e9, season = 'spring', lastPhase = null;
 
 export function initLobby(h) {
   handlers = h;
@@ -36,8 +36,11 @@ export function initLobby(h) {
   root.innerHTML = scene.layers.map((L) => `<div class="layer" data-f="${L.f}" data-raster></div>` +
     (L.fx ? `<div class="layer fxlayer" data-f="${L.f}">${L.fx}</div>` : '')).join('');
   // нарисованные фоны зон (картинки) лежат над средним планом и уходят в туман справа
-  root.querySelectorAll('.layer[data-raster]')[2].insertAdjacentHTML('afterend', ART_BG.map((b) =>
-    `<div class="layer artbg" data-f="${b.f}"><img class="${b.first ? 'first' : ''}" src="${b.src}" alt="" loading="lazy" decoding="async" onerror="this.remove()" style="left:calc(var(--s)*${b.x}px);width:calc(var(--s)*${b.w}px)"></div>`).join(''));
+  // все фоны зон — в одном слое; картинка загружается, только когда рядом камера, и выгружается вдали
+  // (21 широкая картинка сразу не помещалась в память телефона)
+  root.querySelectorAll('.layer[data-raster]')[2].insertAdjacentHTML('afterend', `<div class="layer artbg" data-f="0.6">${ART_BG.map((b) =>
+    `<img class="${b.first ? 'first' : ''}" data-src="${b.src}" data-x="${b.x}" data-w="${b.w}" alt="" decoding="async" style="left:calc(var(--s)*${b.x}px);width:calc(var(--s)*${b.w}px)">`).join('')}</div>`);
+  artImgs = [...root.querySelectorAll('.artbg img')];
   const rEls = root.querySelectorAll('.layer[data-raster]');
   rasterLayers = scene.layers.map((L, i) => ({ f: L.f, w: L.w, raw: L.raw, el: rEls[i], q: Q[L.f] }));
   // слои света идут над тонировкой, чтобы фонари светились ночью
@@ -97,10 +100,20 @@ function redraw() {
   lastRasterCam = cam;
 }
 
+// фоны зон рядом с камерой (с запасом в экран) держим загруженными, остальные выгружаем
+function updateArt() {
+  const a = cam * 0.6 - viewW, b = cam * 0.6 + viewW * 2;
+  for (const img of artImgs) {
+    const x = +img.dataset.x, near = x < b && x + +img.dataset.w > a;
+    if (near && !img.getAttribute('src')) img.src = img.dataset.src;
+    else if (!near && img.getAttribute('src')) img.removeAttribute('src');
+  }
+}
+
 const clamp = (x) => (Number.isFinite(x) ? Math.max(0, Math.min(W - viewW, x)) : 0);
 
 function applyCam(force) {
-  if (force || Math.abs(cam - lastRasterCam) > 80) { lastRasterCam = cam; updateRaster(cam, viewW); }
+  if (force || Math.abs(cam - lastRasterCam) > 80) { lastRasterCam = cam; updateRaster(cam, viewW); updateArt(); }
   for (const L of layerEls) {
     if (L.svg) L.svg.setAttribute('viewBox', `${(cam * L.f).toFixed(1)} 0 ${viewW.toFixed(1)} 1000`);
     else L.el.style.transform = `translate3d(${(-cam * L.f * s).toFixed(1)}px,0,0)`;
