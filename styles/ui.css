@@ -241,19 +241,20 @@
   #cert-print { position: fixed; inset: 0; margin: auto; }
   html, body { overflow: visible; background: #fff; }
 }
-/* место большой темы: дом, пещера, гора, фонтан, храм, библиотека */
-#place { position: fixed; inset: 0; z-index: 40; overflow-y: auto; overscroll-behavior: contain; color: #f6ecd4; }
-#place .pl-bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; }
-.pl-head { position: sticky; top: 0; display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,0)); }
-.pl-head b { display: block; font-size: 1.25rem; } .pl-head small { opacity: .85; }
-.pl-path { display: grid; gap: 34px; padding: 30px 16px 120px; max-width: 520px; margin: 0 auto; }
-.pl-stone { display: flex; align-items: center; gap: 14px; background: none; border: 0; color: inherit; text-align: left; cursor: pointer; font: inherit; }
-.pl-stone.r { flex-direction: row-reverse; text-align: right; }
-.pl-stone .stone { position: relative; flex: none; width: 74px; height: 64px; border-radius: 50% 50% 46% 46%; background: radial-gradient(circle at 35% 30%, #e2ded0, #a9a696 55%, #6c695c); display: grid; place-items: center; box-shadow: 0 6px 14px rgba(0,0,0,.5); }
-.pl-stone .stone b { font-size: 1.6rem; color: #3a2a18; }
-.pl-stone.current .stone { box-shadow: 0 0 0 4px #f2c14e, 0 6px 14px rgba(0,0,0,.5); }
+/* место большой темы: картина 16:9 во весь экран, на узком экране листается вбок; камни фаз стоят на тропе */
+#place { position: fixed; inset: 0; z-index: 40; overflow: auto; overscroll-behavior: contain; background: #0c0a14; color: #f6ecd4; }
+.pl-world { position: relative; width: max(100vw, calc(100dvh * 16 / 9)); aspect-ratio: 16 / 9; }
+.pl-world .pl-bg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.pl-head { position: fixed; top: 0; left: 0; right: 0; z-index: 2; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,0)); pointer-events: none; }
+.pl-head > * { pointer-events: auto; } .pl-head b { display: block; font-size: 1.2rem; } .pl-head small { opacity: .85; }
+.pl-stone { position: absolute; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 6px; background: none; border: 0; color: inherit; cursor: pointer; font: inherit; width: 190px; text-align: center; }
+.pl-stone .stone { position: relative; width: 78px; height: 66px; border-radius: 50% 50% 46% 46%; background: radial-gradient(circle at 35% 30%, #e2ded0, #a9a696 55%, #6c695c); display: grid; place-items: center; box-shadow: 0 8px 0 #4f4a3d, 0 10px 18px rgba(0,0,0,.55); }
+.pl-stone .stone b { font-size: 1.7rem; color: #3a2a18; }
+.pl-stone.current .stone { animation: bob 2.2s ease-in-out infinite; box-shadow: 0 8px 0 #4f4a3d, 0 0 0 5px rgba(242,193,78,.8), 0 0 50px rgba(255,200,90,.9); }
 .pl-stone.done .stone { background: radial-gradient(circle at 35% 30%, #d8f0d0, #8ab87a 55%, #4a7a3a); }
-.pl-stone.locked { opacity: .55; cursor: default; }
-.pl-label { font-weight: 800; text-shadow: 0 2px 6px rgba(0,0,0,.7); }
+.pl-stone.locked { cursor: default; } .pl-stone.locked .stone { filter: grayscale(.6) brightness(.7); }
+.pl-stone .lock { position: absolute; right: -8px; top: -12px; font-style: normal; }
+.pl-stone:focus-visible { outline: 3px solid #f2c14e; outline-offset: 4px; border-radius: 14px; }
+.pl-label { font-weight: 800; font-size: .9rem; line-height: 1.2; padding: 4px 10px; border-radius: 10px; background: rgba(10,8,20,.62); }
 .pl-stars { display: block; font-style: normal; } .pl-stars em { font-style: normal; opacity: .3; } .pl-stars em.on { opacity: 1; color: #f2c14e; }
 .lc-stages .chip.on { background: #8ab87a; }

@@ -248,7 +248,7 @@ body.phone .mistband, body.phone #grain { display: none; }
 .fxlayer svg.scene { overflow: hidden; }
 .wpine { fill: #2d5650; } .wsnow { fill: #f6fbff; }
 /* вход в место большой темы: рисунок стоит на земле у тропы, светится проём */
-.node.entrance { width: calc(var(--s) * 260px); transform: translate(-50%, calc(-100% + var(--s) * 30px)); position: absolute; }
+.node.entrance { width: calc(var(--s) * 360px); transform: translate(-50%, calc(-100% + var(--s) * 30px)); position: absolute; }
 .node.entrance .ent { width: 100%; display: block; overflow: visible; filter: drop-shadow(0 calc(var(--s) * 6px) calc(var(--s) * 6px) rgba(0,0,0,.35)); }
 .node.entrance .door { fill: #120c08; transition: fill .3s; }
 .node.entrance.current .door, .node.entrance.done .door { fill: #ffcf6a; animation: doorglow 2.4s ease-in-out infinite; }

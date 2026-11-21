@@ -1,22 +1,62 @@
 // Входы в места больших тем прямо в ландшафте: дверь дома, пасть пещеры в скале, тоннель в горе,
 // ступени вниз к фонтану, ворота храма, башня-библиотека. Поле 260×240, низ рисунка (y = 240) — земля у тропы.
 // Проём входа (класс .door) светится, когда тема открыта, и закрыт решёткой, когда закрыта.
+import { rng, rock, moss, vine, fernBush, crystal, ROCK } from './art.js';
+
+// Пещера: каменная арка из глыб, тёмная глубина с бликом, мох и лианы сверху, папоротник у входа
+function caveArt() {
+  const r = rng(7);
+  let s = `<path d="M70,240 Q60,200 80,180 L180,180 Q200,200 190,240Z" fill="#c9b48a"/>`;
+  // глыбы, образующие холм
+  for (const [x, y, rx, ry] of [[40, 200, 46, 44], [222, 204, 44, 40], [58, 140, 42, 46], [206, 138, 46, 50], [100, 92, 50, 38], [166, 88, 50, 40], [132, 64, 44, 30]]) s += rock(x, y, rx, ry, r);
+  // проём: глубина и тёмное нутро
+  s += `<path class="mouth" d="M82,236 Q74,150 130,118 Q188,150 180,236Z" fill="url(#entDeep)"/>`;
+  s += `<path class="door" d="M100,236 Q98,170 130,148 Q162,170 160,236Z"/>`;
+  s += `<path d="M86,150 l6,18 l5,-12 l4,16 M168,152 l-5,16 l-4,-12" stroke="#d9dccf" stroke-width="5" stroke-linecap="round" fill="none"/>`;
+  // мох по верху, лианы с края арки
+  s += moss(60, 66, 150, r, 1.4) + moss(10, 118, 50, r) + moss(196, 112, 56, r);
+  for (const x of [96, 112, 150, 170]) s += vine(x, 120 + (x % 7), 40 + r() * 40, r);
+  s += fernBush(30, 240, 0.9, r) + fernBush(236, 240, 0.8, r) + fernBush(70, 240, 0.55, r);
+  s += crystal(196, 236, 22, '#7ae0ee', r);
+  return s;
+}
+
+// Дом мастера: каменный цоколь, деревянные стены, черепичная крыша в два яруса, светящиеся сёдзи, фонари, ступени
+function houseArt() {
+  const r = rng(11);
+  let s = `<rect x="14" y="214" width="232" height="26" rx="3" fill="#8a8678"/>`;
+  for (let x = 18; x < 244; x += 26) s += `<rect x="${x}" y="218" width="22" height="9" rx="2" fill="#a29e8e"/><rect x="${x + 11}" y="229" width="22" height="9" rx="2" fill="#7a7668"/>`;
+  s += `<rect x="24" y="122" width="212" height="94" fill="url(#entWood)"/>`;
+  for (const x of [24, 74, 186, 230]) s += `<rect x="${x}" y="120" width="8" height="96" fill="#3a2414"/>`;
+  s += `<rect x="24" y="166" width="212" height="6" fill="#3a2414"/>`;
+  // окна-сёдзи
+  for (const x of [36, 194]) { s += `<rect x="${x}" y="132" width="32" height="30" fill="#ffe2a0"/>`; for (let i = 1; i < 3; i++) s += `<path d="M${x + i * 11},132 V162 M${x},${132 + i * 10} H${x + 32}" stroke="#5a3820" stroke-width="2"/>`; }
+  // дверь-проём и ступени
+  s += `<path class="door" d="M96,214 V140 H164 V214Z"/>`;
+  for (let i = 0; i < 4; i++) s += `<path d="M96,${150 + i * 16} H164 M${107 + i * 16},140 V214" stroke="#5a3820" stroke-width="2" opacity=".55"/>`;
+  s += `<rect x="90" y="134" width="80" height="8" fill="#3a2414"/>`;
+  s += `<rect x="84" y="214" width="92" height="9" fill="#bab4a4"/><rect x="92" y="223" width="76" height="9" fill="#a8a292"/><rect x="100" y="232" width="60" height="8" fill="#969080"/>`;
+  // крыша: нижний ярус с черепицей и загнутыми углами
+  const roofs = [[118, 140, 26, 8], [74, 96, 22, -40]];
+  for (const [y, hw, h, dx] of roofs) {
+    const d = `M${130 - hw - 18},${y} Q${130 - hw},${y - 4} ${130 - hw + 14},${y - h} L${130 + hw - 14},${y - h} Q${130 + hw},${y - 4} ${130 + hw + 18},${y} Q130,${y + 10} ${130 - hw - 18},${y}Z`;
+    s += `<path d="${d}" fill="#3a3a44"/>`;
+    for (let x = 130 - hw + 6; x < 130 + hw - 2; x += 8) s += `<path d="M${x},${y - h + 2} V${y + 2}" stroke="#23232b" stroke-width="3"/>`;
+    s += `<path d="M${130 - hw - 18},${y} Q130,${y + 10} ${130 + hw + 18},${y}" stroke="#1a1a20" stroke-width="5" fill="none"/>`;
+  }
+  s += `<rect x="82" y="96" width="96" height="22" fill="url(#entWood)"/><rect x="104" y="98" width="52" height="18" rx="2" fill="#efdcb0" stroke="#8a3a22" stroke-width="2"/><text x="130" y="113" text-anchor="middle" font-size="15" fill="#8a3a22" font-family="serif">師</text>`;
+  s += `<path d="M120,52 Q130,40 140,52" stroke="#d9a43a" stroke-width="5" fill="none"/>`;
+  // фонари
+  for (const x of [58, 202]) s += `<path d="M${x},122 V130" stroke="#3a2414" stroke-width="2"/><ellipse cx="${x}" cy="141" rx="10" ry="12" fill="#d8402e"/><ellipse cx="${x}" cy="141" rx="5" ry="8" fill="#ffb347" opacity=".7"/><ellipse cx="${x}" cy="141" rx="30" ry="30" fill="#ff9a3c" opacity=".12"/>`;
+  // бамбук в горшках и кусты
+  for (const x of [8, 252]) { s += `<path d="M${x - 8},240 h16 l-3,-16 h-10Z" fill="#6a4424"/>`; for (let i = 0; i < 3; i++) s += `<rect x="${x - 5 + i * 4}" y="${150 + i * 14}" width="3" height="${76 - i * 14}" fill="#7aa83a"/>`; }
+  s += moss(16, 212, 60, r, 0.7) + moss(184, 212, 60, r, 0.7);
+  return s;
+}
+
 export const ENTRANCE = {
-  house: `<path d="M18,240 V120 H242 V240Z" fill="#8a5a32"/><path d="M18,120 H242 V240 H18Z" fill="url(#entWood)"/>
-    <path d="M0,128 Q30,112 40,70 L220,70 Q230,112 260,128 Q130,146 0,128Z" fill="#3a2a22"/><path d="M40,70 Q130,40 220,70" stroke="#2a1c16" stroke-width="8" fill="none"/>
-    <path d="M6,124 Q130,150 254,124" stroke="#d6dde2" stroke-width="7" fill="none" opacity=".75"/>
-    <rect x="30" y="150" width="46" height="40" rx="3" fill="#ffd98a" opacity=".85"/><path d="M53,150 V190 M30,170 H76" stroke="#5a3820" stroke-width="4"/>
-    <rect x="184" y="150" width="46" height="40" rx="3" fill="#ffd98a" opacity=".85"/><path d="M207,150 V190 M184,170 H230" stroke="#5a3820" stroke-width="4"/>
-    <path class="door" d="M100,240 V160 Q130,138 160,160 V240Z"/><path d="M100,240 V160 Q130,138 160,160 V240" stroke="#3a2412" stroke-width="6" fill="none"/>
-    <rect x="96" y="104" width="68" height="26" rx="3" fill="#efdcb0" stroke="#8a3a22" stroke-width="3"/><text x="130" y="124" text-anchor="middle" font-size="20" fill="#8a3a22" font-family="serif">師</text>
-    <circle cx="86" cy="148" r="9" fill="#d8402e"/><circle cx="174" cy="148" r="9" fill="#d8402e"/>`,
-  cave: `<path d="M0,240 Q10,150 60,110 Q100,60 150,70 Q220,80 245,150 Q258,200 260,240Z" fill="url(#entRock)"/>
-    <path d="M30,240 Q40,180 70,150 M210,240 Q215,190 200,160" stroke="#3a4048" stroke-width="5" fill="none" opacity=".6"/>
-    <path d="M60,112 Q90,96 120,108 M150,74 Q190,84 214,110" stroke="#e8eef2" stroke-width="8" fill="none" opacity=".7"/>
-    <path class="door" d="M78,240 Q76,170 130,150 Q184,170 182,240Z"/>
-    <path d="M96,166 l6,16 l6,-14 l6,18 l6,-16 l6,14 l6,-18 l6,16 l6,-14 l6,14 l6,-16" stroke="#3a4048" stroke-width="6" fill="none"/>
-    <path d="M78,240 Q76,170 130,150 Q184,170 182,240" stroke="#2a2e34" stroke-width="7" fill="none"/>
-    <circle cx="40" cy="226" r="8" fill="#5ad0e0" opacity=".8"/><circle cx="222" cy="230" r="6" fill="#5ad0e0" opacity=".8"/>`,
+  house: houseArt(),
+  cave: caveArt(),
   mountain: `<path d="M0,240 L70,60 L110,100 L150,20 L260,240Z" fill="url(#entRock)"/><path d="M150,20 L176,74 L160,66 L146,82 L132,58Z" fill="#f2f6fa"/>
     <path d="M70,60 L86,98 L74,92 L62,104Z" fill="#f2f6fa"/>
     <path d="M84,240 V176 Q84,140 130,140 Q176,140 176,176 V240Z" fill="#6a5a48"/>
@@ -41,5 +81,6 @@ export const ENTRANCE = {
 // Общие градиенты рисунков входов
 export const ENTRANCE_DEFS = `<defs>
   <linearGradient id="entWood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a683c"/><stop offset="1" stop-color="#6a4226"/></linearGradient>
+  <radialGradient id="entDeep" cx=".5" cy=".75" r=".7"><stop offset="0" stop-color="#3a3428"/><stop offset=".6" stop-color="#14110c"/><stop offset="1" stop-color="#0a0806"/></radialGradient>
   <linearGradient id="entRock" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa4a8"/><stop offset=".6" stop-color="#6c767c"/><stop offset="1" stop-color="#4a5258"/></linearGradient>
 </defs>`;
