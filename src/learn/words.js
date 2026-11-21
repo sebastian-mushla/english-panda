@@ -1,5 +1,6 @@
 import { TARGET } from '../state.js';
 import { RIDDLES } from './words-i18n.js';
+import { THEMES2, RAW2, SENTENCES2 } from './words2.js';
 
 // Банк слов A1. Формат строки: [en, emoji, ru, cz, загадка на простом английском, пример с пропуском ___].
 export const THEMES = {
@@ -158,6 +159,13 @@ export const SENTENCES = {
   ],
 };
 
+// Глава каждой темы: 1 — «Весна · A1», 2 — «Лето · A2»
+export const CHAPTER = {};
+for (const th of Object.keys(THEMES)) CHAPTER[th] = 1;
+for (const th of Object.keys(THEMES2)) CHAPTER[th] = 2;
+Object.assign(THEMES, THEMES2);
+Object.assign(SENTENCES, SENTENCES2);
+
 // en — неизменный id слова (ключ прогресса). t, riddle, ex — на изучаемом языке (TARGET).
 export const WORDS = {};
 export const BY_THEME = {};
@@ -174,5 +182,16 @@ for (const [theme, rows] of Object.entries(RAW)) {
     return (WORDS[en] = w);
   });
 }
+for (const [theme, rows] of Object.entries(RAW2)) {
+  BY_THEME[theme] = rows.map(([en, emoji, ru, cz, rEn, exEn, rRu, exRu, rCz, exCz]) => {
+    const w = { en, emoji, ru, cz, theme, cefr: 'A2',
+      t: { en, ru, cz }[TARGET],
+      riddle: { en: rEn, ru: rRu, cz: rCz }[TARGET],
+      ex: { en: exEn, ru: exRu, cz: exCz }[TARGET] };
+    BY_TARGET[w.t.toLowerCase()] = w;
+    return (WORDS[en] = w);
+  });
+}
+export const themesOf = (ch) => Object.keys(THEMES).filter((th) => CHAPTER[th] === ch);
 // Предложение темы: [на изучаемом языке, на родном]
 export const sentence = (s, native) => [s[TI[TARGET]], s[TI[native]]];

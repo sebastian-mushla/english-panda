@@ -1,19 +1,31 @@
 // Геометрия мира в «мировых единицах»: высота экрана = 1000 единиц.
 export const H = 1000;
-export const W = 8600;      // ширина главы 1 вместе с туманом лета
+export const W = 15600;     // главы 1 и 2 вместе с туманом осени
 export const VW = 1800;     // типичная ширина экрана в единицах (для выравнивания слоёв)
 
 export const ZONES = [
-  { id: 'bamboo', x0: 0, x1: 1850, icon: '🎋' },
-  { id: 'falls', x0: 1850, x1: 3300, icon: '💧' },
-  { id: 'village', x0: 3300, x1: 4950, icon: '🏮' },
-  { id: 'tea', x0: 4950, x1: 6450, icon: '🍵' },
-  { id: 'gate', x0: 6450, x1: 7100, icon: '⛩' },
-  { id: 'fog', x0: 7100, x1: 8600, icon: '🌫' },
+  // Глава 1 «Весна»
+  { id: 'bamboo', x0: 0, x1: 1850, icon: '🎋', ch: 1 },
+  { id: 'falls', x0: 1850, x1: 3300, icon: '💧', ch: 1 },
+  { id: 'village', x0: 3300, x1: 4950, icon: '🏮', ch: 1 },
+  { id: 'tea', x0: 4950, x1: 6450, icon: '🍵', ch: 1 },
+  { id: 'gate', x0: 6450, x1: 7100, icon: '⛩', ch: 1 },
+  // Глава 2 «Лето»
+  { id: 'terraces', x0: 7100, x1: 8800, icon: '🌾', ch: 2 },
+  { id: 'lake', x0: 8800, x1: 10400, icon: '🪷', ch: 2 },
+  { id: 'market', x0: 10400, x1: 12100, icon: '🧺', ch: 2 },
+  { id: 'monastery', x0: 12100, x1: 13700, icon: '🏯', ch: 2 },
+  { id: 'sgate', x0: 13700, x1: 14400, icon: '🔥', ch: 2 },
+  { id: 'fog', x0: 14400, x1: 15600, icon: '🌫', ch: 3 },
 ];
+export const chapterAt = (x) => (ZONES.find((z) => x >= z.x0 && x < z.x1) || ZONES[ZONES.length - 1]).ch;
 
 // Позиции камней-уровней на тропе
-export const NODE_X = [560, 1240, 2350, 2980, 3620, 4250, 4800, 5420, 6020, 6760];
+export const NODE_X = [560, 1240, 2350, 2980, 3620, 4250, 4800, 5420, 6020, 6760,
+  7500, 8250, 9050, 9850, 10700, 11450, 12350, 13050, 13550, 14050];
+// Начало главы 2 и туман следующей главы
+export const CH2_X = 7100, FOG_X = 14400;
+export const LAKE = { x0: 8900, x1: 10300 };
 // Панды-NPC: книга, лавка, словарь
 export const NPC_X = { book: 960, shop: 4020, dict: 5720 };
 

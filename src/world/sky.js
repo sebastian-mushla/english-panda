@@ -1,6 +1,6 @@
 // Фаза дня и сезон: цвета неба, тонировка сцены, сила света фонарей, звёзды, солнце и луна.
 import { state } from '../state.js';
-import { TEA } from './geo.js';
+import { TEA, chapterAt } from './geo.js';
 
 // Ключевые точки по мировой координате X (центр экрана)
 const KEYS = [
@@ -11,7 +11,15 @@ const KEYS = [
   { x: 4650, name: 'sunset', sky: ['#9c4f6e', '#e8805a', '#f6bd78'], tint: [210, 80, 70, 0.24], glow: 0.8, stars: 0.2, rays: 0.55, sun: [0.86, 0.74] },
   { x: 5700, name: 'tea', sky: ['#2a2346', '#5a3b5e', '#8a5a5a'], tint: [60, 28, 10, 0.32], glow: 1, stars: 0.5, rays: 0, sun: [0.95, 1.2] },
   { x: 6750, name: 'night', sky: ['#0b1430', '#1b2b55', '#334a7c'], tint: [12, 22, 64, 0.5], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
-  { x: 8600, name: 'night', sky: ['#0b1430', '#1b2b55', '#334a7c'], tint: [12, 22, 64, 0.52], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
+  // Глава 2 «Лето»: новый день
+  { x: 7000, name: 'night', sky: ['#0b1430', '#1b2b55', '#334a7c'], tint: [12, 22, 64, 0.5], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
+  { x: 7500, name: 'dawn', sky: ['#f6b49a', '#fbd8b8', '#e0f2e0'], tint: [255, 160, 120, 0.14], glow: 0.35, stars: 0.1, rays: 0.95, sun: [0.12, 0.62] },
+  { x: 8800, name: 'day', sky: ['#6cc2dc', '#b8e6e4', '#f4f8e4'], tint: [255, 250, 220, 0.03], glow: 0.06, stars: 0, rays: 0.6, sun: [0.38, 0.14] },
+  { x: 10200, name: 'noon', sky: ['#4fb2d8', '#a2dcea', '#f2f6dc'], tint: [255, 245, 200, 0.05], glow: 0.05, stars: 0, rays: 0.5, sun: [0.55, 0.07] },
+  { x: 11700, name: 'golden', sky: ['#eba868', '#f7d08e', '#f6e8bc'], tint: [255, 170, 70, 0.16], glow: 0.4, stars: 0, rays: 0.9, sun: [0.74, 0.34] },
+  { x: 12900, name: 'sunset', sky: ['#a8466a', '#ee7a4e', '#f8b86a'], tint: [215, 80, 60, 0.26], glow: 0.85, stars: 0.2, rays: 0.55, sun: [0.87, 0.74] },
+  { x: 13900, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.5], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
+  { x: 15600, name: 'night', sky: ['#0d1532', '#1f2c58', '#3a4a80'], tint: [14, 24, 66, 0.52], glow: 1, stars: 1, rays: 0, sun: [0.95, 1.3] },
 ];
 
 // Реальное время суток → ближайший ключ
@@ -88,10 +96,17 @@ export function applyPhase(centerX, viewW) {
 }
 
 export const SEASONS = ['spring', 'summer', 'autumn', 'winter'];
-export function currentSeason() {
-  return state.view.season === 'auto' ? 'spring' : state.view.season;
+// «По главе»: весна в главе 1, лето в главе 2, осень в тумане главы 3
+const CH_SEASON = { 1: 'spring', 2: 'summer', 3: 'autumn' };
+export function seasonAt(x) {
+  return state.view.season === 'auto' ? CH_SEASON[chapterAt(x)] || 'spring' : state.view.season;
 }
-export function applySeason() {
+let camX = 0;
+export function currentSeason() {
+  return seasonAt(camX);
+}
+export function applySeason(x = camX) {
+  camX = x;
   const s = currentSeason();
   SEASONS.forEach((n) => document.body.classList.toggle('season-' + n, n === s));
   last = '';

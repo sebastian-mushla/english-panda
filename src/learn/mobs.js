@@ -118,4 +118,102 @@ export const MOBS = {
   },
 };
 
+// Духи главы 2 «Лето»
+Object.assign(MOBS, {
+  cicada: {
+    hp: 6, reward: 16,
+    name: { ru: 'Цикада-певунья', cz: 'Zpěvavá cikáda' },
+    text: { ru: 'Всё лето поёт, бегает и плавает в росе. Знает все слова-действия.', cz: 'Celé léto zpívá, běhá a plave v rose. Zná všechna slova o činnostech.' },
+    svg: `<ellipse cx="50" cy="58" rx="16" ry="26" fill="#5a7a3a"/><ellipse cx="50" cy="58" rx="9" ry="20" fill="#7fa04a"/>
+      <path d="M36,44 Q10,40 8,70 Q26,60 40,62Z M64,44 Q90,40 92,70 Q74,60 60,62Z" fill="#cfeedd" opacity=".75" stroke="#7aa0a0" stroke-width="1.5"/>
+      <circle cx="50" cy="30" r="12" fill="#4a6a2a"/><circle cx="43" cy="28" r="4" fill="#f2c14e"/><circle cx="57" cy="28" r="4" fill="#f2c14e"/>
+      <circle cx="43" cy="28" r="1.8" fill="#111"/><circle cx="57" cy="28" r="1.8" fill="#111"/>
+      <path d="M72,18 q6,-4 10,0 M76,10 q6,-4 10,0" stroke="#3f9b6e" stroke-width="2.5" fill="none"/><text x="78" y="26" font-size="12" fill="#3f9b6e">♪</text>`,
+  },
+  silkworm: {
+    hp: 6, reward: 16,
+    name: { ru: 'Шелкопряд-портной', cz: 'Bourec krejčí' },
+    text: { ru: 'Прядёт шёлк и шьёт пандам шляпы, шарфы и платья. Не терпит дырявых носков.', cz: 'Přede hedvábí a šije pandám klobouky, šály a šaty. Nesnáší děravé ponožky.' },
+    svg: `<path d="M12,70 Q30,40 50,62 Q70,84 90,54" stroke="#f4a6c0" stroke-width="3" fill="none" stroke-dasharray="4 3"/>
+      <g fill="#f4f1ea" stroke="#c9b48a" stroke-width="2"><circle cx="30" cy="66" r="10"/><circle cx="44" cy="62" r="11"/><circle cx="58" cy="60" r="11"/><circle cx="72" cy="56" r="12"/></g>
+      <circle cx="76" cy="52" r="2.4" fill="#2a1d14"/><path d="M80,58 q4,2 6,0" stroke="#2a1d14" stroke-width="1.6" fill="none"/>
+      <path d="M60,30 l10,10 l-14,4z" fill="#c23a2b"/><rect x="20" y="22" width="22" height="16" rx="3" fill="#2f5bb0"/><path d="M22,26 h18 M22,32 h18" stroke="#fff" stroke-width="1.5"/>`,
+  },
+  thunder: {
+    hp: 6, reward: 16,
+    name: { ru: 'Громовой барабанщик', cz: 'Hromový bubeník' },
+    text: { ru: 'Сидит на туче и бьёт в барабаны. После его грозы всегда выходит радуга.', cz: 'Sedí na mraku a bubnuje. Po jeho bouřce vždycky vyjde duha.' },
+    svg: `<g fill="#c9d4e4"><circle cx="34" cy="62" r="16"/><circle cx="52" cy="54" r="20"/><circle cx="70" cy="62" r="16"/><rect x="20" y="60" width="64" height="18" rx="9"/></g>
+      <circle cx="44" cy="58" r="3" fill="#2a3a5a"/><circle cx="60" cy="58" r="3" fill="#2a3a5a"/><path d="M46,68 q6,5 12,0" stroke="#2a3a5a" stroke-width="2.5" fill="none"/>
+      <circle cx="18" cy="38" r="10" fill="#c23a2b" stroke="#7a1d14" stroke-width="2"/><circle cx="86" cy="38" r="10" fill="#c23a2b" stroke="#7a1d14" stroke-width="2"/>
+      <path d="M50,80 l-6,10 h6 l-4,10 l12,-14 h-6 l4,-6z" fill="#f2c14e"/>`,
+  },
+  snail: {
+    hp: 6, reward: 16,
+    name: { ru: 'Часовая улитка', cz: 'Hodinový šnek' },
+    text: { ru: 'Носит на спине часы и никогда не опаздывает. Правда, и не спешит.', cz: 'Nosí na zádech hodiny a nikdy nechodí pozdě. Ale ani nespěchá.' },
+    svg: `<path d="M10,80 Q30,70 62,78 L84,78 Q92,78 90,70 Q86,60 78,62" fill="#c9a46a" stroke="#8a6a32" stroke-width="2"/>
+      <circle cx="44" cy="54" r="24" fill="#f2c14e" stroke="#8a6014" stroke-width="3"/><circle cx="44" cy="54" r="18" fill="#fff8dc"/>
+      <path d="M44,54 V42 M44,54 L53,58" stroke="#2a1d14" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M80,62 L76,46 M86,64 L88,48" stroke="#8a6a32" stroke-width="2"/><circle cx="76" cy="45" r="3" fill="#2a1d14"/><circle cx="88" cy="47" r="3" fill="#2a1d14"/>`,
+  },
+  cricket: {
+    hp: 6, reward: 18,
+    name: { ru: 'Сверчок-фонарщик', cz: 'Cvrček lampář' },
+    text: { ru: 'Каждый вечер зажигает фонари на улицах, у моста и у рынка.', cz: 'Každý večer rozsvěcí lampy v ulicích, u mostu i u trhu.' },
+    svg: `<ellipse cx="44" cy="62" rx="24" ry="14" fill="#5a3a1e"/><circle cx="22" cy="54" r="10" fill="#6a4424"/><circle cx="18" cy="52" r="2.5" fill="#f2c14e"/>
+      <path d="M14,46 Q4,24 18,12 M20,44 Q16,22 32,12" stroke="#5a3a1e" stroke-width="2" fill="none"/>
+      <path d="M40,72 L30,90 M54,72 L66,90 M60,60 L80,44" stroke="#5a3a1e" stroke-width="3"/>
+      <path d="M80,44 v-4" stroke="#3a2a1a" stroke-width="2"/><ellipse cx="80" cy="34" rx="9" ry="10" fill="#d8402e" stroke="#7a1d14" stroke-width="2"/><ellipse cx="80" cy="34" rx="4" ry="6" fill="#ffb347"/>`,
+  },
+  twin: {
+    hp: 6, reward: 18,
+    name: { ru: 'Дух-близнец Инь-Ян', cz: 'Dvojčecí duch jin-jang' },
+    text: { ru: 'Одна половина большая и весёлая, другая маленькая и грустная. Вместе они знают все противоположности.', cz: 'Jedna polovina je velká a veselá, druhá malá a smutná. Spolu znají všechny protiklady.' },
+    svg: `<circle cx="50" cy="50" r="38" fill="#f4f1ea" stroke="#2a2a2a" stroke-width="3"/>
+      <path d="M50,12 A38,38 0 0 1 50,88 A19,19 0 0 1 50,50 A19,19 0 0 0 50,12Z" fill="#1d1d24"/>
+      <circle cx="50" cy="31" r="6" fill="#1d1d24"/><circle cx="50" cy="69" r="6" fill="#f4f1ea"/>
+      <path d="M38,40 q4,4 8,0" stroke="#1d1d24" stroke-width="2" fill="none"/><path d="M54,62 q4,-4 8,0" stroke="#f4f1ea" stroke-width="2" fill="none"/>`,
+  },
+  squirrel: {
+    hp: 7, reward: 18,
+    name: { ru: 'Белка-мастерица', cz: 'Veverka řemeslnice' },
+    text: { ru: 'Сегодня она повар, завтра — водитель, послезавтра — пилот. Перепробовала все профессии.', cz: 'Dnes je kuchařka, zítra řidička, pozítří pilotka. Vyzkoušela všechna povolání.' },
+    svg: `<path d="M64,84 Q100,70 86,30 Q78,14 66,26 Q84,40 70,66Z" fill="#c8642a"/>
+      <ellipse cx="46" cy="66" rx="20" ry="20" fill="#d9783a"/><ellipse cx="46" cy="70" rx="11" ry="13" fill="#f4dcb4"/>
+      <circle cx="42" cy="40" r="16" fill="#d9783a"/><path d="M30,30 l-2,-12 l8,6z M48,26 l6,-10 l2,12z" fill="#c8642a"/>
+      <circle cx="37" cy="40" r="2.6" fill="#111"/><circle cx="49" cy="40" r="2.6" fill="#111"/><circle cx="43" cy="46" r="2" fill="#5a2a14"/>
+      <rect x="30" y="18" width="26" height="10" rx="5" fill="#fff" stroke="#ccc"/><rect x="36" y="10" width="14" height="10" rx="5" fill="#fff" stroke="#ccc"/>`,
+  },
+  kitedragon: {
+    hp: 7, reward: 18,
+    name: { ru: 'Воздушный змей-дракон', cz: 'Drak z draka' },
+    text: { ru: 'Когда-то был обычным воздушным змеем. Теперь играет в футбол, танцует и бренчит на гитаре.', cz: 'Kdysi to byl obyčejný papírový drak. Teď hraje fotbal, tančí a brnká na kytaru.' },
+    svg: `<path d="M50,10 L80,44 L50,78 L20,44Z" fill="#e2412b" stroke="#7a1d14" stroke-width="2.5"/><path d="M50,10 V78 M20,44 H80" stroke="#f2c14e" stroke-width="2"/>
+      <circle cx="42" cy="38" r="3" fill="#111"/><circle cx="58" cy="38" r="3" fill="#111"/><path d="M42,52 q8,6 16,0" stroke="#111" stroke-width="2.5" fill="none"/>
+      <path d="M50,78 q-10,8 0,14 q10,6 -2,12" stroke="#2f5bb0" stroke-width="2.5" fill="none"/><path d="M46,86 l-6,-2 M54,92 l6,-2" stroke="#f2c14e" stroke-width="3"/>`,
+  },
+  firefly: {
+    hp: 7, reward: 20,
+    name: { ru: 'Светлячок-путеводитель', cz: 'Světluška průvodkyně' },
+    text: { ru: 'Освещает дорогу путникам: поездам, лодкам и даже самолётам. Всегда знает, где твой билет.', cz: 'Svítí na cestu poutníkům: vlakům, loďkám i letadlům. Vždycky ví, kde máš lístek.' },
+    svg: `<circle cx="50" cy="64" r="24" fill="#ffd27a" opacity=".35"/><ellipse cx="50" cy="66" rx="12" ry="16" fill="#f6e27a"/>
+      <ellipse cx="50" cy="46" rx="11" ry="10" fill="#3a3a2a"/><circle cx="46" cy="44" r="2.2" fill="#fff"/><circle cx="54" cy="44" r="2.2" fill="#fff"/>
+      <path d="M40,52 Q20,40 24,60 Q34,58 42,56Z M60,52 Q80,40 76,60 Q66,58 58,56Z" fill="#d9f0ff" opacity=".8"/>
+      <path d="M44,38 Q40,26 34,24 M56,38 Q60,26 66,24" stroke="#3a3a2a" stroke-width="2" fill="none"/>
+      <rect x="68" y="72" width="22" height="14" rx="2" fill="#efdcb0" stroke="#8a6a32"/><path d="M72,76 h14 M72,81 h10" stroke="#8a6a32" stroke-width="1.5"/>`,
+  },
+  phoenix: {
+    hp: 10, reward: 40,
+    name: { ru: 'Бронзовый феникс Врат лета', cz: 'Bronzový fénix Brány léta' },
+    text: { ru: 'Сторожит Врата лета. Пропускает только тех, кто помнит все слова лета.', cz: 'Hlídá Bránu léta. Pustí jen ty, kdo si pamatují všechna slova léta.' },
+    svg: `<path d="M50,40 Q20,10 8,30 Q22,32 30,48 Q14,52 12,66 Q30,58 40,62Z" fill="#e07a1f"/>
+      <path d="M50,40 Q80,10 92,30 Q78,32 70,48 Q86,52 88,66 Q70,58 60,62Z" fill="#e07a1f"/>
+      <ellipse cx="50" cy="58" rx="13" ry="18" fill="#c8592a"/><circle cx="50" cy="34" r="10" fill="#d9a43a"/>
+      <path d="M50,24 q-4,-10 0,-16 q4,6 0,16 M44,26 q-8,-6 -8,-12 M56,26 q8,-6 8,-12" stroke="#f2c14e" stroke-width="3" fill="none"/>
+      <circle cx="47" cy="33" r="2" fill="#111"/><circle cx="53" cy="33" r="2" fill="#111"/><path d="M50,37 l-3,4 h6z" fill="#8a2a1f"/>
+      <path d="M44,74 q-6,14 -2,24 M50,76 q0,14 0,24 M56,74 q6,14 2,24" stroke="#c23a2b" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  },
+});
+
 export const mobSVG = (id, cls = '') => `<svg class="mob ${cls}" viewBox="0 0 100 100" aria-hidden="true">${MOBS[id].svg}</svg>`;

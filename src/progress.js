@@ -15,7 +15,10 @@ export const ACH = [
   { id: 'spirits5', icon: '👻', name: { ru: 'Охотник за духами', cz: 'Lovec duchů' }, text: { ru: '5 духов в Книге.', cz: '5 duchů v Knize.' }, test: (s) => Object.keys(s.mobs).length >= 5 },
   { id: 'shopper', icon: '👘', name: { ru: 'Модная панда', cz: 'Módní panda' }, text: { ru: 'Купи первый наряд в Лавке.', cz: 'Kup první oblek v Obchůdku.' }, test: (s) => s.owned.length > 3 },
   { id: 'tea', icon: '🍵', name: { ru: 'Чайная церемония', cz: 'Čajový obřad' }, text: { ru: 'Загляни в чайный дом.', cz: 'Nahlédni do čajovny.' }, test: (s) => s.stats.teaVisited },
-  { id: 'gate', icon: '🏮', name: { ru: 'Хранитель весны', cz: 'Strážce jara' }, text: { ru: 'Пройди Врата весны и получи свиток.', cz: 'Projdi Bránou jara a získej svitek.' }, test: (s) => s.certs.length > 0 },
+  { id: 'gate', icon: '🏮', name: { ru: 'Хранитель весны', cz: 'Strážce jara' }, text: { ru: 'Пройди Врата весны и получи свиток.', cz: 'Projdi Bránou jara a získej svitek.' }, test: (s) => s.certs.some((c) => (c.ch || 1) === 1) },
+  { id: 'summer', icon: '🔥', name: { ru: 'Хранитель лета', cz: 'Strážce léta' }, text: { ru: 'Пройди Врата лета и получи свиток A2.', cz: 'Projdi Bránou léta a získej svitek A2.' }, test: (s) => s.certs.some((c) => c.ch === 2) },
+  { id: 'fisher', icon: '🎣', name: { ru: 'Рыбак долины', cz: 'Rybář údolí' }, text: { ru: 'Поймай 30 нужных рыб.', cz: 'Chyť 30 správných ryb.' }, test: (s) => (s.stats.fish || 0) >= 30 },
+  { id: 'words120', icon: '🏯', name: { ru: 'Мудрец библиотеки', cz: 'Mudrc knihovny' }, text: { ru: '120 слов в словаре.', cz: '120 slov ve slovníku.' }, test: () => knownCount() >= 120 },
 ];
 
 export function checkAch() {

@@ -20,6 +20,8 @@ export function initHud(a) {
 export function setZone(z) {
   zone = z;
   const zEl = el.querySelector('.h-zone');
+  const cEl = el.querySelector('.h-ch');
+  if (cEl) cEl.textContent = t('chapter' + z.ch);
   if (zEl) { zEl.textContent = t('zone.' + z.id); zEl.classList.remove('swap'); void zEl.offsetWidth; zEl.classList.add('swap'); }
 }
 
@@ -27,7 +29,7 @@ function render() {
   const q = ensureDaily();
   el.innerHTML = `
     <div class="h-left">
-      <div class="h-sign"><span class="h-ch">${t('chapter')}</span><span class="h-zone">${zone ? t('zone.' + zone.id) : ''}</span></div>
+      <div class="h-sign"><span class="h-ch">${t('chapter' + (zone?.ch || 1))}</span><span class="h-zone">${zone ? t('zone.' + zone.id) : ''}</span></div>
       <div class="h-daily ${q.done ? 'done' : ''}" title="${t('daily')}"><b>🎋 ${t('daily')}</b><span>${t('daily.' + q.kind)}</span>
         <i class="bar"><i style="width:${q.prog / q.goal * 100}%"></i></i><em>${q.done ? '✓' : `${q.prog}/${q.goal} · +30`}</em></div>
     </div>

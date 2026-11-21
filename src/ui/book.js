@@ -2,7 +2,7 @@
 import { state } from '../state.js';
 import { t, L } from '../i18n.js';
 import { MOBS, mobSVG } from '../learn/mobs.js';
-import { LEVELS } from '../learn/curriculum.js';
+import { LEVELS, CHAPTERS } from '../learn/curriculum.js';
 import { ACH } from '../progress.js';
 import { board, openModal } from './modal.js';
 import { sfx } from '../audio.js';
@@ -43,7 +43,7 @@ function achievements(panel) {
 
 function certs(panel) {
   if (!state.certs.length) { panel.innerHTML = `<p class="empty">${t('noCerts')}</p>`; return; }
-  panel.innerHTML = `<div class="cert-list">${state.certs.map((c, i) => `<button class="cert-mini" data-i="${i}"><span>📜</span><b>${t('certTitle')}</b><small>A1 Starter · ${c.date}</small></button>`).join('')}</div>`;
+  panel.innerHTML = `<div class="cert-list">${state.certs.map((c, i) => `<button class="cert-mini" data-i="${i}"><span>📜</span><b>${t('certTitle')}</b><small>${c.cefr || 'A1'} · ${c.date}</small></button>`).join('')}</div>`;
   panel.querySelectorAll('.cert-mini').forEach((b) => b.addEventListener('click', () => openCertificate(state.certs[+b.dataset.i])));
 }
 
@@ -51,13 +51,13 @@ export function openCertificate(c) {
   const m = openModal(`<div class="certificate" id="cert-print">
       <div class="cert-roll"></div>
       <div class="cert-body">
-        <div class="seal">春</div>
+        <div class="seal">${(c.ch || 1) === 1 ? '春' : '夏'}</div>
         <h2>${t('certTitle')}</h2>
         <p>${t('certConfirms')}</p>
         <div class="cert-name">${c.name || state.name || '🐼'}</div>
-        <p>${t('certText')}</p>
-        <div class="cert-level">CEFR <b>A1</b> · Starter</div>
-        <p class="cert-next">${t('certNext')}</p>
+        <p>${t('certText', { chn: L(CHAPTERS[c.ch || 1].name), cefr: c.cefr || 'A1' })}</p>
+        <div class="cert-level">CEFR <b>${c.cefr || 'A1'}</b> · ${(c.ch || 1) === 1 ? 'Starter' : 'Elementary'}</div>
+        <p class="cert-next">${t((c.ch || 1) === 1 ? 'certNext' : 'certNext2')}</p>
         <p class="cert-off">${t('certOfficial')}</p>
         <div class="cert-foot"><span>English Panda</span><span>${c.date}</span></div>
       </div>

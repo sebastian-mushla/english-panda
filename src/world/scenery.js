@@ -2,7 +2,7 @@
 // размытие дальнего и переднего плана. Цвета сезона приходят из CSS-переменных.
 // Мелкие одинаковые детали (листья, трава, цветы) собираются в один <path> на цвет, чтобы DOM был лёгким.
 // Каждый источник света кладёт свечение в отдельный слой света (lights) с тем же параллаксом.
-import { W, H, lx, groundY, bridgeY, RIVER, TEA } from './geo.js';
+import { W, H, lx, groundY, bridgeY, RIVER, TEA, LAKE, FOG_X } from './geo.js';
 import { pandaG, PANDA_DEFS } from './panda.js';
 
 const P = (n) => Math.round(n * 10) / 10;
@@ -325,13 +325,14 @@ function layerMid(r, lights) {
   s += house(lx(3700, f), 870, 0.55, lights, ink) + house(lx(4380, f), 860, 0.6, lights, ink, { floors: 2 }) + house(lx(4900, f), 870, 0.5, lights, ink);
   s += lanternString(lx(3800, f), lx(4250, f), 600, 30, 5, lights);
   // ночной лес у врат и лето в тумане
-  for (let x = lx(6500, f); x < lx(8800, f); x += 70 + r() * 90) {
+  for (let x = lx(6500, f); x < lx(7150, f); x += 70 + r() * 90) {
     const cx = x, cy = 700 + r() * 80, rx = 70 + r() * 60, ry = 110 + r() * 70;
     s += `<rect fill="url(#gTrunk)" x="${P(cx - 7)}" y="760" width="14" height="180"/>`;
     ink.add('leafB', ell(cx + 8, cy + 10, rx, ry));
     ink.add('leafA', ell(cx, cy, rx * 0.85, ry * 0.85));
     ink.add('leafC', ell(cx - rx * 0.3, cy - ry * 0.4, rx * 0.35, ry * 0.3));
   }
+  s += midSummer(f, r, ink, lights);
   s += ink.out();
   s += `<rect x="0" y="830" width="${w}" height="130" fill="url(#gMist)" opacity=".3"/>`;
   return { f, w, svg: s };
@@ -399,11 +400,11 @@ function teaHouse(lights, r, ink) {
   return s;
 }
 
-function gate(x, base, lights) {
+function gate(x, base, lights, ch = '春') {
   let s = '';
   for (const px of [x - 180, x + 180]) s += `<rect fill="url(#gStone)" x="${px - 42}" y="${base - 32}" width="84" height="32" rx="3"/><rect fill="url(#gPillar)" x="${px - 21}" y="${base - 402}" width="42" height="372"/>`;
   s += `<rect fill="url(#gPillar)" x="${x - 224}" y="${base - 342}" width="448" height="28"/><rect fill="url(#gPillar)" x="${x - 204}" y="${base - 300}" width="408" height="16"/>
-    <rect class="plaque" x="${x - 56}" y="${base - 316}" width="112" height="62" rx="4"/><text class="callig gold-t" x="${x}" y="${base - 267}" text-anchor="middle">春</text>`;
+    <rect class="plaque" x="${x - 56}" y="${base - 316}" width="112" height="62" rx="4"/><text class="callig gold-t" x="${x}" y="${base - 267}" text-anchor="middle">${ch}</text>`;
   for (const [y0, hw, hh] of [[380, 296, 40], [426, 146, 34]]) {
     const d = `M${x - hw},${base - y0} Q${x - hw + 80},${base - y0 - 12} ${x - hw + 100},${base - y0 - hh} L${x + hw - 100},${base - y0 - hh} Q${x + hw - 80},${base - y0 - 12} ${x + hw},${base - y0} Q${x},${base - y0 + 30} ${x - hw},${base - y0}Z`;
     s += `<path class="roof" d="${d}"/><path d="${d}" fill="url(#pTiles)" opacity=".7"/><path class="eave" stroke-width="5" d="M${x + hw},${base - y0} Q${x},${base - y0 + 30} ${x - hw},${base - y0}"/>`;
@@ -435,6 +436,7 @@ function layerGround(r, lights) {
   for (let x = -20; x < w; x += 5 + r() * 5) {
     if (x > TEA.x0 - 30 && x < TEA.x1 + 30) continue;
     if (x > RIVER.x0 + 20 && x < RIVER.x1 - 20) continue;
+    if (x > LAKE.x0 + 20 && x < LAKE.x1 - 20) continue;
     const y = groundY(x) + 4, hh = 10 + r() * 22, lean = (r() - 0.5) * 14;
     grass.add(r() < 0.5 ? 'blade' : 'blade2', `M${P(x - 2)},${P(y)}Q${P(x + lean * 0.4)},${P(y - hh * 0.6)} ${P(x + lean)},${P(y - hh)}Q${P(x + lean * 0.3 + 1)},${P(y - hh * 0.5)} ${P(x + 2)},${P(y)}Z`);
     if (r() < 0.06) { const fy = y - hh * 0.6; grass.add(r() < 0.5 ? 'flowerA' : 'flowerB', circ(x + lean * 0.6, fy, 3.2) + circ(x + lean * 0.6 + 5, fy + 2, 2.6)); }
@@ -462,13 +464,13 @@ function layerGround(r, lights) {
   for (let c = 0; c < W; c += 480) {
     let dp = '';
     for (let x = c; x <= c + 480; x += 30) {
-      if ((x > b0 - 20 && x < b1 + 20) || (x > TEA.x0 - 30 && x < TEA.x1 + 30)) { dp += ' '; continue; }
+      if ((x > b0 - 20 && x < b1 + 20) || (x > TEA.x0 - 30 && x < TEA.x1 + 30) || (x > LAKE.x0 && x < LAKE.x1)) { dp += ' '; continue; }
       dp += `${dp.endsWith(' ') || !dp ? 'M' : 'L'}${x},${P(groundY(x) + 20)}`;
     }
     if (dp.trim()) s += `<path class="dirt" d="${dp.trim()}"/>`;
   }
   for (let x = 30; x < W; x += 46 + r() * 20) {
-    if ((x > b0 - 20 && x < b1 + 20) || (x > TEA.x0 - 20 && x < TEA.x1 + 20)) continue;
+    if ((x > b0 - 20 && x < b1 + 20) || (x > TEA.x0 - 20 && x < TEA.x1 + 20) || (x > LAKE.x0 - 20 && x < LAKE.x1 + 20)) continue;
     const cy = groundY(x) + 18 + r() * 8, rx = 18 + r() * 10;
     s += `<ellipse cx="${P(x)}" cy="${P(cy + 2)}" rx="${P(rx)}" ry="${P(6 + r() * 3)}" fill="#000" opacity=".18"/><ellipse fill="url(#gStone)" cx="${P(x)}" cy="${P(cy)}" rx="${P(rx)}" ry="${P(6 + r() * 3)}"/>`;
   }
@@ -484,11 +486,13 @@ function layerGround(r, lights) {
   for (const x of [3330, 4260, 4880]) s += `<path class="pot" d="M${x - 22},${P(groundY(x) - 2)} h44 l-7,-32 h-30Z"/>` + bamboo(x, groundY(x) - 32, 120, 6, r, ink, { lean: 4 });
   s += teaHouse(lights, r, ink);
   s += gate(6760, groundY(6760) + 4, lights);
-  for (let x = 7150; x < w; x += 110 + r() * 90) {
+  s += groundSummer(r, ink, lights);
+  // осень в тумане
+  for (let x = FOG_X + 50; x < w; x += 110 + r() * 90) {
     const cy = groundY(x) - 160, rx = 80 + r() * 50, ry = 130 + r() * 50;
     s += `<rect fill="url(#gTrunk)" x="${P(x - 8)}" y="${P(groundY(x) - 60)}" width="16" height="80"/>`;
-    ink.add('summer', ell(x, cy, rx, ry));
-    ink.add('leafC', ell(x - rx * 0.3, cy - ry * 0.4, rx * 0.3, ry * 0.25));
+    ink.add('autumnD', ell(x + 8, cy + 8, rx, ry));
+    ink.add('autumn', ell(x, cy, rx * 0.85, ry * 0.85));
   }
   return { f, w, svg: s + ink.out() };
 }
@@ -496,7 +500,7 @@ function layerGround(r, lights) {
 function layerFront(r, lights) {
   const f = 1.4, w = layerW(f);
   let s = '';
-  for (const X of [-40, 120, 1880, 3260]) {
+  for (const X of [-40, 120, 1880, 3260, 7150, 12150]) {
     const x = lx(X, f), ink = new Ink();
     let g = '';
     for (let i = 0; i < 3; i++) g += bamboo(x + i * 48, 1050, 1120, 32 + r() * 10, r, ink, { grad: 'gBamFront', lf: ['leaffront', 'leaffront2', 'leaffront'], node: 'bamfrontn', lean: (r() - 0.5) * 6 });
@@ -518,6 +522,157 @@ function layerFront(r, lights) {
   }
   s += gr.out();
   return { f, w, svg: s };
+}
+
+
+// ---------- Глава 2 «Лето» ----------
+function pagoda(x, base, s, lights, tiers = 5) {
+  let g = '';
+  let y = base;
+  for (let i = 0; i < tiers; i++) {
+    const w = (120 - i * 16) * s, h = (54 - i * 4) * s, l = x - w / 2;
+    g += `<rect fill="url(#gWall)" x="${P(l)}" y="${P(y - h)}" width="${P(w)}" height="${P(h)}"/>`;
+    for (const px of [l, l + w - 8 * s]) g += `<rect fill="url(#gPillar)" x="${P(px)}" y="${P(y - h)}" width="${P(8 * s)}" height="${P(h)}"/>`;
+    g += `<rect class="win" x="${P(x - 10 * s)}" y="${P(y - h * 0.75)}" width="${P(20 * s)}" height="${P(h * 0.5)}"/>`;
+    lights.push(glow(x, y - h * 0.5, 50 * s, true));
+    const T = y - h, ov = 34 * s, rl = l - ov, rr = l + w + ov;
+    const d = `M${P(rl)},${P(T)} Q${P(l)},${P(T - 6 * s)} ${P(l + 10 * s)},${P(T - 22 * s)} L${P(l + w - 10 * s)},${P(T - 22 * s)} Q${P(l + w)},${P(T - 6 * s)} ${P(rr)},${P(T)} Q${P(x)},${P(T + 14 * s)} ${P(rl)},${P(T)}Z`;
+    g += `<path class="roof" d="${d}"/><path d="${d}" fill="url(#pTiles)" opacity=".7"/><path class="eave" stroke-width="${P(4 * s)}" d="M${P(rr)},${P(T)} Q${P(x)},${P(T + 14 * s)} ${P(rl)},${P(T)}"/>`;
+    g += lantern(rl + 8 * s, T + 14 * s, s * 0.6, lights, i % 2 === 0) + lantern(rr - 8 * s, T + 14 * s, s * 0.6, lights);
+    y = T - 20 * s;
+  }
+  g += `<path class="ridge" stroke-width="${P(5 * s)}" d="M${P(x)},${P(y + 18 * s)} V${P(y - 30 * s)}"/><circle class="gold" cx="${P(x)}" cy="${P(y - 32 * s)}" r="${P(6 * s)}"/>`;
+  return g;
+}
+
+function stall(x, base, s, color, sign, lights, ink, r) {
+  const w = 170 * s, l = x - w / 2, top = base - 150 * s;
+  let g = `<ellipse cx="${P(x)}" cy="${P(base + 2)}" rx="${P(w * 0.6)}" ry="${P(10 * s)}" fill="#000" opacity=".2"/>`;
+  for (const px of [l + 6 * s, l + w - 14 * s]) g += `<rect fill="url(#gTrunk)" x="${P(px)}" y="${P(top)}" width="${P(8 * s)}" height="${P(base - top)}"/>`;
+  g += `<rect fill="url(#gDeck)" x="${P(l - 6 * s)}" y="${P(base - 62 * s)}" width="${P(w + 12 * s)}" height="${P(14 * s)}" rx="${P(3 * s)}"/>
+    <rect fill="url(#gWall)" x="${P(l)}" y="${P(base - 48 * s)}" width="${P(w)}" height="${P(48 * s)}"/>`;
+  // товары на прилавке
+  const goods = ['orange', 'apple', 'melon'];
+  for (let i = 0; i < 9; i++) ink.add('good-' + goods[i % 3], circ(l + 18 * s + i * 16 * s, base - 70 * s - (i % 2) * 6 * s, (7 + r() * 3) * s));
+  ink.add('basketw', `M${P(l + 10 * s)},${P(base - 62 * s)}h${P(46 * s)}l${P(-6 * s)},${P(-22 * s)}h${P(-34 * s)}Z`);
+  // полосатый навес с фестонами
+  const aw = `M${P(l - 18 * s)},${P(top + 30 * s)} L${P(l + 10 * s)},${P(top - 8 * s)} H${P(l + w - 10 * s)} L${P(l + w + 18 * s)},${P(top + 30 * s)}` +
+    Array.from({ length: 6 }, (_, i) => { const x1 = l + w + 18 * s - (i + 1) * (w + 36 * s) / 6; return ` Q${P(x1 + (w + 36 * s) / 12)},${P(top + 46 * s)} ${P(x1)},${P(top + 30 * s)}`; }).join('') + 'Z';
+  g += `<path d="${aw}" style="fill:${color}"/><path d="${aw}" fill="url(#pStripe)" opacity=".55"/><path class="eave" stroke-width="${P(3 * s)}" d="M${P(l - 18 * s)},${P(top + 30 * s)} L${P(l + 10 * s)},${P(top - 8 * s)} H${P(l + w - 10 * s)} L${P(l + w + 18 * s)},${P(top + 30 * s)}"/>`;
+  g += `<rect class="plaque" x="${P(x - 22 * s)}" y="${P(top - 46 * s)}" width="${P(44 * s)}" height="${P(36 * s)}" rx="${P(4 * s)}"/><text class="callig gold-t" x="${P(x)}" y="${P(top - 18 * s)}" text-anchor="middle" style="font-size:${P(26 * s)}px">${sign}</text>`;
+  g += lantern(l + 4 * s, top + 52 * s, s * 0.7, lights, true) + lantern(l + w - 4 * s, top + 52 * s, s * 0.7, lights);
+  spill(x, base + 8, w * 0.6, lights);
+  return g;
+}
+
+function prayerFlags(x0, x1, y, sag, ink) {
+  const cols = ['flagR', 'flagY', 'flagG', 'flagB', 'flagW'];
+  let g = `<path class="rope" fill="none" d="M${x0},${y} Q${(x0 + x1) / 2},${y + sag * 2} ${x1},${y}"/>`;
+  const n = Math.floor((x1 - x0) / 34);
+  for (let i = 1; i < n; i++) {
+    const t = i / n, x = x0 + (x1 - x0) * t, yy = (1 - t) * (1 - t) * y + 2 * (1 - t) * t * (y + sag * 2) + t * t * y;
+    ink.add(cols[i % 5], `M${P(x - 10)},${P(yy)}h20l-10,${24}Z`);
+  }
+  return g;
+}
+
+function midSummer(f, r, ink, lights) {
+  let s = '';
+  // рисовые террасы на склоне
+  const a = lx(7150, f), b = lx(8850, f);
+  s += `<path fill="url(#gCliff)" d="M${P(a - 100)},940 Q${P(a + 200)},420 ${P((a + b) / 2)},400 Q${P(b - 200)},420 ${P(b + 100)},940Z" opacity=".35"/>`;
+  for (let i = 0; i < 8; i++) {
+    const y = 900 - i * 52, ins = 40 + i * 46;
+    const d = `M${P(a + ins)},${y} Q${P((a + b) / 2)},${y - 30} ${P(b - ins)},${y} L${P(b - ins)},${y + 28} Q${P((a + b) / 2)},${y - 2} ${P(a + ins)},${y + 28}Z`;
+    s += `<path class="paddy" d="${d}"/><path class="paddyedge" d="M${P(a + ins)},${y} Q${P((a + b) / 2)},${y - 30} ${P(b - ins)},${y}"/>`;
+    for (let x = a + ins + 14; x < b - ins - 10; x += 16 + r() * 6) {
+      const t = (x - a - ins) / (b - a - 2 * ins), yy = y + 22 - 30 * 4 * t * (1 - t) * 0.5;
+      ink.add('rice', `M${P(x)},${P(yy)}l-3,-12M${P(x)},${P(yy)}l0,-14M${P(x)},${P(yy)}l3,-12`);
+    }
+  }
+  s += house(lx(8300, f), 520, 0.4, lights, ink);
+  // озеро лотосов с павильоном
+  const c = lx(8800, f), d2 = lx(10450, f), m = (c + d2) / 2;
+  s += `<rect fill="url(#gLake)" x="${P(c)}" y="740" width="${P(d2 - c)}" height="200"/>`;
+  for (let i = 0; i < 10; i++) ink.add('shine', `M${P(c + 40 + r() * (d2 - c - 120))},${P(760 + r() * 150)}h${P(40 + r() * 80)}`);
+  for (let i = 0; i < 26; i++) {
+    const x = c + 30 + r() * (d2 - c - 60), y = 770 + r() * 150, rr = 12 + r() * 14;
+    ink.add('lily', ell(x, y, rr, rr * 0.32));
+    if (r() < 0.4) { ink.add('lotus', `M${P(x - 8)},${P(y - 2)}q8,-22 16,0z`); ink.add('lotusL', `M${P(x - 4)},${P(y - 2)}q4,-14 8,0z`); }
+  }
+  s += `<g transform="translate(0 0)">${house(m, 790, 0.45, lights, ink, { deck: 60 })}</g>`;
+  s += `<path fill="#6a4424" d="M${P(m - 200)},840 h120 l-14,16 h-92z"/>${decoPanda(m - 150, 842, 0.35, { hat: 'straw' })}`;
+  // рынок: дома второго ряда и гирлянда
+  s += house(lx(10700, f), 860, 0.5, lights, ink, { floors: 2 }) + house(lx(11250, f), 860, 0.45, lights, ink) + house(lx(11850, f), 860, 0.5, lights, ink, { floors: 2 });
+  s += lanternString(lx(10650, f), lx(11300, f), 560, 30, 7, lights) + lanternString(lx(11350, f), lx(12000, f), 560, 30, 7, lights);
+  // монастырь на холме с лестницей
+  const h = lx(12900, f);
+  const hill = `M${P(h - 420)},940 Q${P(h - 300)},520 ${P(h - 80)},420 L${P(h + 80)},420 Q${P(h + 300)},520 ${P(h + 420)},940Z`;
+  s += `<path d="${hill}" fill="url(#gCliff)"/><path d="${hill}" fill="url(#gLit)"/>`;
+  for (let i = 0; i < 6; i++) ink.add('treetop', circ(h - 300 + r() * 600, 560 + r() * 300, 20 + r() * 16));
+  let st = '';
+  for (let i = 0; i < 14; i++) { const y = 920 - i * 36, x = h + (i % 2 ? 60 : -60) * Math.sin(i * 0.8); st += `<rect fill="url(#gStone)" x="${P(x - 40)}" y="${P(y)}" width="80" height="10" rx="2"/>`; }
+  s += st + pagoda(h, 430, 1.3, lights);
+  s += prayerFlags(h - 380, h - 90, 600, 30, ink) + prayerFlags(h + 90, h + 380, 600, 30, ink);
+  // летние деревья вдоль главы 2
+  for (let x = lx(7150, f); x < lx(FOG_X, f); x += 160 + r() * 200) {
+    if (x > c - 40 && x < d2 + 40) continue;
+    const cy = 760 + r() * 60, rx = 60 + r() * 40, ry = 90 + r() * 50;
+    s += `<rect fill="url(#gTrunk)" x="${P(x - 6)}" y="800" width="12" height="140"/>`;
+    ink.add('leafB', ell(x + 6, cy + 8, rx, ry)); ink.add('leafA', ell(x, cy, rx * 0.85, ry * 0.85)); ink.add('leafC', ell(x - rx * 0.3, cy - ry * 0.4, rx * 0.3, ry * 0.25));
+  }
+  return s;
+}
+
+function groundSummer(r, ink, lights) {
+  let s = '';
+  // террасы: пугало, фермеры, рис у тропы
+  for (let x = 7150; x < 8800; x += 9 + r() * 6) {
+    const y = groundY(x) + 34 + r() * 20;
+    if (r() < 0.6) ink.add('rice', `M${P(x)},${P(y)}l-4,-18M${P(x)},${P(y)}l0,-22M${P(x)},${P(y)}l4,-18`);
+  }
+  const sx = 7900, sy = groundY(7900);
+  s += `<path class="trunkfront" stroke-width="8" d="M${sx},${P(sy)} V${P(sy - 150)} M${sx - 50},${P(sy - 110)} H${sx + 50}"/>
+    <circle fill="#e8d7a8" cx="${sx}" cy="${P(sy - 168)}" r="20"/><path fill="#d9b66b" stroke="#8a6a32" stroke-width="2" d="M${sx - 40},${P(sy - 176)} L${sx},${P(sy - 206)} L${sx + 40},${P(sy - 176)}Z"/>
+    <path fill="#c23a2b" d="M${sx - 34},${P(sy - 130)} h68 l-8,50 h-52z"/>`;
+  s += decoPanda(7300, groundY(7300) - 4, 0.8, { hat: 'straw', item: 'basket' }) + decoPanda(8600, groundY(8600) - 4, 0.75, { hat: 'straw', robe: 'jade', item: 'broom' }, true);
+  for (const x of [7700, 8450]) s += stoneLantern(x, groundY(x) - 2, lights);
+  // озеро: вода перед тропой, мостки, рыбак, лотосы
+  const { x0, x1 } = LAKE;
+  let wd = `M${x0},1000 `;
+  for (let x = x0; x <= x1; x += 20) wd += `L${x},${P(groundY(x) + 28)} `;
+  s += `<path fill="url(#gWater)" d="${wd}L${x1},1000Z"/>`;
+  for (let x = x0 + 10; x < x1; x += 22) s += `<rect fill="url(#gDeck)" x="${x}" y="${P(groundY(x) + 6)}" width="18" height="12" rx="2"/>`;
+  for (let x = x0 + 40; x < x1; x += 160) s += `<rect fill="url(#gTrunk)" x="${x - 5}" y="${P(groundY(x) + 14)}" width="10" height="${P(1000 - groundY(x))}"/>`;
+  for (let i = 0; i < 9; i++) fx(1, `<path class="ripple" d="M${x0 + 60 + i * 150},${930 + (i % 3) * 22} q20,-6 40,0" style="animation-delay:${-i * 0.4}s"/>`);
+  for (let i = 0; i < 30; i++) {
+    const x = x0 + 20 + r() * (x1 - x0 - 40), y = groundY(x) + 60 + r() * 100, rr = 16 + r() * 16;
+    ink.add('lily', ell(x, y, rr, rr * 0.3));
+    if (r() < 0.45) { ink.add('lotus', `M${P(x - 10)},${P(y - 2)}q10,-28 20,0z`); ink.add('lotusL', `M${P(x - 5)},${P(y - 2)}q5,-18 10,0z`); }
+  }
+  const fx0 = 9450, fy = groundY(fx0);
+  s += decoPanda(fx0, fy + 6, 0.75, { hat: 'straw', robe: 'night' }) + `<path stroke="#5a3a1a" stroke-width="3" fill="none" d="M${fx0 + 30},${P(fy - 60)} L${fx0 + 150},${P(fy - 150)}"/><path stroke="#eee" stroke-width="1.2" fill="none" d="M${fx0 + 150},${P(fy - 150)} Q${fx0 + 170},${P(fy - 40)} ${fx0 + 168},${P(fy + 70)}"/>`;
+  // рынок: прилавки, покупатели, гирлянды
+  const stalls = [[10560, '#c23a2b', '果'], [11020, '#2f8a63', '茶'], [11620, '#2f5bb0', '布'], [12000, '#e0a92a', '鱼']];
+  for (const [x, col, sign] of stalls) s += stall(x, groundY(x) - 6, 1, col, sign, lights, ink, r);
+  s += lanternString(10500, 10900, 440, 22, 4, lights) + lanternString(11500, 11900, 440, 22, 4, lights);
+  s += decoPanda(10820, groundY(10820) - 4, 0.75, { item: 'basket' }) + decoPanda(11280, groundY(11280) - 4, 0.75, { hat: 'lotus', robe: 'red', item: 'fan' }, true) + decoPanda(11820, groundY(11820) - 4, 0.7, { item: 'umbrella' });
+  // монастырь: колокол, курильница, монахи, флажки
+  const bx = 12650, by = groundY(bx);
+  s += `<rect fill="url(#gPillar)" x="${bx - 70}" y="${P(by - 200)}" width="14" height="200"/><rect fill="url(#gPillar)" x="${bx + 56}" y="${P(by - 200)}" width="14" height="200"/>
+    <path class="roof" d="M${bx - 120},${P(by - 196)} Q${bx - 60},${P(by - 206)} ${bx - 50},${P(by - 240)} H${bx + 50} Q${bx + 60},${P(by - 206)} ${bx + 120},${P(by - 196)} Q${bx},${P(by - 176)} ${bx - 120},${P(by - 196)}Z"/>
+    <path fill="#a67c3a" stroke="#5a3a14" stroke-width="3" d="M${bx - 34},${P(by - 70)} Q${bx - 36},${P(by - 160)} ${bx},${P(by - 166)} Q${bx + 36},${P(by - 160)} ${bx + 34},${P(by - 70)}Z"/>
+    <path stroke="#5a3a14" stroke-width="3" d="M${bx - 30},${P(by - 100)} h60 M${bx - 32},${P(by - 82)} h64"/>`;
+  const ix = 13250, iy = groundY(ix);
+  s += `<path fill="#4a4a3a" d="M${ix - 40},${P(iy - 10)} Q${ix - 46},${P(iy - 70)} ${ix},${P(iy - 72)} Q${ix + 46},${P(iy - 70)} ${ix + 40},${P(iy - 10)}Z"/><rect fill="#3a3a2a" x="${ix - 48}" y="${P(iy - 80)}" width="96" height="12" rx="4"/>`;
+  fx(1, `<path class="smoke" d="M${ix},${P(iy - 84)} q12,-40 -4,-80 q-14,-40 8,-90" fill="none"/>`);
+  lights.push(glow(ix, iy - 80, 60, true));
+  s += decoPanda(12500, groundY(12500) - 4, 0.8, { hat: 'scholar', robe: 'monk', item: 'book' }) + decoPanda(13400, groundY(13400) - 4, 0.75, { robe: 'monk', item: 'staff' }, true);
+  s += prayerFlags(12200, 12560, 520, 24, ink) + prayerFlags(12780, 13150, 520, 24, ink);
+  for (const x of [12250, 13650]) s += stoneLantern(x, groundY(x) - 2, lights);
+  // Врата лета
+  s += gate(14050, groundY(14050) + 4, lights, '夏');
+  return s;
 }
 
 const DEFS = `<defs>
@@ -554,6 +709,8 @@ const DEFS = `<defs>
   <linearGradient id="gPorcShade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#6a7a9a" stop-opacity=".35"/></linearGradient>
   <radialGradient id="gOrange" cx=".35" cy=".3"><stop offset="0" stop-color="#ffc46a"/><stop offset=".6" stop-color="#f08a1f"/><stop offset="1" stop-color="#b85a0a"/></radialGradient>
   <linearGradient id="gCandle" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff6e0"/><stop offset="1" stop-color="#d9c49a"/></linearGradient>
+  <linearGradient id="gLake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bfe8e8"/><stop offset=".4" stop-color="#6fbcc4"/><stop offset="1" stop-color="#2f7d8a"/></linearGradient>
+  <pattern id="pStripe" width="28" height="10" patternUnits="userSpaceOnUse"><rect width="14" height="10" fill="#fff"/></pattern>
   <pattern id="pTiles" width="12" height="16" patternUnits="userSpaceOnUse"><path d="M1.5,0V16" stroke="#000" stroke-opacity=".38" stroke-width="3"/><path d="M7,0V16" stroke="#fff" stroke-opacity=".14" stroke-width="2.5"/><path d="M0,15Q6,10.5 12,15" stroke="#000" stroke-opacity=".22" fill="none" stroke-width="1.5"/></pattern>
   <pattern id="pPlank" width="16" height="240" patternUnits="userSpaceOnUse"><path d="M0.5,0V240" stroke="#2a160a" stroke-opacity=".55" stroke-width="1.5"/><path d="M6,20q2,40 0,80M10,120q-2,50 1,100" stroke="#fff" stroke-opacity=".08" fill="none" stroke-width="1.2"/></pattern>
   <pattern id="pLattice" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M0,17 H34 M17,0 V34" stroke="#2a170c" stroke-width="5"/><rect x="10" y="10" width="14" height="14" fill="none" stroke="#2a170c" stroke-width="3"/></pattern>

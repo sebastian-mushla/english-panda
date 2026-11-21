@@ -1,25 +1,25 @@
 /* Мир лобби: сезоны (палитры), небо, свет, туман, камни уровней, панды */
 
 /* ---------- Сезоны ---------- */
-body {
+body, .season-probe {
   --m1: #c6dfdb; --m2: #9cc4bc; --m3: #6f9f94; --mist: #eaf6f1; --snow: 0;
   --leaf1: #79c25a; --leaf2: #3f9b54; --leaffar: #a6d3a0; --bam: #7fb069; --bamn: #4b7d43; --bamfar: #b5d8b0;
   --ground: #5d9a48; --grass: #8fcf62; --pine: #2f7d86; --pine2: #3f9a8f; --trunk: #6b4a2a;
   --cliff: #5e7f78; --cliff2: #4a6a63; --moss: #6fae5a; --blossom: #f4a6c0; --blossom2: #f7c6d6;
   --roof: #5d7f4a; --summer: #2e7a3e; --front: #1f3a24; --rainbow: .5;
 }
-body.season-summer {
+body.season-summer, .season-probe.season-summer {
   --m1: #bcd9d6; --m2: #8bbfb2; --m3: #5a9282; --mist: #e4f3ee;
   --leaf1: #4fa845; --leaf2: #2d7a3a; --leaffar: #8fc58a; --bam: #5f9e4c; --bamn: #3a6e34; --bamfar: #9fcd98;
   --ground: #4a8c3a; --grass: #6fbf4a; --moss: #4f9c45; --blossom: #f6d06b; --blossom2: #f3a64a; --roof: #4c6e3e; --rainbow: .7;
 }
-body.season-autumn {
+body.season-autumn, .season-probe.season-autumn {
   --m1: #e1d2c0; --m2: #c9b39a; --m3: #a08a70; --mist: #f6eadb;
   --leaf1: #e8913c; --leaf2: #c4532d; --leaffar: #e9be8a; --bam: #b9a24f; --bamn: #8a7232; --bamfar: #dccb94;
   --ground: #8f7a3c; --grass: #c9a24a; --pine: #4a6e5a; --pine2: #5c7f62; --moss: #a88a3a;
   --blossom: #e4572e; --blossom2: #f2a03a; --roof: #7a5a3a; --cliff: #6e6a60; --cliff2: #5a564c; --rainbow: .3;
 }
-body.season-winter {
+body.season-winter, .season-probe.season-winter {
   --m1: #dfe7ee; --m2: #c4d2dc; --m3: #9fb2c0; --mist: #f4f8fb; --snow: 1;
   --leaf1: #a9c0bc; --leaf2: #7f9d97; --leaffar: #d6e2e2; --bam: #8fa88f; --bamn: #64806a; --bamfar: #d2dfdc;
   --ground: #e3ecf1; --grass: #f7fbfd; --pine: #3f6670; --pine2: #577f87; --moss: #eef4f7;
@@ -132,6 +132,15 @@ text.gold-t { font-size: 54px; }
 .trunkfront { stroke: #140c06; } .pillarfront { fill: #1e0a05; }
 .grassfront { stroke: var(--front); stroke-width: 6; stroke-linecap: round; fill: none; }
 
+/* Глава 2 «Лето» */
+.paddy { fill: color-mix(in srgb, #9fd9dc 55%, var(--leaf1)); } .paddyedge { stroke: var(--grass); stroke-width: 6; fill: none; }
+.rice { stroke: color-mix(in srgb, var(--leaf1) 80%, #2a4a10); stroke-width: 2.6; stroke-linecap: round; fill: none; }
+.shine { stroke: rgba(255,255,255,.5); stroke-width: 3; stroke-linecap: round; fill: none; }
+.lotus { fill: #f49ab8; } .lotusL { fill: #ffd6e4; }
+.good-orange { fill: #f08a1f; } .good-apple { fill: #d8402e; } .good-melon { fill: #7fbf4a; } .basketw { fill: #c99a52; }
+.flagR { fill: #d8402e; } .flagY { fill: #f2c14e; } .flagG { fill: #3f9b6e; } .flagB { fill: #2f5bb0; } .flagW { fill: #f4f1ea; }
+.autumn { fill: #e8913c; opacity: .85; } .autumnD { fill: #b84a2a; opacity: .85; }
+
 /* ---------- Киношные слои поверх мира ---------- */
 #rays { position: absolute; inset: 0; pointer-events: none; opacity: calc(var(--rays) * .7);
   background: repeating-conic-gradient(from 90deg at var(--sunx) var(--suny), rgba(255,236,190,0) 0deg, rgba(255,236,190,.16) 2.5deg, rgba(255,236,190,0) 6deg, rgba(255,236,190,0) 11deg);
@@ -199,7 +208,7 @@ body.phone .mistband, body.phone #grain { display: none; }
 }
 .npcsign i { font-style: normal; margin-right: .25em; }
 
-.fogwall { top: 0 !important; width: calc(var(--s) * 1700px); height: 100%; pointer-events: none;
+.fogwall { top: 0 !important; width: calc(var(--s) * var(--fw, 1700) * 1px); height: 100%; pointer-events: none;
   background: linear-gradient(90deg, rgba(236,243,240,0), rgba(236,243,240,.8) 14%, rgba(236,243,240,.96) 40%); }
 .fogsign { transform: translate(-50%, -100%); display: grid; gap: 2px; text-align: center; width: calc(var(--s) * 360px);
   padding: 12px 16px 16px; color: var(--ink); background: var(--parch); border: 4px solid var(--wood); border-radius: 8px; box-shadow: var(--shadow); }

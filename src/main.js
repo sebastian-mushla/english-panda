@@ -9,7 +9,7 @@ import { openBook } from './ui/book.js';
 import { openShop } from './ui/shop.js';
 import { openDict } from './ui/dictionary.js';
 import { openModal } from './ui/modal.js';
-import { buildPlay, buildReview, isUnlocked, currentLevel } from './learn/curriculum.js';
+import { buildPlay, buildReview, isUnlocked, currentLevel, LEVELS } from './learn/curriculum.js';
 import { startAmbient } from './audio.js';
 import { checkAch } from './progress.js';
 import { pandaSVG } from './world/panda.js';
@@ -39,7 +39,7 @@ function back() {
   if (pendingWalk) { const [a, b] = pendingWalk; pendingWalk = null; setTimeout(() => walkTo(a, b), 300); }
 }
 
-on('progress', (p) => { if (p?.first && p.level < 10) pendingWalk = [p.level, p.level + 1]; });
+on('progress', (p) => { if (p?.first && p.level < LEVELS.length) pendingWalk = [p.level, p.level + 1]; });
 on('stat', checkAch);
 
 initLobby({

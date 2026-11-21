@@ -30,6 +30,9 @@ export function keyboard(el, onKey) {
   return {
     destroy: () => removeEventListener('keydown', onDoc),
     mark(k, cls) { const b = btn(k); if (b) { b.classList.add(cls); setTimeout(() => b.classList.remove(cls), 400); } },
+    // «Фонарь»: использованные буквы гаснут до следующего слова
+    used(k, ok) { btn(k)?.classList.add(ok ? 'hit' : 'miss'); },
+    reset() { el.querySelectorAll('.key').forEach((b) => b.classList.remove('hit', 'miss')); },
   };
 }
 

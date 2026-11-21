@@ -2,7 +2,7 @@
 // В памяти держим только куски рядом с камерой, остальные освобождаем и дорисовываем при подходе:
 // иначе на телефонах (особенно iPhone) вкладка вылетает из-за нехватки памяти.
 import { VW } from './geo.js';
-import { glowAt } from './sky.js';
+import { glowAt, seasonAt } from './sky.js';
 
 const CHUNK = 1000;
 // переменные сезона, которые нужны SVG-слоям (в картинке нет <body>, поэтому подставляем значения)
@@ -16,8 +16,21 @@ async function sheet() {
   return css;
 }
 
-function varsBlock(glow) {
-  const cs = getComputedStyle(document.body);
+// Цвета сезона берём с невидимого «пробника»: куски разных глав рисуются в своём сезоне
+const probes = {};
+function seasonStyle(season) {
+  if (!probes[season]) {
+    const p = document.createElement('div');
+    p.className = 'season-probe season-' + season;
+    p.hidden = true;
+    document.body.append(p);
+    probes[season] = p;
+  }
+  return getComputedStyle(probes[season]);
+}
+
+function varsBlock(glow, x) {
+  const cs = seasonStyle(seasonAt(x));
   const q = (Math.round(glow * 10) / 10).toFixed(1), d = (Math.round(Math.max(0, 1 - glow) * 10) / 10).toFixed(1);
   return `svg{${VARS.map((v) => `${v}:${cs.getPropertyValue(v).trim()}`).join(';')};--glowq:${q};--dayq:${d};--f-cn:'Songti SC','STKaiti','Noto Serif CJK SC',serif}`;
 }
@@ -94,7 +107,7 @@ async function draw(L, i) {
   const x0 = i * CHUNK, cw = Math.min(CHUNK, L.w - x0);
   const pw = Math.ceil(cw * scale * L.q) + 1, ph = Math.ceil(1000 * scale * L.q);
   const worldX = (x0 + CHUNK / 2 - (1 - L.f) * VW / 2) / L.f;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} 0 ${cw} 1000" width="${pw}" height="${ph}" preserveAspectRatio="none"><style>${css}${varsBlock(glowAt(worldX))}</style>${L.raw}</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} 0 ${cw} 1000" width="${pw}" height="${ph}" preserveAspectRatio="none"><style>${css}${varsBlock(glowAt(worldX), worldX)}</style>${L.raw}</svg>`;
   const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
   try {
     const img = await load(url);

@@ -1,7 +1,7 @@
 // Лобби: горизонтальный мир с параллаксом, камень-уровень на тропе, панды-NPC, карта внизу.
 import { state, save, on, emit } from '../state.js';
 import { t } from '../i18n.js';
-import { W, ZONES, NODE_X, NPC_X, walkY, zoneAt, groundY } from './geo.js';
+import { W, ZONES, NODE_X, NPC_X, walkY, zoneAt, groundY, CH2_X, FOG_X } from './geo.js';
 import { buildScene } from './scenery.js';
 import { applyPhase, applySeason } from './sky.js';
 import { setupRaster, updateRaster, rasterIdle } from './raster.js';
@@ -101,8 +101,13 @@ function applyCam(force) {
 }
 
 function updateZone(force) {
-  const z = zoneAt(cam + viewW / 2);
-  if (z.id !== zoneId || force) { zoneId = z.id; handlers.onZone?.(z); }
+  const center = cam + viewW / 2, z = zoneAt(center);
+  if (z.id !== zoneId || force) {
+    zoneId = z.id;
+    const s2 = applySeason(center); // сезон «по главе» меняется при переходе между главами
+    if (s2 !== season) { season = s2; lastPhaseCam = -1e9; }
+    handlers.onZone?.(z);
+  }
 }
 
 let lastT = 0;
@@ -175,7 +180,7 @@ function renderOverlay() {
     const done = !!state.levels[l.n]?.stars?.[0], open = isUnlocked(l.n);
     const cls = done ? 'done' : open ? 'current' : 'locked';
     h += `<button class="node ${cls}${l.exam ? ' exam' : ''}" data-n="${l.n}" style="--x:${x};--y:${y}" aria-label="${t('level')} ${l.n}">
-      <span class="stone"><b>${l.exam ? '春' : l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}</span>
+      <span class="stone"><b>${l.exam ? (l.ch === 2 ? '夏' : '春') : l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}</span>
       ${done ? `<span class="nstars">${stars(l.n)}</span>` : ''}</button>`;
   });
   const npc = [
@@ -188,8 +193,11 @@ function renderOverlay() {
     h += `<button class="npc" data-npc="${id}" style="--x:${x};--y:${groundY(x)}" aria-label="${label}">
       <span class="npcsign"><i>${icon}</i>${label}</span>${pandaSVG(look)}</button>`;
   }
-  h += `<div class="fogwall" style="--x:7080"></div>
-    <div class="fogsign" style="--x:7380;--y:${groundY(7380)}"><b>${t('zone.fog')}</b><span>${t('soon')}</span><small>${t('fogText')}</small></div>`;
+  // туман закрывает следующую главу: лето — пока не пройдены Врата весны, потом осень
+  const ch2open = !!state.levels[10]?.stars?.[0];
+  const fx = ch2open ? FOG_X : CH2_X, fsx = fx + 300;
+  h += `<div class="fogwall" style="--x:${fx - 20};--fw:${W - fx + 200}"></div>
+    <div class="fogsign" style="--x:${fsx};--y:${groundY(fsx)}"><b>${t(ch2open ? 'zone.fog' : 'zone.fog1')}</b><span>${t(ch2open ? 'soon' : 'locked')}</span><small>${t(ch2open ? 'fogText2' : 'fogText')}</small></div>`;
   const px = NODE_X[cur - 1];
   h += `<div class="player" style="--x:${px};--y:${walkY(px)}">${pandaSVG(state.equip)}</div>`;
   overlay.innerHTML = h;

@@ -4,7 +4,7 @@ import { t, L, nWords } from '../i18n.js';
 import { sfx } from '../audio.js';
 import { THEMES } from '../learn/words.js';
 import { MOBS, mobSVG } from '../learn/mobs.js';
-import { LEVELS } from '../learn/curriculum.js';
+import { LEVELS, CHAPTERS } from '../learn/curriculum.js';
 import { newSession, commit, knownCount } from '../learn/srs.js';
 import { hintCost } from '../learn/hints.js';
 import { checkAch, dailyStep } from '../progress.js';
@@ -16,6 +16,9 @@ const GAMES = {
   intro: () => import('../games/intro.js'), cards: () => import('../games/cards.js'), type: () => import('../games/type.js'), gap: () => import('../games/gap.js'), rush: () => import('../games/rush.js'),
   spell: () => import('../games/spell.js'), sudoku: () => import('../games/sudoku.js'), builder: () => import('../games/builder.js'),
   duel: () => import('../games/duel.js'),
+  fishing: () => import('../games/fishing.js'), baskets: () => import('../games/baskets.js'), wordsearch: () => import('../games/wordsearch.js'),
+  crossword: () => import('../games/crossword.js'), dialog: () => import('../games/dialog.js'), truefalse: () => import('../games/truefalse.js'),
+  lantern: () => import('../games/lantern.js'), chain: () => import('../games/chain.js'),
 };
 
 const root = document.getElementById('game');
@@ -91,7 +94,7 @@ export function runPlay(play, { onExit, onNext }) {
   });
 
   const ctx = {
-    def, play, words: play.words, review: play.review, pool, themes: play.themes, lives,
+    def, play, words: play.words, review: play.review, pool, themes: play.themes, others: play.others || [], lives,
     sfx,
     right(w) { session.right.add(w.en); state.stats.right++; dailyStep('right'); sfx('right'); },
     wrong(w) {
@@ -145,7 +148,7 @@ export function runPlay(play, { onExit, onNext }) {
       if (got.every(Boolean)) state.stats.perfect++;
       state.stats.noHintLevels = hints === 0 ? state.stats.noHintLevels + 1 : 0;
       dailyStep('levels');
-      if (def.exam && !state.certs.length) state.certs.push({ ch: 1, date: new Date().toISOString().slice(0, 10), name: state.name });
+      if (def.exam && !state.certs.some((c) => (c.ch || 1) === def.ch)) state.certs.push({ ch: def.ch, cefr: CHAPTERS[def.ch].cefr, date: new Date().toISOString().slice(0, 10), name: state.name });
     }
     save();
     sfx(win ? 'win' : 'lose');
@@ -188,7 +191,7 @@ export function runPlay(play, { onExit, onNext }) {
     area.querySelector('.lobby').addEventListener('click', () => { sfx('click'); exit(); });
     area.querySelector('.again').addEventListener('click', () => { sfx('click'); exit(); onNext?.(def.n); });
     area.querySelector('.next')?.addEventListener('click', () => { sfx('click'); exit(); onNext?.(def.n + 1); });
-    area.querySelector('.cert')?.addEventListener('click', () => openCertificate(state.certs[0]));
+    area.querySelector('.cert')?.addEventListener('click', () => openCertificate(state.certs.find((c) => (c.ch || 1) === def.ch)));
   }
 
   function reviewResult() {
