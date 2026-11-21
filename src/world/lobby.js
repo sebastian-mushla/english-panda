@@ -61,11 +61,13 @@ function resize() {
   s = innerHeight / 1000;
   viewW = innerWidth / s;
   document.documentElement.style.setProperty('--s', s);
+  // живые слои анимаций — размером с экран: камера двигает viewBox, а не сам слой.
+  // Слой шириной во весь мир (18 000+ px) на телефоне не помещался в видеопамять, и вкладка падала при прокрутке.
   for (const L of layerEls) {
     if (!L.svg) continue;
-    const w = +L.svg.dataset.w;
-    L.svg.setAttribute('width', Math.ceil(w * s));
-    L.svg.setAttribute('height', Math.ceil(1000 * s));
+    L.svg.setAttribute('width', innerWidth);
+    L.svg.setAttribute('height', innerHeight);
+    L.svg.setAttribute('preserveAspectRatio', 'none');
   }
   target = clamp(target);
   cam = clamp(cam);
@@ -87,7 +89,10 @@ const clamp = (x) => (Number.isFinite(x) ? Math.max(0, Math.min(W - viewW, x)) :
 
 function applyCam(force) {
   if (force || Math.abs(cam - lastRasterCam) > 80) { lastRasterCam = cam; updateRaster(cam, viewW); }
-  for (const L of layerEls) L.el.style.transform = `translate3d(${(-cam * L.f * s).toFixed(1)}px,0,0)`;
+  for (const L of layerEls) {
+    if (L.svg) L.svg.setAttribute('viewBox', `${(cam * L.f).toFixed(1)} 0 ${viewW.toFixed(1)} 1000`);
+    else L.el.style.transform = `translate3d(${(-cam * L.f * s).toFixed(1)}px,0,0)`;
+  }
   const mm = $('#mm-view');
   if (mm) { mm.style.left = (cam / W * 100) + '%'; mm.style.width = (viewW / W * 100) + '%'; }
   if (force || Math.abs(cam - lastPhaseCam) > 3) {
