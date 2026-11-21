@@ -112,7 +112,12 @@ export const NODE_X = (() => {
   for (const ch of [1, 2, 3, 4]) {
     const list = LEVELS.filter((l) => l.ch === ch), [a, b] = CH_SPAN[ch];
     const k = list.length - 1;
-    list.forEach((l, i) => { xs[l.n - 1] = l.exam ? b : Math.round(a + (b - 500 - a) * (k > 1 ? i / (k - 1) : 0)); });
+    list.forEach((l, i) => {
+      let x = l.exam ? b : Math.round(a + (b - 500 - a) * (k > 1 ? i / (k - 1) : 0));
+      // вход в место не ставим внутрь чайного дома: он должен стоять снаружи, на земле
+      if (l.place && x > 4800 && x < 6450) x = 4790;
+      xs[l.n - 1] = x;
+    });
   }
   return xs;
 })();

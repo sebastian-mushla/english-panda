@@ -247,3 +247,18 @@ body.phone .mistband, body.phone #grain { display: none; }
 .winterD { fill: #c8d8dc; } .winterS { fill: #ffffff; }
 .fxlayer svg.scene { overflow: hidden; }
 .wpine { fill: #2d5650; } .wsnow { fill: #f6fbff; }
+/* вход в место большой темы: рисунок стоит на земле у тропы, светится проём */
+.node.entrance { width: calc(var(--s) * 260px); transform: translate(-50%, calc(-100% + var(--s) * 30px)); position: absolute; }
+.node.entrance .ent { width: 100%; display: block; overflow: visible; filter: drop-shadow(0 calc(var(--s) * 6px) calc(var(--s) * 6px) rgba(0,0,0,.35)); }
+.node.entrance .door { fill: #120c08; transition: fill .3s; }
+.node.entrance.current .door, .node.entrance.done .door { fill: #ffcf6a; animation: doorglow 2.4s ease-in-out infinite; }
+.node.entrance.done .door { fill: #9fdc8a; animation: none; }
+.node.entrance.locked .ent { filter: grayscale(.6) brightness(.75); }
+.node.entrance:hover .ent, .node.entrance:focus-visible .ent { transform: translateY(-3px); }
+.node.entrance:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; border-radius: 12px; }
+.node.entrance .ent-n { position: absolute; left: 50%; bottom: calc(var(--s) * 12px); transform: translateX(-50%); width: calc(var(--s) * 56px); height: calc(var(--s) * 56px); border-radius: 50%;
+  display: grid; place-items: center; background: radial-gradient(circle at 40% 35%, #f2e6c8, #c9b78c); border: calc(var(--s) * 3px) solid #5a4632; }
+.node.entrance .ent-n b { font-size: calc(var(--s) * 30px); color: #3a2a18; }
+.node.entrance .lock { right: -30%; top: -30%; }
+.node.entrance .nstars { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); white-space: nowrap; margin-top: calc(var(--s) * -4px); }
+@keyframes doorglow { 50% { fill: #ffe9a8; } }

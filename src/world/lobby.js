@@ -9,7 +9,7 @@ import { setupRaster, updateRaster, rasterIdle } from './raster.js';
 import { stepParticles, setParticleMood } from './particles.js';
 import { pandaSVG } from './panda.js';
 import { LEVELS, isUnlocked, currentLevel, NODE_X, EXAM_N } from '../learn/curriculum.js';
-import { PLACE_ICON } from '../ui/place.js';
+import { ENTRANCE, ENTRANCE_DEFS } from './entrances.js';
 import { setWater, sfx } from '../audio.js';
 
 const $ = (s) => document.querySelector(s);
@@ -179,6 +179,9 @@ function stars(n) {
   return [0, 1, 2].map((i) => `<i class="${st[i] ? 'on' : ''}">★</i>`).join('');
 }
 
+// Где стоит панда: у входа в место — сбоку, чтобы не загораживать дверь
+const standX = (n) => NODE_X[n - 1] - (LEVELS[n - 1]?.place ? 150 : 0);
+
 function renderOverlay() {
   const cur = currentLevel();
   let h = '';
@@ -186,8 +189,16 @@ function renderOverlay() {
     const x = NODE_X[i], y = walkY(x);
     const done = !!state.levels[l.n]?.stars?.[0], open = isUnlocked(l.n);
     const cls = done ? 'done' : open ? 'current' : 'locked';
-    h += `<button class="node ${cls}${l.exam ? ' exam' : ''}${l.place ? ' place' : ''}" data-n="${l.n}" style="--x:${x};--y:${y}" aria-label="${t('level')} ${l.n}">
-      <span class="stone"><b>${l.exam ? ({ 1: '春', 2: '夏', 3: '秋', 4: '冬' })[l.ch] : l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}${l.place ? `<em class="picon">${PLACE_ICON[l.place]}</em>` : ''}</span>
+    // вход в место большой темы рисуется прямо на объекте: дверь дома, пасть пещеры, ступени к фонтану…
+    if (l.place) {
+      h += `<button class="node entrance ${cls}" data-n="${l.n}" style="--x:${x};--y:${y}" aria-label="${t('level')} ${l.n} · ${t('place.' + l.place)}">
+        <svg class="ent" viewBox="0 0 260 240" aria-hidden="true">${ENTRANCE_DEFS}${ENTRANCE[l.place]}</svg>
+        <span class="ent-n"><b>${l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}</span>
+        ${done ? `<span class="nstars">${stars(l.n)}</span>` : ''}</button>`;
+      return;
+    }
+    h += `<button class="node ${cls}${l.exam ? ' exam' : ''}" data-n="${l.n}" style="--x:${x};--y:${y}" aria-label="${t('level')} ${l.n}">
+      <span class="stone"><b>${l.exam ? ({ 1: '春', 2: '夏', 3: '秋', 4: '冬' })[l.ch] : l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}</span>
       ${done ? `<span class="nstars">${stars(l.n)}</span>` : ''}</button>`;
   });
   const npc = [
@@ -212,7 +223,7 @@ function renderOverlay() {
   const fsx = fx + 300;
   h += `<div class="fogwall" style="--x:${fx - 20};--fw:${W - fx + 200}"></div>
     <div class="fogsign" style="--x:${fsx};--y:${groundY(fsx)}"><b>${t(label)}</b><span>${t(sub)}</span><small>${t(text)}</small></div>`;
-  const px = NODE_X[cur - 1];
+  const px = standX(cur);
   h += `<div class="player" style="--x:${px};--y:${walkY(px)}">${pandaSVG(state.equip)}</div>`;
   overlay.innerHTML = h;
   playerEl = overlay.querySelector('.player');
@@ -223,7 +234,7 @@ function renderOverlay() {
 // Панда идёт от одного камня к другому
 export function walkTo(from, to) {
   if (!playerEl) return;
-  const a = NODE_X[from - 1], b = NODE_X[to - 1];
+  const a = standX(from), b = standX(to);
   playerEl.style.setProperty('--x', a); playerEl.style.setProperty('--y', walkY(a));
   focus(to);
   requestAnimationFrame(() => {

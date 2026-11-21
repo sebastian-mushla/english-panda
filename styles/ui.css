@@ -256,6 +256,4 @@
 .pl-stone.locked { opacity: .55; cursor: default; }
 .pl-label { font-weight: 800; text-shadow: 0 2px 6px rgba(0,0,0,.7); }
 .pl-stars { display: block; font-style: normal; } .pl-stars em { font-style: normal; opacity: .3; } .pl-stars em.on { opacity: 1; color: #f2c14e; }
-.node.place .stone { border-radius: 40% 40% 12px 12px; }
-.node .picon { position: absolute; right: -10px; top: -14px; font-style: normal; font-size: calc(var(--s) * 34px); }
 .lc-stages .chip.on { background: #8ab87a; }
