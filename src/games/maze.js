@@ -32,7 +32,12 @@ export default function maze(el, ctx) {
     // плитки — в дальних свободных клетках
     const free = [];
     for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (!wall[y][x] && x + y > 6) free.push([x, y]);
-    const spots = shuffle(free).slice(0, 4);
+    // плитки ставим так, чтобы к каждой можно было дойти, не наступая на другие плитки
+    let spots;
+    for (let k = 0; k < 200; k++) {
+      spots = shuffle(free).slice(0, 4);
+      if (spots.slice(0, 3).every((sp, i) => reach(sp, spots.slice(0, 3).filter((_, j) => j !== i)))) break;
+    }
     tiles = gramOptions(it).map((text, i) => ({ text, ok: text === it.a, x: spots[i][0], y: spots[i][1] }));
     [gx, gy] = spots[3];
     el.querySelector('.fg-task').innerHTML = `<p class="en">${esc(it.s).replace('___', '<u>____</u>')} <i>(${esc(it.base)})</i></p><small>${esc(L(it))}</small>`;
@@ -46,6 +51,20 @@ export default function maze(el, ctx) {
     });
     busy = false;
     draw();
+  }
+
+  // есть ли путь от старта до клетки to в обход клеток block
+  function reach(to, block) {
+    const seen = new Set(['1,1']), queue = [[1, 1]], bad = new Set(block.map(([x, y]) => x + ',' + y));
+    while (queue.length) {
+      const [x, y] = queue.shift();
+      if (x === to[0] && y === to[1]) return true;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const k = (x + dx) + ',' + (y + dy);
+        if (wall[y + dy]?.[x + dx] === false && !seen.has(k) && !bad.has(k)) { seen.add(k); queue.push([x + dx, y + dy]); }
+      }
+    }
+    return false;
   }
 
   function step(dx, dy) {
