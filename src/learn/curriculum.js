@@ -96,6 +96,27 @@ const PROGRAM = {
       { L: 35 }, { L: 36 }, T_('cz_conj', ['cz_conj'], 'g_cz_conj'), { L: 37 }, { L: 38 }, { L: 39 }, { L: 40 }],
   },
 };
+// Словарные темы из words_ext: игры по кругу, чтобы темы не повторялись одинаково
+const W_STAGES = [['cards', 'spell', 'duel'], ['fishing', 'type', 'duel'], ['baskets', 'gap', 'duel'], ['truefalse', 'spell', 'duel'],
+  ['chain', 'lantern', 'duel'], ['wordsearch', 'type', 'duel'], ['crossword', 'gap', 'duel'], ['rush', 'spell', 'duel']];
+let wi = 0;
+const W_ = (theme) => ({ W: theme, stages: W_STAGES[wi++ % W_STAGES.length], mob: 'w_' + theme });
+// Вставить словарные камни перед экзаменом главы (последний пункт), равномерно между темами
+function withWords(list, themes) {
+  const body = list.slice(0, -1), out = [];
+  const step = body.length / (themes.length + 1);
+  let k = 0;
+  body.forEach((it, i) => { out.push(it); while (k < themes.length && i + 1 >= Math.round(step * (k + 1))) out.push(W_(themes[k++])); });
+  while (k < themes.length) out.push(W_(themes[k++]));
+  return [...out, list[list.length - 1]];
+}
+const EXT_BY_CH = { 1: ['school', 'days', 'rooms', 'fruit'], 2: ['shopping', 'health', 'sport', 'kitchen', 'feelings', 'transport'],
+  3: ['work', 'environment', 'media', 'money', 'people', 'study'], 4: ['society', 'science', 'law', 'business', 'arts', 'ideas'] };
+for (const tg of ['en', 'cz']) for (const ch of [1, 2, 3, 4]) {
+  if (PROGRAM[tg][ch]) PROGRAM[tg][ch] = withWords(PROGRAM[tg][ch], EXT_BY_CH[ch]);
+  else PROGRAM[tg][ch] = withWords([...LEGACY.filter((l) => l.ch === ch).map((l) => ({ L: l.n }))], EXT_BY_CH[ch]);
+}
+
 const EXAM_TITLE = { ru: 'Экзамен главы', uk: 'Іспит розділу', cz: 'Zkouška kapitoly' };
 
 // Этапы одной фазы грамматики: правило → узнавание → печать (если форма меняется) → найди ошибку → проверка
@@ -114,6 +135,7 @@ function buildLevels() {
     if (!prog) { for (const l of LEGACY.filter((x) => x.ch === ch)) push({ ...l }); continue; }
     for (const it of prog) {
       if (it.L) push({ ...LEGACY[it.L - 1] });
+      else if (it.W) push({ ch, theme: it.W, stages: it.stages, mob: it.mob });
       else if (it.exam) push({ ch, theme: 'gate', exam: true, built: true, gram: it.exam.join('|'), title: EXAM_TITLE, mob: it.mob, stages: ['errorspot', 'check'] });
       else if (it.place) push({ ch, topic: it.g, place: it.place, mob: it.mob, built: true, phases: it.phases.map((k, i) => ({ gram: k.join('|'), stages: grammarStages(k, i) })) });
       else push({ ch, topic: it.g, gram: it.kinds.join('|'), mob: it.mob, built: true, stages: grammarStages(it.kinds) });
@@ -123,13 +145,12 @@ function buildLevels() {
 }
 export const LEVELS = buildLevels();
 
-// Переход на программу до B2: номера уровней сдвинулись (у английского после главы 1, у чешского везде),
-// поэтому сдвинутый прогресс сбрасываем, а пойманные духи и слова остаются
-if ((state.prog || 0) < 4 && (TARGET === 'en' || TARGET === 'cz')) {
-  const from = TARGET === 'en' ? (state.prog === 3 ? 999 : 20) : (state.prog === 3 ? 34 : 2);
-  for (const k of Object.keys(state.levels || {})) if (+k >= from) delete state.levels[k];
-  for (const k of Object.keys(state.phases || {})) if (+k.split(':')[0] >= from) delete state.phases[k];
-  state.prog = 4;
+// Номера уровней сдвигались (программа до B2, затем новые словарные темы), поэтому прогресс уровней
+// у английского и чешского сбрасываем один раз; пойманные духи, слова и монеты остаются
+if ((state.prog || 0) < 5 && (TARGET === 'en' || TARGET === 'cz')) {
+  state.levels = {};
+  state.phases = {};
+  state.prog = 5;
   save();
 }
 // Номер экзамена каждой главы (для тумана и свитков)

@@ -303,8 +303,17 @@ import { MOBS as M_B1 } from './en_b1.js';
 import { MOBS as M_B2 } from './en_b2.js';
 import { MOBS as M_CZ } from './cz_ab.js';
 import { MOBS as M_CZB } from './cz_b.js';
+import { EXT_THEMES, EXT_RAW } from './words_ext.js';
 for (const [id, e, c, ru, uk, cz] of [...M_A2, ...M_B1, ...M_B2, ...M_CZ, ...M_CZB]) {
   MOBS[id] = em(e, c, ru, uk, cz || ru, 'Хранитель темы. Отпустит, только если ты знаешь правило.', 'Хранитель теми. Відпустить, лише якщо ти знаєш правило.', 'Strážce tématu. Pustí tě, jen když znáš pravidlo.');
 }
+
+// Духи словарных тем: эмодзи первого слова темы
+const W_COL = ['#5a8a5a', '#c8702e', '#2f6a8a', '#8a4a8a', '#a3301e', '#6a7a3a'];
+Object.keys(EXT_THEMES).forEach((th, i) => {
+  const n = EXT_THEMES[th].name;
+  MOBS['w_' + th] = em([...EXT_RAW[th][0][1]][0], W_COL[i % W_COL.length], 'Дух темы «' + n.ru + '»', 'Дух теми «' + n.uk + '»', 'Duch tématu „' + n.cz + '“',
+    'Отпустит, если знаешь слова этой темы.', 'Відпустить, якщо знаєш слова цієї теми.', 'Pustí tě, když znáš slova tohoto tématu.');
+});
 
 export const mobSVG = (id, cls = '') => `<svg class="mob ${cls}" viewBox="0 0 100 100" aria-hidden="true">${MOBS[id].svg}</svg>`;

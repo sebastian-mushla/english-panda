@@ -6,6 +6,7 @@ import * as CZ3 from './words3cz.js';
 import * as CZ4 from './words4cz.js';
 import { HU, HU_SENT } from './hu.js';
 import { UK } from './uk.js';
+import { EXT_THEMES, EXT_RAW } from './words_ext.js';
 
 // Банк слов A1. Формат строки: [en, emoji, ru, cz, загадка на простом английском, пример с пропуском ___].
 export const THEMES = {
@@ -255,6 +256,20 @@ if (TARGET === 'cz') {
     CZ4.REFL.map(([t, ru, uk, emoji]) => ({ en: 'r:' + t, t, ru, uk, emoji, ex: '___' })));
   add('office', { ru: 'Официальная речь', uk: 'Офіційне мовлення', cz: 'Úřední čeština', en: 'Formal Czech' },
     CZ4.OFFICE.map(([t, ru, uk, emoji]) => ({ en: 'o:' + t, t, ru, uk, emoji, ex: 'To je ___.' })));
+}
+// Дополнительный словарь A1–B2 (только английский и чешский). Если id уже занят старым словом — приставка «x:»
+if (TARGET === 'en' || TARGET === 'cz') {
+  for (const [theme, { ch, name }] of Object.entries(EXT_THEMES)) {
+    THEMES[theme] = name;
+    CHAPTER[theme] = ch;
+    BY_THEME[theme] = EXT_RAW[theme].map(([en, emoji, ru, uk, cz, exEn, exCz]) => {
+      const id = WORDS[en] ? 'x:' + en : en;
+      const w = { en: id, emoji, ru, uk, cz, theme, cefr: ['A1', 'A2', 'B1', 'B2'][ch - 1], riddle: null,
+        t: TARGET === 'cz' ? cz : en, ex: TARGET === 'cz' ? exCz : exEn };
+      BY_TARGET[w.t.toLowerCase()] ||= w;
+      return (WORDS[id] = w);
+    });
+  }
 }
 // Понятнее картинки: эмодзи, которые сами по себе не читались (банк, школа, «большой» = слон)
 const EMOJI = {

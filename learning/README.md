@@ -17,7 +17,8 @@
 - Данные тем: `src/learn/en_a1.js`, `en_a2.js`, `en_b1.js`, `en_b2.js`, `cz_ab.js` (задания, уроки, духи). Порядок на карте: `PROGRAM` в `src/learn/curriculum.js`.
 - EN: A1 (глава 1), A2 (глава 2), B1 (глава 3), B2 (глава 4) — грамматика готова, 61 камень. Экзамен B2 — из всех тем главы.
 - CZ: A1 (глава 1), A2 (глава 2), B1 (пещера падежей 2/3/7, modal + kdyby, числа с падежами, сравнение), B2 (падежи мн. ч., храм: пассив + který, порядок слов, союзы + старые механики: виды, se/si, vykání) — 60 камней.
-- Не сделано: словарь не расширен до целей (A1 ~500, A2 ~1000, B1 ~2000, B2 ~3000)
+- Словарь: старые ~210 слов + `src/learn/words_ext.js` — 22 темы по 10 слов (A1: school, days, rooms, fruit; A2: shopping, health, sport, kitchen, feelings, transport; B1: work, environment, media, money, people, study; B2: society, science, law, business, arts, ideas). Камни вставляются в главы автоматически (`withWords` в curriculum.js).
+- Не сделано: словарь до целей (A1 ~500, A2 ~1000, B1 ~2000, B2 ~3000) — добавлять новые темы в words_ext.js
 
 ## Мои пожелания
 - (дописывай сюда)
