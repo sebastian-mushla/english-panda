@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>English Panda</title>
+  <meta name="theme-color" content="#1d2a2a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Nunito:wght@500;700;800;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/world.css">
+  <link rel="stylesheet" href="styles/ui.css">
+  <link rel="stylesheet" href="styles/games.css">
+</head>
+<body>
+  <!-- Мир лобби: слои рисует src/world/lobby.js -->
+  <main id="world" aria-label="World">
+    <div id="sky"><div id="stars"></div><div id="rays"></div><div id="sun"></div><div id="moon"></div>
+      <svg id="birds" viewBox="0 0 180 60" aria-hidden="true"><path d="M10,30 q8,-8 16,0 q8,-8 16,0"/><path d="M50,18 q6,-6 12,0 q6,-6 12,0"/><path d="M60,42 q7,-7 14,0 q7,-7 14,0"/><path d="M100,26 q6,-6 12,0 q6,-6 12,0"/><path d="M140,36 q5,-5 10,0 q5,-5 10,0"/></svg></div>
+    <div id="layers"></div>
+    <div id="tint"></div>
+    <div class="mistband" id="mistA"></div><div class="mistband" id="mistB"></div>
+    <canvas id="particles"></canvas>
+    <div id="fog"></div>
+    <div id="grade"></div><div id="vignette"></div><div id="grain"></div>
+  </main>
+
+  <!-- Верхняя панель -->
+  <header id="hud"></header>
+  <!-- Нижняя карта мира -->
+  <nav id="minimap"></nav>
+
+  <!-- Экран уровня (мини-игры) -->
+  <section id="game" hidden></section>
+  <!-- Окна: книга, лавка, словарь, карточка уровня -->
+  <div id="modal-root"></div>
+  <div id="toast-root"></div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
