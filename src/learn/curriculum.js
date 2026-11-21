@@ -1,4 +1,5 @@
 // Уровни главы 1. Порядок испытаний: знакомство → узнавание → воспроизведение → дуэль.
+// Перед «Печатью» всегда идёт «Каллиграфия»: сначала увидеть написание из готовых букв, потом печатать по памяти.
 // Позже: генератор глав A2–C2 из банка слов и тем грамматики (≈3000 уровней).
 import { state } from '../state.js';
 import { BY_THEME, WORDS } from './words.js';
@@ -11,7 +12,7 @@ export const LEVELS = [
   { n: 4, theme: 'family', stages: ['gap', 'builder', 'duel'], mob: 'turtle' },
   { n: 5, theme: 'animals', stages: ['cards', 'rush', 'duel'], mob: 'mantis' },
   { n: 6, theme: 'food', stages: ['sudoku', 'builder', 'duel'], mob: 'dumpling' },
-  { n: 7, theme: 'body', stages: ['type', 'rush', 'duel'], mob: 'hare' },
+  { n: 7, theme: 'body', stages: ['spell', 'type', 'rush', 'duel'], mob: 'hare' },
   { n: 8, theme: 'nature', stages: ['cards', 'gap', 'duel'], mob: 'koi' },
   { n: 9, theme: 'home', stages: ['spell', 'builder', 'duel'], mob: 'dragon' },
   { n: 10, theme: 'gate', stages: ['type', 'gap', 'builder', 'rush', 'duel'], mob: 'lion', exam: true },
@@ -51,7 +52,7 @@ export function buildPlay(n) {
 // Повторение из словаря: без дуэли и звёзд
 export function buildReview(list) {
   return {
-    def: { n: 0, theme: 'review', stages: ['type', 'gap'], mob: null, review: true },
+    def: { n: 0, theme: 'review', stages: ['spell', 'type', 'gap'], mob: null, review: true },
     words: list, review: [], themes: [...new Set(list.map((w) => w.theme))],
   };
 }

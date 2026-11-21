@@ -38,6 +38,7 @@ export function typeLine(el, word, { onRight, onWrong, onDone }) {
   const letters = [...word];
   let pos = 0;
   el.innerHTML = letters.map((c) => (c === ' ' ? '<i class="gap"></i>' : '<i class="slot"></i>')).join('');
+  el.style.setProperty('--n', letters.length);
   const skip = () => { while (letters[pos] === ' ') pos++; };
   skip();
   const put = () => {

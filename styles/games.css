@@ -221,3 +221,102 @@
   .prompt .mean { font-size: 1.8rem; }
 }
 #game:focus { outline: none; }
+
+/* ---------- Любой размер экрана ----------
+   Экран уровня: шапка сверху, задание по центру, клавиатура прижата к низу.
+   Размеры клавиш, букв и картинок считаются от ширины и высоты окна (clamp), поэтому
+   на мини-телефоне всё помещается, а на большом становится крупнее. */
+#game { inset: 0 0 auto 0; height: 100dvh; padding-bottom: env(safe-area-inset-bottom); }
+.g-head { flex-wrap: wrap; row-gap: 6px; }
+.g-title { flex: 1; }
+.g-x, .g-hint, .g-coins { flex: none; }
+.g-instr span { font-size: clamp(.72rem, 1.7dvh, .95rem); padding: clamp(3px, .6dvh, 6px) 14px; display: -webkit-inline-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.g-stage-area { padding: clamp(4px, 1.2dvh, 10px) clamp(8px, 3vw, 16px) clamp(8px, 2dvh, 24px); }
+
+.st-type, .st-gap, .st-rush, .st-spell { place-items: stretch; }
+.typer, .spell { height: 100%; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 2dvh, 18px); }
+.spell { justify-content: center; }
+.typer > .prompt, .typer > .sentence { margin-top: auto; }
+.typer > .kb { margin-top: auto; width: 100%; }
+
+.kbd { gap: clamp(4px, .8dvh, 7px); }
+.krow { gap: clamp(3px, 1vw, 6px); }
+.key { height: clamp(30px, 6dvh, 60px); max-width: 58px; font-size: clamp(.95rem, min(4.4vw, 2.6dvh), 1.4rem); border-radius: clamp(6px, 1.6vw, 10px); }
+.key.space { height: clamp(26px, 4.6dvh, 50px); }
+.typer .count, .spell .count { margin-top: 0; }
+
+.prompt { padding: clamp(6px, 1.4dvh, 12px) clamp(12px, 4vw, 22px); gap: clamp(8px, 2vw, 14px); }
+.prompt .emo { font-size: clamp(1.8rem, 6dvh, 3.4rem); }
+.prompt .mean { font-size: clamp(1.4rem, 4.6dvh, 2.6rem); }
+.slots { --n: 6; gap: clamp(3px, 1vw, 6px); flex-wrap: nowrap; }
+.slot { width: min(52px, calc((100vw - 40px) / var(--n) - 6px)); height: clamp(30px, 6.5dvh, 60px); font-size: clamp(1.1rem, 4dvh, 2rem); }
+.gap { width: clamp(8px, 2vw, 18px); height: clamp(30px, 6.5dvh, 60px); }
+.tile { width: clamp(40px, min(13vw, 7.5dvh), 64px); height: clamp(40px, min(13vw, 7.5dvh), 64px); font-size: clamp(1.3rem, 3.6dvh, 1.9rem); }
+
+.sentence { padding: clamp(10px, 2dvh, 18px) clamp(12px, 4vw, 22px); }
+.sentence .emo { font-size: clamp(1.8rem, 5dvh, 3rem); }
+.sentence p { font-size: clamp(1.1rem, min(5vw, 3.2dvh), 1.8rem); }
+.sentence .slot { width: min(30px, calc((100vw - 80px) / var(--n) - 4px)); height: clamp(26px, 5dvh, 40px); font-size: clamp(1rem, 3dvh, 1.5rem); }
+
+.rush { gap: clamp(6px, 1.2dvh, 10px); }
+.rush-top { font-size: clamp(1.3rem, 3dvh, 1.8rem); }
+.field { min-height: 120px; }
+.buffer { min-height: clamp(40px, 6dvh, 56px); font-size: clamp(1.2rem, 3.4dvh, 1.7rem); padding: 4px 18px; }
+
+.sgrid { width: min(440px, 88vw, 52dvh); }
+.foe-art { width: clamp(90px, 18dvh, 170px); height: clamp(90px, 18dvh, 170px); }
+.dcard { height: clamp(90px, 17dvh, 190px); }
+
+/* Свиток подсказки — узкая полоска над клавиатурой (или под инструкцией), не закрывает задание */
+.g-hintpop.strip { position: static; width: auto; margin: 0 clamp(8px, 3vw, 16px) clamp(6px, 1dvh, 10px); animation: pop .25s; }
+.typer .g-hintpop.strip { width: 100%; margin: 0; }
+.g-hintpop.strip .scroll { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; padding: 8px 12px; box-shadow: 0 4px 10px rgba(0,0,0,.3); }
+.g-hintpop.strip b { font-size: 1.25rem; }
+.g-hintpop.strip p { margin: 0; font-size: clamp(.95rem, 2.2dvh, 1.15rem); }
+.g-hintpop.strip small { display: none; }
+
+@media (max-height: 700px) and (max-width: 720px) {
+  .icard { aspect-ratio: 1.6; } .icard .front .emo { font-size: 1.8rem; }
+  .g-x, .g-hint, .g-coins { height: 38px; } .g-x { width: 38px; }
+}
+
+/* Остальные игры на низких экранах: всё ужимается по высоте окна */
+.builder { gap: clamp(8px, 1.8dvh, 16px); }
+.answer { min-height: clamp(48px, 9dvh, 76px); padding: clamp(6px, 1.2dvh, 12px); }
+.word { padding: clamp(6px, 1.1dvh, 10px) clamp(10px, 3vw, 16px); font-size: clamp(1rem, 2.6dvh, 1.25rem); }
+.builder .prompt .mean { font-size: clamp(1.3rem, 3.6dvh, 2rem); }
+.builder .stage-actions { margin-top: clamp(4px, 1dvh, 16px); }
+.sudoku { gap: clamp(8px, 2dvh, 18px); }
+.sgrid { width: min(440px, 88vw, 46dvh); }
+.pword { padding: clamp(6px, 1.2dvh, 10px) clamp(10px, 3vw, 18px); font-size: clamp(1rem, 2.6dvh, 1.25rem); }
+.duel { gap: clamp(4px, 1dvh, 8px); }
+.foe-art { width: clamp(64px, 13dvh, 170px); height: clamp(64px, 13dvh, 170px); padding: 8px; }
+.foe-name { font-size: clamp(1.2rem, 3dvh, 1.7rem); }
+.bubble { padding: clamp(6px, 1.2dvh, 12px) 18px; }
+.bubble .ask b { font-size: clamp(1.4rem, 4dvh, 2.4rem); } .bubble .ask .emo { font-size: clamp(2rem, 5dvh, 3.2rem); }
+.combo { min-height: clamp(1rem, 3dvh, 2rem); font-size: clamp(1.2rem, 3dvh, 2rem); }
+.rush-top { line-height: 1.1; }
+@media (max-width: 720px) {
+  .dcard { height: clamp(56px, 10dvh, 110px); padding: 8px; }
+  .field { min-height: 70px; }
+}
+@media (max-height: 700px) {
+  .mcard { aspect-ratio: 1.15; } .mem-grid { gap: 6px; }
+  .sentence { gap: 4px; } .sentence .emo { font-size: 1.6rem; }
+}
+.g-stage { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-height: 700px) {
+  .foe-name { display: none; }
+  .foe-hp i { font-size: .95rem; }
+  .duel .lives { position: absolute; top: 0; right: 0; }
+  .duel .lives i { font-size: 1.1rem; }
+  .duel { grid-template-rows: auto auto auto 1fr; }
+}
+@media (max-width: 720px) {
+  .dcard .seal { width: 22px; height: 22px; top: 5px; left: 5px; font-size: .8rem; border-radius: 4px; }
+  .dcard .en { padding-left: 14px; font-size: clamp(1rem, 4.4vw, 1.45rem); }
+}
+.stage-actions { margin-top: clamp(6px, 1.6dvh, 16px); }
+/* дуэль помещается целиком; обрезаем только временный вылет карт во время анимации раздачи */
+.st-duel { overflow: hidden; }
+@media (max-height: 700px) and (max-width: 720px) { .icard { aspect-ratio: 1.75; } }

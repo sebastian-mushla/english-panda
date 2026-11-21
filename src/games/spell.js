@@ -28,6 +28,7 @@ export default function spell(el, ctx) {
     el.querySelector('.mean').textContent = meaning(cur);
     el.querySelector('.count').textContent = `${5 - list.length} / 5`;
     slots.innerHTML = letters.map((c) => (c === ' ' ? '<i class="gap"></i>' : '<i class="slot"></i>')).join('');
+    slots.style.setProperty('--n', letters.length);
     const pool = letters.filter((c) => c !== ' ').map((c) => c.toLowerCase());
     for (let i = 0; i < 2; i++) pool.push(DECOY[Math.floor(Math.random() * DECOY.length)]);
     tiles = shuffle(pool).map((c) => ({ c, used: false }));

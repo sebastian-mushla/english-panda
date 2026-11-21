@@ -79,6 +79,11 @@ export function runPlay(play, { onExit, onNext }) {
     hintSteps[hintKey] = step;
     const res = hintFn(step);
     sfx('flip');
+    // на клавиатурных играх и телефонах — полоска над клавиатурой / под инструкцией, чтобы не закрывать задание
+    const kb = area.querySelector('.kb');
+    const strip = !!kb || innerWidth < 760;
+    pop.classList.toggle('strip', strip);
+    if (kb) kb.before(pop); else if (strip) root.querySelector('.g-instr').after(pop); else root.append(pop);
     pop.hidden = false;
     pop.innerHTML = `<div class="scroll"><b>${res.label} · ${step}/3</b><p class="${res.en ? 'en' : ''}">${res.text}</p><small>${t('hintNote')}</small></div>`;
     pop.onclick = () => { pop.hidden = true; };
