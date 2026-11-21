@@ -3,6 +3,7 @@ import { state, save, on, emit } from '../state.js';
 import { t } from '../i18n.js';
 import { W, ZONES, NPC_X, walkY, zoneAt, groundY, CH2_X, CH3_X, CH4_X, FOG_X } from './geo.js';
 import { CH3_OPEN, CH4_OPEN } from '../learn/words.js';
+import { ADMIN_OPEN } from '../adminFlags.js';
 import { buildScene } from './scenery.js';
 import { applyPhase, applySeason } from './sky.js';
 import { setupRaster, updateRaster, rasterIdle } from './raster.js';
@@ -223,7 +224,8 @@ function renderOverlay() {
   }
   // туман закрывает следующую главу: лето — пока не пройдены Врата весны, потом осень
   // Туман закрывает следующую главу: лето — до Врат весны, осень — до Врат лета (и всегда, если учишь не английский), зима — скоро
-  const done = (n) => !!state.levels[n]?.stars?.[0];
+  // в режиме админа главы открыты: туман остаётся только у ещё не сделанной главы C1
+  const done = (n) => ADMIN_OPEN || !!state.levels[n]?.stars?.[0];
   const [fx, label, sub, text] = !done(EXAM_N[1]) ? [CH2_X, 'zone.fog1', 'locked', 'fogText']
     : !done(EXAM_N[2]) ? [CH3_X, 'zone.fog', 'locked', 'fogText2']
       : !CH3_OPEN ? [CH3_X, 'zone.fog', 'soon', 'ch3Locked']
