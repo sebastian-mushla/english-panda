@@ -65,6 +65,15 @@ initHud({ book: () => openBook(), shop: () => openShop(), dict: () => openDict(s
 // Звук можно включить только после первого жеста пользователя
 addEventListener('pointerdown', () => { if (state.sound) startAmbient(); }, { once: true });
 
+// Заставка при запуске: картинка на весь экран, исчезает по касанию
+{
+  const sp = document.createElement('div');
+  sp.id = 'splash';
+  sp.innerHTML = `<img src="assets/title.webp" alt=""><h1>English Panda</h1><p>${t('tapToStart')}</p>`;
+  document.body.append(sp);
+  sp.addEventListener('click', () => { sp.classList.add('out'); setTimeout(() => sp.remove(), 600); }, { once: true });
+}
+
 if (!state.welcomed) {
   const m = openModal(`<div class="welcome">
       <div class="w-panda">${pandaSVG({ hat: 'straw', robe: 'jade', item: 'scroll' })}</div>
