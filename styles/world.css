@@ -268,3 +268,13 @@ body.phone .mistband, body.phone #grain { display: none; }
 .layer.artbg img { position: absolute; top: 0; height: 100%; object-fit: cover;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
 .layer.artbg img.first { -webkit-mask-image: linear-gradient(90deg, #000 80%, transparent); mask-image: linear-gradient(90deg, #000 80%, transparent); }
+
+/* Нарисованные входы (картинки из Gemini); если файла нет — остаётся SVG-рисунок */
+.node.entrance .ent-svg { display: none; }
+.node.entrance.noimg .ent-img { display: none; }
+.node.entrance.noimg .ent-svg { display: block; }
+.node.entrance .ent-img { height: auto; }
+.node.entrance.current .ent-img { filter: drop-shadow(0 0 calc(var(--s) * 14px) rgba(255, 200, 90, .75)) drop-shadow(0 calc(var(--s) * 6px) calc(var(--s) * 6px) rgba(0,0,0,.35)); }
+/* у картинки снизу пустое поле ~15 %: опускаем, чтобы объект стоял на тропе */
+.node.entrance .ent-img { margin-bottom: calc(var(--s) * -50px); }
+.node.entrance:has(.ent-img) { width: calc(var(--s) * 430px); }

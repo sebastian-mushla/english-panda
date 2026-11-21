@@ -203,7 +203,8 @@ function renderOverlay() {
     // вход в место большой темы рисуется прямо на объекте: дверь дома, пасть пещеры, ступени к фонтану…
     if (l.place) {
       h += `<button class="node entrance ${cls}" data-n="${l.n}" style="--x:${x};--y:${y}" aria-label="${t('level')} ${l.n} · ${t('place.' + l.place)}">
-        <svg class="ent" viewBox="0 0 260 240" aria-hidden="true">${ENTRANCE_DEFS}${ENTRANCE[l.place]}</svg>
+        <img class="ent ent-img" src="assets/doors/${l.place}.png" alt="" loading="lazy" onerror="this.parentNode.classList.add('noimg')">
+        <svg class="ent ent-svg" viewBox="0 0 260 240" aria-hidden="true">${ENTRANCE_DEFS}${ENTRANCE[l.place]}</svg>
         <span class="ent-n"><b>${l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}</span>
         ${done ? `<span class="nstars">${stars(l.n)}</span>` : ''}</button>`;
       return;
