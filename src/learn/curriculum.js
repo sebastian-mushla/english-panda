@@ -2,6 +2,7 @@
 // Тема грамматики — «Правило» → узнавание → печать → «Найди ошибку» → проверка (80 %).
 // Большая тема — вход в место (дом, пещера, гора…): внутри свои камни-фазы, каждая со своей проверкой.
 import { state, TARGET, save } from '../state.js';
+import { ADMIN_OPEN } from '../adminFlags.js';
 import { BY_THEME, WORDS, themesOf, CH3_OPEN, CH4_OPEN } from './words.js';
 import { dueWords } from './srs.js';
 import { LESSONS } from './lessons.js';
@@ -177,6 +178,7 @@ export function levelWords(def) {
 }
 
 export function isUnlocked(n) {
+  if (ADMIN_OPEN) return true;
   if (levelDef(n)?.ch === 3 && !CH3_OPEN) return false; // глава 3 — только для английского и чешского
   if (levelDef(n)?.ch === 4 && !CH4_OPEN) return false; // глава 4 — пока только для чешского
   return n === 1 || !!state.levels[n - 1]?.stars?.[0];

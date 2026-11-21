@@ -4,6 +4,7 @@ import { state } from '../state.js';
 import { t, L } from '../i18n.js';
 import { levelDef, topicTitle, phaseTitle, phaseDone } from '../learn/curriculum.js';
 import { sfx } from '../audio.js';
+import { ADMIN_OPEN } from '../adminFlags.js';
 import { esc } from '../games/kit.js';
 
 export const PLACE_ICON = { house: '🏠', cave: '🦇', mountain: '⛰️', fountain: '⛲', temple: '🏯', library: '📚' };
@@ -19,7 +20,7 @@ export function openPlace(n, onPhase) {
   root.id = 'place';
   root.className = 'place place-' + def.place;
   const done = (i) => phaseDone(n, i);
-  const open = (i) => i === 0 || done(i - 1);
+  const open = (i) => ADMIN_OPEN || i === 0 || done(i - 1);
   // сцена-картина 16:9: на телефоне её листают по горизонтали, камни фаз стоят прямо на тропе внутри
   const pts = def.phases.map((p, i) => PATH[Math.round(i * (PATH.length - 1) / Math.max(1, def.phases.length - 1))]);
   root.innerHTML = `<header class="pl-head"><button class="g-x pl-x" aria-label="${t('close')}">✕</button>

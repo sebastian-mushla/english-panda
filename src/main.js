@@ -15,6 +15,7 @@ import { startAmbient } from './audio.js';
 import { checkAch } from './progress.js';
 import { pandaSVG } from './world/panda.js';
 import { langPickHTML, bindLangPick } from './ui/langpick.js';
+import { ADMIN_HOST } from './adminFlags.js';
 
 document.documentElement.lang = ({ cz: 'cs', uk: 'uk' })[state.lang] || 'ru';
 
@@ -40,6 +41,17 @@ function startPhase(n, i) {
     onNext: (k, p) => setTimeout(() => (p != null && p < levelDef(k).phases.length ? startPhase(k, p) : openLevelCard(k, start)), 250),
   });
 }
+
+// Один этап уровня или фазы (для админки): без смены прогресса темы целиком
+function runStage(n, phase, stage) {
+  closePlace();
+  setPaused(true);
+  const play = buildPlay(n, phase);
+  play.def = { ...play.def, stages: [stage] };
+  runPlay(play, { onExit: back, onNext: back });
+}
+
+if (ADMIN_HOST) import('./ui/admin.js').then((m) => m.initAdmin({ start, startPhase, runStage, focus }));
 
 function startReview(list) {
   if (!list.length) return;
