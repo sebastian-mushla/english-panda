@@ -59,6 +59,7 @@ body.dragging #world { cursor: grabbing; }
   box-shadow: 0 0 40px 12px rgba(255,250,220,.35);
 }
 #layers, #lights { position: absolute; inset: 0; pointer-events: none; }
+#lights { opacity: var(--glow, .1); }
 .layer { position: absolute; left: 0; top: 0; height: 100%; will-change: transform; }
 .layer svg.scene { display: block; overflow: visible; }
 .layer canvas.chunk { position: absolute; top: 0; height: 100%; }
@@ -71,6 +72,8 @@ body.dragging #world { cursor: grabbing; }
   background: linear-gradient(180deg, transparent 62%, color-mix(in srgb, var(--mist) 28%, transparent) 90%, color-mix(in srgb, var(--mist) 12%, transparent));
 }
 body.paused #world { visibility: hidden; }
+#layers, #lights, #overlay { transition: opacity .2s; }
+#world.jumping #layers, #world.jumping #lights, #world.jumping #overlay { opacity: 0; }
 
 /* ---------- Цвета SVG ---------- */
 .snow { fill: #fff; opacity: var(--snow); }

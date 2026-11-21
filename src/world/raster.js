@@ -9,7 +9,7 @@ const CHUNK = 1000;
 const VARS = ['--m1', '--m2', '--m3', '--mist', '--snow', '--leaf1', '--leaf2', '--leaffar', '--bam', '--bamfar', '--ground', '--grass',
   '--pine', '--pine2', '--trunk', '--cliff', '--cliff2', '--moss', '--blossom', '--blossom2', '--roof', '--summer', '--front', '--rainbow'];
 
-let css = null, layers = [], scale = 1, gen = 0, running = false, cam = 0, view = 1800;
+let css = null, layers = [], scale = 1, gen = 0, running = false, cam = 0, view = 1800, idle = [];
 
 async function sheet() {
   if (css === null) css = await fetch('styles/world.css').then((r) => r.text()).catch(() => '');
@@ -80,7 +80,14 @@ async function pump() {
     await new Promise((r) => setTimeout(r, 0));
   }
   running = false;
-  if (my !== gen) pump();
+  if (my !== gen) return pump();
+  idle.splice(0).forEach((r) => r());
+}
+
+// Обещание: все куски вокруг камеры нарисованы
+export function rasterIdle() {
+  if (!running && !nextTask()) return Promise.resolve();
+  return new Promise((r) => idle.push(r));
 }
 
 async function draw(L, i) {
@@ -94,6 +101,7 @@ async function draw(L, i) {
     const cv = document.createElement('canvas');
     cv.width = pw; cv.height = ph;
     cv.getContext('2d').drawImage(img, 0, 0);
+    img.src = ''; // сразу отпускаем декодированную картинку: на iOS сборщик мусора не успевает
     cv.className = 'chunk';
     cv.style.cssText = `left:calc(${x0}px * var(--s));width:calc(${cw}px * var(--s) + 1px)`;
     return cv;

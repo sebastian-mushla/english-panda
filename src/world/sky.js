@@ -78,7 +78,7 @@ export function applyPhase(centerX, viewW) {
   sky.setProperty('--rays', p.rays.toFixed(3));
   document.getElementById('tint').style.background = `rgba(${p.tint.slice(0, 3).map(Math.round).join(',')},${p.tint[3].toFixed(3)})`;
   const lights = document.getElementById('lights');
-  if (lights) lights.style.opacity = p.glow.toFixed(3);
+  if (lights) lights.style.setProperty('--glow', p.glow.toFixed(3));
   // для SVG-слоёв значения грубые (шаг 0.1) и меняются редко
   const gq = (Math.round(p.glow * 10) / 10).toFixed(1), dq = (Math.round(Math.max(0, 1 - p.glow) * 10) / 10).toFixed(1);
   if (root.getPropertyValue('--glowq') !== gq) root.setProperty('--glowq', gq);

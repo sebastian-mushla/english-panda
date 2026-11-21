@@ -4,7 +4,7 @@ import { t } from '../i18n.js';
 import { W, ZONES, NODE_X, NPC_X, walkY, zoneAt, groundY } from './geo.js';
 import { buildScene } from './scenery.js';
 import { applyPhase, applySeason } from './sky.js';
-import { setupRaster, updateRaster } from './raster.js';
+import { setupRaster, updateRaster, rasterIdle } from './raster.js';
 import { stepParticles, setParticleMood } from './particles.js';
 import { pandaSVG } from './panda.js';
 import { LEVELS, isUnlocked, currentLevel } from '../learn/curriculum.js';
@@ -211,8 +211,28 @@ export function walkTo(from, to) {
   });
 }
 
-export function focus(n) { target = clamp(NODE_X[n - 1] - viewW / 2); vel = 0; }
-export function focusX(x) { target = clamp(x - viewW / 2); vel = 0; }
+export function focus(n) { jump(NODE_X[n - 1]); }
+export function focusX(x) { jump(x); }
+
+// Дальний переход (карта внизу, «К уровню»): короткое затемнение, камера сразу на месте,
+// дорисовываются только куски этой зоны. Раньше камера пролетала весь мир, игра рисовала
+// каждый промежуточный кусок, и на iPhone вкладка вылетала из-за памяти.
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+let jumping = false;
+async function jump(x) {
+  const to = clamp(x - viewW / 2);
+  vel = 0;
+  if (Math.abs(to - cam) < viewW * 1.2 || jumping) { target = to; return; }
+  jumping = true;
+  const world = $('#world');
+  world.classList.add('jumping');
+  await wait(200);
+  target = cam = to;
+  applyCam(true);
+  await Promise.race([rasterIdle(), wait(1200)]);
+  world.classList.remove('jumping');
+  jumping = false;
+}
 export function setPaused(p) { paused = p; document.body.classList.toggle('paused', p); }
 
 // ---------- Карта мира внизу ----------
