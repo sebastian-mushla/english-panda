@@ -1,5 +1,6 @@
-// Растеризация слоёв мира: каждый SVG-слой один раз рисуется в холсты-куски шириной 1000 единиц.
-// При прокрутке двигаются готовые картинки, браузеру не нужно заново рисовать тысячи элементов SVG.
+// Растеризация слоёв мира: каждый SVG-слой рисуется в холсты-куски шириной 1000 единиц.
+// В памяти держим только куски рядом с камерой, остальные освобождаем и дорисовываем при подходе:
+// иначе на телефонах (особенно iPhone) вкладка вылетает из-за нехватки памяти.
 import { VW } from './geo.js';
 import { glowAt } from './sky.js';
 
@@ -8,7 +9,7 @@ const CHUNK = 1000;
 const VARS = ['--m1', '--m2', '--m3', '--mist', '--snow', '--leaf1', '--leaf2', '--leaffar', '--bam', '--bamfar', '--ground', '--grass',
   '--pine', '--pine2', '--trunk', '--cliff', '--cliff2', '--moss', '--blossom', '--blossom2', '--roof', '--summer', '--front', '--rainbow'];
 
-let css = null, job = 0;
+let css = null, layers = [], scale = 1, gen = 0, running = false, cam = 0, view = 1800;
 
 async function sheet() {
   if (css === null) css = await fetch('styles/world.css').then((r) => r.text()).catch(() => '');
@@ -25,42 +26,78 @@ function load(src) {
   return new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = src; });
 }
 
-// layers: [{f, w, raw, el}], s — масштаб экрана, camX — текущая камера (сначала рисуем ближнее)
-export async function rasterize(layers, s, camX, viewW) {
-  const my = ++job;
-  const style = await sheet();
-  const tasks = [];
+// Куски, которые должны быть в памяти, и куски, которые можно выбросить
+const range = (L, a, b) => [Math.max(0, Math.floor((cam * L.f + view * a) / CHUNK)), Math.min(Math.ceil(L.w / CHUNK) - 1, Math.floor((cam * L.f + view * b) / CHUNK))];
+
+function free(cv) { cv.width = 0; cv.height = 0; cv.remove(); }
+
+// layers: [{f, w, raw, el, q}] — q: доля разрешения экрана (дальние слои и свет можно рисовать мягче)
+export async function setupRaster(list, s) {
+  const my = ++gen;
+  await sheet();
+  if (my !== gen) return;
+  for (const L of layers) for (const cv of L.chunks?.values() || []) if (cv) free(cv);
+  layers = list;
+  scale = s;
+  for (const L of layers) L.chunks = new Map();
+  pump();
+}
+
+export function updateRaster(camX, viewW) {
+  cam = camX; view = viewW;
   for (const L of layers) {
-    const q = L.f === 1 ? Math.min(devicePixelRatio || 1, 1.25) : 1;
-    L.fresh = [];
-    for (let x0 = 0; x0 < L.w; x0 += CHUNK) {
-      const worldX = (x0 + CHUNK / 2 - (1 - L.f) * VW / 2) / L.f;
-      const screenX = x0 - camX * L.f;
-      tasks.push({ L, x0, q, worldX, dist: Math.abs(screenX + CHUNK / 2 - viewW / 2) });
+    const [k0, k1] = range(L, -2.2, 3.2);
+    for (const [i, cv] of L.chunks) if (i < k0 || i > k1) { if (cv) free(cv); L.chunks.delete(i); }
+  }
+  pump();
+}
+
+// Следующий нужный кусок: ближайший к центру экрана
+function nextTask() {
+  let best = null;
+  for (const L of layers) {
+    const [k0, k1] = range(L, -0.8, 1.8);
+    for (let i = k0; i <= k1; i++) {
+      if (L.chunks.has(i)) continue;
+      const d = Math.abs(i * CHUNK + CHUNK / 2 - (cam * L.f + view / 2)) / Math.max(0.3, L.f);
+      if (!best || d < best.d) best = { L, i, d };
     }
   }
-  tasks.sort((a, b) => a.dist - b.dist);
-  for (const tk of tasks) {
-    if (my !== job) return;
-    const { L, x0, q } = tk;
-    const cw = Math.min(CHUNK, L.w - x0);
-    const pw = Math.ceil(cw * s * q) + 1, ph = Math.ceil(1000 * s * q);
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} 0 ${cw} 1000" width="${pw}" height="${ph}" preserveAspectRatio="none"><style>${style}${varsBlock(glowAt(tk.worldX))}</style>${L.raw}</svg>`;
-    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
-    try {
-      const img = await load(url);
-      if (my !== job) return;
-      const cv = document.createElement('canvas');
-      cv.width = pw; cv.height = ph;
-      cv.getContext('2d').drawImage(img, 0, 0);
-      cv.className = 'chunk';
-      cv.style.cssText = `left:calc(${x0}px * var(--s));width:calc(${cw}px * var(--s) + 1px)`;
-      cv.dataset.x = x0;
-      // заменить старый кусок (после смены сезона или размера окна)
-      L.el.querySelector(`canvas.chunk[data-x="${x0}"]`)?.remove();
-      L.el.append(cv);
-    } catch { /* кусок не нарисовался — просто пропускаем */ }
-    URL.revokeObjectURL(url);
+  return best;
+}
+
+async function pump() {
+  if (running) return;
+  running = true;
+  const my = gen;
+  for (let tk = nextTask(); tk && my === gen; tk = nextTask()) {
+    const { L, i } = tk;
+    L.chunks.set(i, null); // занято, чтобы не взять второй раз
+    const cv = await draw(L, i).catch(() => null);
+    if (my !== gen) { if (cv) free(cv); break; }
+    if (!L.chunks.has(i)) { if (cv) free(cv); continue; } // пока рисовали, кусок стал не нужен
+    if (cv) { L.el.append(cv); L.chunks.set(i, cv); } else L.chunks.delete(i);
     await new Promise((r) => setTimeout(r, 0));
+  }
+  running = false;
+  if (my !== gen) pump();
+}
+
+async function draw(L, i) {
+  const x0 = i * CHUNK, cw = Math.min(CHUNK, L.w - x0);
+  const pw = Math.ceil(cw * scale * L.q) + 1, ph = Math.ceil(1000 * scale * L.q);
+  const worldX = (x0 + CHUNK / 2 - (1 - L.f) * VW / 2) / L.f;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} 0 ${cw} 1000" width="${pw}" height="${ph}" preserveAspectRatio="none"><style>${css}${varsBlock(glowAt(worldX))}</style>${L.raw}</svg>`;
+  const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+  try {
+    const img = await load(url);
+    const cv = document.createElement('canvas');
+    cv.width = pw; cv.height = ph;
+    cv.getContext('2d').drawImage(img, 0, 0);
+    cv.className = 'chunk';
+    cv.style.cssText = `left:calc(${x0}px * var(--s));width:calc(${cw}px * var(--s) + 1px)`;
+    return cv;
+  } finally {
+    URL.revokeObjectURL(url);
   }
 }

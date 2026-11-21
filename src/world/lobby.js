@@ -4,7 +4,7 @@ import { t } from '../i18n.js';
 import { W, ZONES, NODE_X, NPC_X, walkY, zoneAt, groundY } from './geo.js';
 import { buildScene } from './scenery.js';
 import { applyPhase, applySeason } from './sky.js';
-import { rasterize } from './raster.js';
+import { setupRaster, updateRaster } from './raster.js';
 import { stepParticles, setParticleMood } from './particles.js';
 import { pandaSVG } from './panda.js';
 import { LEVELS, isUnlocked, currentLevel } from '../learn/curriculum.js';
@@ -18,17 +18,22 @@ export function initLobby(h) {
   handlers = h;
   const scene = buildScene();
   const root = $('#layers');
-  // дальние слои и земля рисуются в картинки-куски (raster.js), передний план остаётся живым SVG
-  const RASTER = new Set([0.12, 0.3, 0.6, 1]);
-  root.innerHTML = scene.layers.map((L) => `<div class="layer" data-f="${L.f}"${RASTER.has(L.f) ? ' data-raster' : ''}>${RASTER.has(L.f) ? '' : L.html}</div>` +
+  // Все статичные слои (горы, роща, земля, передний план, свет) рисуются в картинки-куски (raster.js).
+  // Живыми SVG остаются только маленькие анимации (струи водопада, рябь, пламя).
+  // q — доля разрешения: дальнее, передний план и свет мягкие и так, их можно рисовать грубее.
+  const phone = innerWidth < 760 || matchMedia('(pointer: coarse)').matches;
+  const Q = { 0.12: phone ? 0.45 : 0.55, 0.3: phone ? 0.55 : 0.65, 0.6: phone ? 0.7 : 0.8, 1: phone ? 1 : Math.min(devicePixelRatio || 1, 1.25), 1.4: 0.5 };
+  root.innerHTML = scene.layers.map((L) => `<div class="layer" data-f="${L.f}" data-raster></div>` +
     (L.fx ? `<div class="layer fxlayer" data-f="${L.f}">${L.fx}</div>` : '')).join('');
   const rEls = root.querySelectorAll('.layer[data-raster]');
-  rasterLayers = scene.layers.filter((L) => RASTER.has(L.f)).map((L, i) => ({ f: L.f, w: L.w, raw: L.raw, el: rEls[i] }));
+  rasterLayers = scene.layers.map((L, i) => ({ f: L.f, w: L.w, raw: L.raw, el: rEls[i], q: Q[L.f] }));
   // слои света идут над тонировкой, чтобы фонари светились ночью
   const lightsRoot = document.createElement('div');
   lightsRoot.id = 'lights';
-  lightsRoot.innerHTML = scene.lights.map((L) => `<div class="layer lightlayer" data-f="${L.f}">${L.html}</div>`).join('');
+  lightsRoot.innerHTML = scene.lights.map((L) => `<div class="layer lightlayer" data-f="${L.f}"></div>`).join('');
   $('#tint').after(lightsRoot);
+  lightsRoot.querySelectorAll('.lightlayer').forEach((el, i) => rasterLayers.push({ ...scene.lights[i], el, q: phone ? 0.35 : 0.5 }));
+  document.body.classList.toggle('phone', phone);
   overlay = document.createElement('div');
   overlay.id = 'overlay';
   overlay.className = 'layer';
@@ -69,16 +74,18 @@ function resize() {
   if (rasterS && Math.abs(s - rasterS) / rasterS > 0.15) { clearTimeout(redrawT); redrawT = setTimeout(redraw, 400); }
 }
 
-let redrawT = 0;
+let redrawT = 0, lastRasterCam = -1e9;
 function redraw() {
   if (!innerHeight) return;
   rasterS = s;
-  rasterize(rasterLayers, s, cam, viewW);
+  setupRaster(rasterLayers, s).then(() => updateRaster(cam, viewW));
+  lastRasterCam = cam;
 }
 
 const clamp = (x) => (Number.isFinite(x) ? Math.max(0, Math.min(W - viewW, x)) : 0);
 
 function applyCam(force) {
+  if (force || Math.abs(cam - lastRasterCam) > 80) { lastRasterCam = cam; updateRaster(cam, viewW); }
   for (const L of layerEls) L.el.style.transform = `translate3d(${(-cam * L.f * s).toFixed(1)}px,0,0)`;
   const mm = $('#mm-view');
   if (mm) { mm.style.left = (cam / W * 100) + '%'; mm.style.width = (viewW / W * 100) + '%'; }

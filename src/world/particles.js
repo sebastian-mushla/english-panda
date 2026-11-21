@@ -4,11 +4,12 @@ const ctx = cv.getContext('2d');
 let W = 0, H = 0, dpr = 1, parts = [], season = 'spring', night = 0, indoor = false;
 
 function resize() {
-  dpr = Math.min(2, devicePixelRatio || 1);
+  const phone = innerWidth < 760 || matchMedia('(pointer: coarse)').matches;
+  dpr = Math.min(phone ? 1.5 : 2, devicePixelRatio || 1);
   W = innerWidth; H = innerHeight;
   cv.width = W * dpr; cv.height = H * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const n = Math.round(Math.min(70, (W * H) / 22000));
+  const n = Math.round(Math.min(phone ? 28 : 70, (W * H) / 22000));
   parts = Array.from({ length: n }, () => spawn(true));
 }
 
@@ -43,8 +44,14 @@ export function setParticleMood(s, n, inside = false) {
   indoor = inside;
 }
 
+// Частицы рисуем не чаще 60 раз в секунду: на экранах 120 Гц это вдвое меньше работы, а глаз разницы не видит
+let lastDraw = 0, accDx = 0;
 export function stepParticles(dxPx, t) {
-  if (document.hidden) return;
+  accDx += dxPx;
+  if (document.hidden || t - lastDraw < 15) return;
+  lastDraw = t;
+  dxPx = accDx;
+  accDx = 0;
   ctx.clearRect(0, 0, W, H);
   const cols = COLORS[season];
   for (let i = 0; i < parts.length; i++) {

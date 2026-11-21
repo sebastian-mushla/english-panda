@@ -37,7 +37,7 @@ function render() {
       <button class="h-btn" data-a="book" title="${t('book')}"><i>📖</i><span>${t('book')}</span></button>
       <button class="h-btn" data-a="shop" title="${t('shop')}"><i>🏮</i><span>${t('shop')}</span></button>
       <button class="h-btn" data-a="dict" title="${t('dict')}"><i>📜</i><span>${t('dict')}</span></button>
-      <button class="h-btn lang" data-a="settings" title="${t('learning')}: ${LANG_NAME[TARGET][state.lang]}"><i>${FLAG[state.lang]}</i>→<i>${FLAG[TARGET]}</i></button>
+      <button class="h-btn lang" data-a="settings" title="${t('learning')}: ${LANG_NAME[TARGET][state.lang]}"><i>${FLAG[state.lang]}</i><b class="arr">→</b><i>${FLAG[TARGET]}</i></button>
       <button class="h-btn round" data-a="sound" title="${t('sound')}">${state.sound ? '🔊' : '🔇'}</button>
       <button class="h-btn round" data-a="settings" title="${t('settings')}">⚙️</button>
     </div>`;

@@ -145,6 +145,8 @@ text.gold-t { font-size: 54px; }
 #vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(18,10,4,.5)); }
 #grain { position: absolute; inset: 0; pointer-events: none; opacity: .06;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .45 0 0 0 0 .38 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+/* Телефон: без тяжёлых декоративных слоёв на весь экран */
+body.phone .mistband, body.phone #grain { display: none; }
 #birds { position: absolute; top: 14%; left: -20%; width: 180px; opacity: .55; animation: birds 60s linear infinite; }
 #birds path { fill: none; stroke: #2a3a40; stroke-width: 2.4; stroke-linecap: round; animation: flap 1.1s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 #birds path:nth-child(2n) { animation-delay: -.5s; }

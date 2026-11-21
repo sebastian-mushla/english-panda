@@ -576,7 +576,7 @@ export function buildScene() {
     layers: layers.map((L) => ({ f: L.f, w: L.w, html: wrap(L, L.svg), raw: DEFS + L.svg, fx: FX[L.f] ? wrap(L, FX[L.f].join('')) : '' })),
     lights: Object.entries(lights).map(([f, arr]) => {
       const L = { f: +f, w: layerW(+f) };
-      return { f: L.f, w: L.w, html: wrap(L, arr.join('')) };
+      return { f: L.f, w: L.w, html: wrap(L, arr.join('')), raw: DEFS + arr.join('') };
     }),
   };
 }
