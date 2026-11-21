@@ -15,7 +15,11 @@ import { setWater, sfx } from '../audio.js';
 const $ = (s) => document.querySelector(s);
 let s = 1, viewW = 1800, cam = state.cam || 0, target = cam, paused = false;
 // Фоны зон из картинок: x и w в единицах слоя (мир × f), высота — весь экран
-const ART_BG = [{ src: 'assets/zone-bamboo.webp', f: 0.6, x: 0, w: 2900 }];
+// Каждая картинка лежит на слое f = 0.6 и видна, пока камера в своей зоне; края уходят в туман и перекрываются с соседями
+const ART_ZONES = ['bamboo', 'falls', 'village', 'tea', 'gate', 'terraces', 'lake', 'market', 'monastery'];
+const ART_BG = ZONES.filter((z) => ART_ZONES.includes(z.id)).map((z) => (z.x0 === 0
+  ? { src: 'assets/zones/' + z.id + '.webp', f: 0.6, x: 0, w: 2900, first: true }
+  : { src: 'assets/zones/' + z.id + '.webp', f: 0.6, x: Math.round(z.x0 * 0.6 - 500), w: Math.round((z.x1 - z.x0) * 0.6 + 2000) }));
 let layerEls = [], rasterLayers = [], rasterS = 0, overlay, playerEl, handlers = {}, zoneId = '', lastPhaseCam = -1e9, season = 'spring', lastPhase = null;
 
 export function initLobby(h) {
@@ -31,7 +35,7 @@ export function initLobby(h) {
     (L.fx ? `<div class="layer fxlayer" data-f="${L.f}">${L.fx}</div>` : '')).join('');
   // нарисованные фоны зон (картинки) лежат над средним планом и уходят в туман справа
   root.querySelectorAll('.layer[data-raster]')[2].insertAdjacentHTML('afterend', ART_BG.map((b) =>
-    `<div class="layer artbg" data-f="${b.f}"><img src="${b.src}" alt="" decoding="async" style="left:calc(var(--s)*${b.x}px);width:calc(var(--s)*${b.w}px)"></div>`).join(''));
+    `<div class="layer artbg" data-f="${b.f}"><img class="${b.first ? 'first' : ''}" src="${b.src}" alt="" loading="lazy" decoding="async" onerror="this.remove()" style="left:calc(var(--s)*${b.x}px);width:calc(var(--s)*${b.w}px)"></div>`).join(''));
   const rEls = root.querySelectorAll('.layer[data-raster]');
   rasterLayers = scene.layers.map((L, i) => ({ f: L.f, w: L.w, raw: L.raw, el: rEls[i], q: Q[L.f] }));
   // слои света идут над тонировкой, чтобы фонари светились ночью
