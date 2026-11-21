@@ -1,5 +1,5 @@
 // Экран уровня: шапка с подсказкой и монетами, испытания по очереди, итог со звёздами.
-import { state, save, addCoins, on, off, emit, upg } from '../state.js';
+import { state, save, addCoins, on, off, emit, upg, TARGET } from '../state.js';
 import { t, L, nWords } from '../i18n.js';
 import { sfx } from '../audio.js';
 import { THEMES } from '../learn/words.js';
@@ -11,6 +11,8 @@ import { checkAch, dailyStep } from '../progress.js';
 import { toast } from './modal.js';
 import { openCertificate } from './book.js';
 import { pandaSVG } from '../world/panda.js';
+
+import { LESSONS } from '../learn/lessons.js';
 
 const GAMES = {
   intro: () => import('../games/intro.js'), cards: () => import('../games/cards.js'), type: () => import('../games/type.js'), gap: () => import('../games/gap.js'), rush: () => import('../games/rush.js'),
@@ -31,7 +33,8 @@ export function runPlay(play, { onExit, onNext }) {
   const { def } = play;
   const stages = def.exam || def.review ? [...def.stages] : ['intro', ...def.stages];
   // перед играми на формы слова сначала урок: игра не должна требовать того, чему ещё не учили
-  if (!def.exam && !def.review && def.gram && stages.some((g) => ['verbform', 'maze', 'sokoban', 'irregular', 'letters', 'cases', 'aspect', 'diacritics', 'sesi', 'tyvy'].includes(g))) stages.splice(1, 0, 'rule');
+  // (или когда у уровня есть свой урок, например «Местоимения» в главе 1)
+  if (!def.exam && !def.review && def.gram && (stages.some((g) => ['verbform', 'maze', 'sokoban', 'irregular', 'letters', 'cases', 'aspect', 'diacritics', 'sesi', 'tyvy'].includes(g)) || def.gram.split('|').some((k) => LESSONS[TARGET]?.[k]))) stages.splice(1, 0, 'rule');
   const session = newSession();
   const pool = [...play.words, ...play.review];
   let si = 0, mistakes = 0, hints = 0, mounted = null, hintKey = null, hintFn = null, stageWrong = new Set();

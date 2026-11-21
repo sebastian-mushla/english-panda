@@ -10,7 +10,7 @@ export const LEVELS = [
   { n: 1, ch: 1, theme: 'greet', stages: ['cards', 'dialog', 'duel'], mob: 'crane' },
   { n: 2, ch: 1, theme: 'numbers', stages: ['spell', 'type', 'duel'], mob: 'lantern' },
   { n: 3, ch: 1, theme: 'colors', stages: ['fishing', 'sudoku', 'duel'], mob: 'fox' },
-  { n: 4, ch: 1, theme: 'family', stages: ['chain', 'builder', 'duel'], mob: 'turtle' },
+  { n: 4, ch: 1, theme: 'family', gram: 'pronouns', stages: ['chain', 'builder', 'duel'], mob: 'turtle' },
   { n: 5, ch: 1, theme: 'animals', stages: ['baskets', 'rush', 'duel'], mob: 'mantis' },
   { n: 6, ch: 1, theme: 'food', stages: ['truefalse', 'builder', 'duel'], mob: 'dumpling' },
   { n: 7, ch: 1, theme: 'body', stages: ['spell', 'type', 'lantern', 'duel'], mob: 'hare' },

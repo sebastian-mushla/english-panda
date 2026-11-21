@@ -2,22 +2,38 @@
 // Для каждого изучаемого языка (en / cz) и вида грамматики: заголовок, пункты объяснения (ru / uk) и таблица примеров.
 export const LESSONS = {
   en: {
+    pronouns: {
+      title: { ru: 'Кто? Местоимения', uk: 'Хто? Займенники', cz: 'Kdo? Zájmena' },
+      pts: {
+        ru: ['Местоимение заменяет имя: не «Мэй читает», а «она читает».', 'he — про мужчину или мальчика, she — про женщину или девочку.', 'it — про вещь или животное: The cat is black. It is small.', 'you — и «ты», и «вы». they — «они», про людей и про вещи.'],
+        uk: ['Займенник замінює ім\'я: не «Мей читає», а «вона читає».', 'he — про чоловіка чи хлопчика, she — про жінку чи дівчинку.', 'it — про річ або тварину: The cat is black. It is small.', 'you — і «ти», і «ви». they — «вони», про людей і про речі.'],
+        cz: ['Zájmeno nahrazuje jméno: ne „Mei čte“, ale „ona čte“.', 'he — o muži nebo chlapci, she — o ženě nebo dívce.', 'it — o věci nebo zvířeti: The cat is black. It is small.', 'you — „ty“ i „vy“. they — „oni“, o lidech i věcech.'],
+      },
+      ex: {
+        ru: [['I', 'я'], ['you', 'ты / вы'], ['he', 'он'], ['she', 'она'], ['it', 'оно (вещь, животное)'], ['we', 'мы'], ['they', 'они']],
+        uk: [['I', 'я'], ['you', 'ти / ви'], ['he', 'він'], ['she', 'вона'], ['it', 'воно (річ, тварина)'], ['we', 'ми'], ['they', 'вони']],
+        cz: [['I', 'já'], ['you', 'ty / vy'], ['he', 'on'], ['she', 'ona'], ['it', 'ono (věc, zvíře)'], ['we', 'my'], ['they', 'oni']],
+      },
+    },
     present: {
       title: { ru: 'Present Simple — настоящее время', uk: 'Present Simple — теперішній час', cz: "Present Simple — přítomný čas" },
       pts: {
-        cz: ["Mluvíme o tom, co se děje pravidelně: každý den, v neděli, večer.",
+        cz: ["Kdo to dělá: I — já, you — ty / vy, he — on, she — ona, it — ono (věc nebo zvíře), we — my, they — oni.",
+          "Mluvíme o tom, co se děje pravidelně: každý den, v neděli, večer.",
           "I / you / we / they — sloveso se nemění: I play, they live.",
           "he / she / it (jeden člověk nebo věc) — přidáme -s: he plays, she lives.",
           "Po -o, -sh, -ch, -x přidáme -es: go → goes, do → does, watch → watches.",
           "Souhláska + y → -ies: cry → cries, study → studies.",
           "Otázka a zápor — přes do / does, sloveso bez -s: Do you like tea? She doesn't eat meat."],
-        ru: ['Говорим о том, что бывает регулярно: каждый день, по воскресеньям, вечером.',
+        ru: ['Кто делает: I — я, you — ты / вы, he — он, she — она, it — оно (вещь или животное), we — мы, they — они.',
+          'Говорим о том, что бывает регулярно: каждый день, по воскресеньям, вечером.',
           'I / you / we / they — глагол не меняется: I play, they live.',
           'he / she / it (один человек или предмет) — добавляем -s: he plays, she lives.',
           'После -o, -sh, -ch, -x добавляем -es: go → goes, do → does, watch → watches.',
           'Согласная + y → -ies: cry → cries, study → studies.',
           'Вопрос и «не» — через do / does, а глагол без -s: Do you like tea? She doesn\'t eat meat.'],
-        uk: ['Говоримо про те, що буває регулярно: щодня, щонеділі, увечері.',
+        uk: ['Хто робить: I — я, you — ти / ви, he — він, she — вона, it — воно (річ або тварина), we — ми, they — вони.',
+          'Говоримо про те, що буває регулярно: щодня, щонеділі, увечері.',
           'I / you / we / they — дієслово не змінюється: I play, they live.',
           'he / she / it (одна людина чи річ) — додаємо -s: he plays, she lives.',
           'Після -o, -sh, -ch, -x додаємо -es: go → goes, do → does, watch → watches.',
@@ -121,6 +137,14 @@ export const LESSONS = {
     },
   },
   cz: {
+    pronouns: {
+      title: { ru: 'Кто? Местоимения', uk: 'Хто? Займенники' },
+      pts: {
+        ru: ['já — я, ty — ты, on — он, ona — она, ono — оно, my — мы, vy — вы, oni — они.', 'В чешском местоимение часто пропускают: окончание глагола уже говорит, кто делает. Mám = я имею, máme = мы имеем.', 'vy — и «вы» многим людям, и вежливое «Вы» одному человеку.'],
+        uk: ['já — я, ty — ти, on — він, ona — вона, ono — воно, my — ми, vy — ви, oni — вони.', 'У чеській займенник часто пропускають: закінчення дієслова вже каже, хто робить. Mám = я маю, máme = ми маємо.', 'vy — і «ви» багатьом людям, і ввічливе «Ви» одній людині.'],
+      },
+      ex: [['já', 'mám'], ['ty', 'máš'], ['on / ona', 'má'], ['my', 'máme'], ['vy', 'máte'], ['oni', 'mají']],
+    },
     present: {
       title: { ru: 'Настоящее время (přítomný čas)', uk: 'Теперішній час (přítomný čas)' },
       pts: {

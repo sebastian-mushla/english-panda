@@ -37,7 +37,7 @@ export function lessonHTML(kind) {
   const ls = LESSONS[TARGET]?.[kind];
   if (!ls) return '';
   return `<div class="lesson"><h4>${esc(L(ls.title))}</h4><ul>${L(ls.pts).map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
-    <table class="lesson-ex en">${ls.ex.map((r) => `<tr>${r.map((c, i) => `<td>${i ? '→ ' : ''}${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
+    <table class="lesson-ex en">${(Array.isArray(ls.ex) ? ls.ex : L(ls.ex)).map((r) => `<tr>${r.map((c, i) => `<td>${i ? '→ ' : ''}${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
 }
 
 // Подписи колонок таблицы глаголов: у чешского вторая форма — прошедшее время, третья — настоящее (já)
