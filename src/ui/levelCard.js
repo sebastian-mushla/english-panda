@@ -18,6 +18,7 @@ export function openLevelCard(n, onStart) {
   const title = def.built ? L(topicTitle(def)) : '';
   const m = openModal(`<div class="lcard">
       <h2>${t('level')} ${n}</h2>
+      ${def.place ? `<img class="lc-door" src="assets/places/${def.place}-door.webp" alt="">` : ''}
       <div class="lc-sub">${def.exam ? `${t('exam')} · ${t({ 1: 'zone.gate', 2: 'zone.sgate', 3: 'zone.agate', 4: 'zone.wgate' }[def.ch])}` : (def.built ? `${def.place ? PLACE_ICON[def.place] + ' ' + t('place.' + def.place) + ' · ' : ''}${esc(title)}` : `${L(THEMES[def.theme])} · <span class="en">${THEMES[def.theme][TARGET]}</span>`)}</div>
       <div class="lc-inner parch">
         <div class="lc-top">

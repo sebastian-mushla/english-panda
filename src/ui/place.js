@@ -8,7 +8,7 @@ import { esc } from '../games/kit.js';
 
 export const PLACE_ICON = { house: '🏠', cave: '🦇', mountain: '⛰️', fountain: '⛲', temple: '🏯', library: '📚' };
 
-import { interior, PATH } from '../world/interiors.js';
+import { PATH } from '../world/interiors.js';
 
 let root = null;
 
@@ -25,7 +25,8 @@ export function openPlace(n, onPhase) {
   root.innerHTML = `<header class="pl-head"><button class="g-x pl-x" aria-label="${t('close')}">✕</button>
       <div><b>${PLACE_ICON[def.place] || ''} ${esc(t('place.' + def.place))}</b><small>${esc(L(topicTitle(def)) || '')}</small></div></header>
     <div class="pl-world">
-      <svg class="pl-bg" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">${interior(def.place)}
+      <img class="pl-bg" src="assets/places/${def.place}-in.webp" alt="" decoding="async">
+      <svg class="pl-bg" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">
         <path d="M${pts.map(([x, y]) => `${x},${y + 40}`).join(' L')}" stroke="#f6ecd4" stroke-width="6" stroke-dasharray="4 18" stroke-linecap="round" fill="none" opacity=".75"/></svg>
       ${def.phases.map((p, i) => {
         const st = state.phases[n + ':' + i]?.stars || [];

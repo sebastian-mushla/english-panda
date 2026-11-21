@@ -258,3 +258,7 @@
 .pl-label { font-weight: 800; font-size: .9rem; line-height: 1.2; padding: 4px 10px; border-radius: 10px; background: rgba(10,8,20,.62); }
 .pl-stars { display: block; font-style: normal; } .pl-stars em { font-style: normal; opacity: .3; } .pl-stars em.on { opacity: 1; color: #f2c14e; }
 .lc-stages .chip.on { background: #8ab87a; }
+
+/* Картинки мест: фон интерьера под тропой и вход в карточке темы */
+img.pl-bg { object-fit: cover; }
+.lc-door { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 14px; margin-bottom: 10px; }
