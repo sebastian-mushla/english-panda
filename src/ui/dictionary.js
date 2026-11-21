@@ -1,11 +1,21 @@
-// Словарь учёного: все встреченные слова, знание 0–5, примеры, повторение слабых слов.
+// Словарь учёного: все встреченные слова, транскрипция и озвучка, знание 0–5, примеры, повторение слабых слов.
 import { state } from '../state.js';
 import { t, L, nWords } from '../i18n.js';
 import { WORDS, THEMES } from '../learn/words.js';
 import { weakWords, dueWords } from '../learn/srs.js';
 import { board } from './modal.js';
-import { sfx } from '../audio.js';
+import { sfx, speakWord, canSpeak } from '../audio.js';
+import { IPA, RU_STRESS } from '../learn/phonetics.js';
+import { TARGET } from '../state.js';
 import { esc, fillEx } from '../games/kit.js';
+
+// Транскрипция: английский — IPA, русский — ударение, чешский — ударение на первом слоге
+function phon(w) {
+  if (TARGET === 'en' && IPA[w.en]) return `<i class="ipa">[${esc(IPA[w.en])}]</i>`;
+  if (TARGET === 'ru' && RU_STRESS[w.en]) return `<i class="ipa">${esc(RU_STRESS[w.en])}</i>`;
+  if (TARGET === 'cz') return `<i class="ipa">ˈ${esc(w.t)}</i>`;
+  return '';
+}
 
 export function openDict(onReview) {
   let theme = 'all', q = '';
@@ -30,9 +40,17 @@ export function openDict(onReview) {
         list.innerHTML = rows.map((w) => {
           const r = state.words[w.en];
           return `<div class="drow"><span class="emo">${w.emoji}</span>
-            <div class="dw"><b class="en">${esc(w.t)}</b><span>${esc(L({ ru: w.ru, cz: w.cz }))}</span><small class="en">${fillEx(w)}</small></div>
-            <div class="know" title="${t('knowledge')}">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= r.box ? 'on' : ''}"></i>`).join('')}</div></div>`;
+            <div class="dw"><b class="en">${esc(w.t)}</b>${phon(w)}<span>${esc(L({ ru: w.ru, cz: w.cz }))}</span><small class="en">${fillEx(w)}</small></div>
+            <div class="know" title="${t('knowledge')}">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= r.box ? 'on' : ''}"></i>`).join('')}</div>
+            ${canSpeak() ? `<button class="spk" data-en="${esc(w.en)}" aria-label="${t('listen')}">🔊</button>` : ''}</div>`;
         }).join('');
+        list.querySelectorAll('.spk').forEach((b) => b.addEventListener('click', () => {
+          const w = WORDS[b.dataset.en];
+          // второе нажатие подряд — медленно
+          const slow = b.classList.toggle('slow');
+          speakWord(w.t, TARGET, slow);
+          setTimeout(() => b.classList.remove('slow'), 2500);
+        }));
       };
       draw();
       panel.querySelector('.search').addEventListener('input', (e) => { q = e.target.value.trim().toLowerCase(); draw(); });

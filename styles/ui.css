@@ -151,9 +151,11 @@
 .dict-meta .btn { margin-left: auto; }
 .due { color: var(--red); }
 .dict-list { display: grid; gap: 8px; max-height: 52vh; overflow: auto; padding-right: 4px; }
-.drow { display: grid; grid-template-columns: 48px 1fr auto; gap: 12px; align-items: center; padding: 8px 12px; border-radius: 10px; background: rgba(255,250,235,.6); border: 1px solid rgba(185,149,90,.6); }
+.drow { display: grid; grid-template-columns: 48px 1fr auto 44px; gap: 12px; align-items: center; padding: 8px 12px; border-radius: 10px; background: rgba(255,250,235,.6); border: 1px solid rgba(185,149,90,.6); }
 .drow .emo { font-size: 2rem; text-align: center; }
-.dw { display: grid; } .dw b { font-size: 1.15rem; } .dw span { font-weight: 700; color: var(--ink-soft); } .dw small { color: var(--ink-soft); opacity: .85; }
+.dw { display: grid; }
+.ipa { font-style: normal; font-family: 'Charis SIL', 'Doulos SIL', 'Lucida Sans Unicode', 'Arial Unicode MS', sans-serif; font-size: .9rem; color: var(--jade-d); font-weight: 600; }
+.spk.slow { background: #fff4c2; border-color: var(--gold-d); } .dw b { font-size: 1.15rem; } .dw span { font-weight: 700; color: var(--ink-soft); } .dw small { color: var(--ink-soft); opacity: .85; }
 .know { display: flex; gap: 3px; } .know i { width: 12px; height: 18px; border-radius: 3px; background: rgba(0,0,0,.12); }
 .know i.on { background: linear-gradient(180deg, #7fd0a0, var(--jade)); }
 .spk { width: 40px; height: 40px; border-radius: 50%; background: #fffaf0; border: 2px solid var(--parch-line); font-size: 1.1rem; }
@@ -229,7 +231,7 @@
   .sign { min-width: 0; font-size: 1.4rem; padding: 6px 14px 8px; }
   .board-panel { padding: 12px; }
   .medals { grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); }
-  .drow { grid-template-columns: 36px 1fr; } .drow .know { display: none; }
+  .drow { grid-template-columns: 36px 1fr 40px; } .drow .know { display: none; }
   .lc-top { grid-template-columns: 90px 1fr; } .lc-spirit .medal { width: 84px; height: 84px; }
 }
 

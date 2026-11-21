@@ -86,3 +86,22 @@ export function setSound(on) {
   state.sound = on;
   if (master) master.gain.setTargetAtTime(on ? 0.8 : 0, ac.currentTime, 0.05);
 }
+
+// Озвучка слова в словаре — только по нажатию на 🔊 (в играх голоса нет).
+// Голос берётся под изучаемый язык: английский, русский или чешский.
+const VOICE_LANG = { en: ['en-GB', 'en-US', 'en'], ru: ['ru-RU', 'ru'], cz: ['cs-CZ', 'cs'] };
+export const canSpeak = () => 'speechSynthesis' in window;
+export function speakWord(text, lang, slow = false) {
+  if (!canSpeak()) return false;
+  const prefs = VOICE_LANG[lang] || VOICE_LANG.en;
+  const voices = speechSynthesis.getVoices();
+  const voice = prefs.map((p) => voices.find((v) => v.lang.replace('_', '-').toLowerCase().startsWith(p.toLowerCase()))).find(Boolean);
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = voice?.lang || prefs[0];
+  if (voice) u.voice = voice;
+  u.rate = slow ? 0.6 : 0.9;
+  speechSynthesis.speak(u);
+  return true;
+}
+if (canSpeak()) speechSynthesis.getVoices();

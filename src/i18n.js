@@ -74,7 +74,7 @@ const S = {
     'gi.truefalse': 'Картинка или загадка совпадает со словом? Отвечай быстро!',
     'gi.lantern': 'Угадай слово по буквам. Ошибка гасит фонарь, после трёх ошибок появится картинка.',
     'gi.chain': 'Запомни слова по порядку. Они спрячутся — нажми их в том же порядке.',
-    fishOnly: 'Лови только:', tfTrue: 'Верно', tfFalse: 'Неверно', chainLook: 'Запоминай…', chainRepeat: 'Повтори по порядку',
+    listen: 'Послушать', fishOnly: 'Лови только:', tfTrue: 'Верно', tfFalse: 'Неверно', chainLook: 'Запоминай…', chainRepeat: 'Повтори по порядку',
     'hint.act': 'Смотри на поле: подсказка уже там.', iSpeak: 'Я говорю на', iLearn: 'Хочу учить', learning: 'Учу', 'hint.pattern': 'Узор фразы', shieldSaved: 'Нефритовый щит спас фонарь!', reviewDone: 'Повторение окончено!',
   },
   cz: {
@@ -146,7 +146,7 @@ const S = {
     'gi.truefalse': 'Odpovídá obrázek nebo hádanka slovu? Odpovídej rychle!',
     'gi.lantern': 'Hádej slovo po písmenech. Chyba zhasíná lucernu, po třech chybách se objeví obrázek.',
     'gi.chain': 'Zapamatuj si slova popořadě. Schovají se — klepni na ně ve stejném pořadí.',
-    fishOnly: 'Chytej jen:', tfTrue: 'Pravda', tfFalse: 'Nepravda', chainLook: 'Zapamatuj si…', chainRepeat: 'Zopakuj popořadě',
+    listen: 'Poslechnout', fishOnly: 'Chytej jen:', tfTrue: 'Pravda', tfFalse: 'Nepravda', chainLook: 'Zapamatuj si…', chainRepeat: 'Zopakuj popořadě',
     'hint.act': 'Podívej se na hrací plochu: nápověda už tam je.', iSpeak: 'Mluvím', iLearn: 'Chci se učit', learning: 'Učím se', 'hint.pattern': 'Vzor věty', shieldSaved: 'Nefritový štít zachránil lucernu!', reviewDone: 'Opakování hotovo!',
   },
 };
