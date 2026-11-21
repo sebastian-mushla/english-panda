@@ -5,7 +5,10 @@ import { keyboard, typeLine } from './keyboard.js';
 import { gramPool } from './gram.js';
 
 export default function verbform(el, ctx) {
-  const list = shuffle(gramPool(ctx)).slice(0, 6);
+  // задания, где ответ совпадает со словом в скобках (They ___ (live) → live), путают: в печати их не даём
+  const pool = gramPool(ctx);
+  const changed = pool.filter((g) => g.a.toLowerCase() !== g.base.toLowerCase());
+  const list = shuffle(changed.length >= 4 ? changed : pool).slice(0, 6);
   const total = list.length;
   let line, busy = true;
 

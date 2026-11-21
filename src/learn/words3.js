@@ -64,12 +64,14 @@ export const GRAMMAR = [
   { kind: 'past', s: 'Did you ___ my message?', base: 'get', a: 'get', ru: 'Ты получил моё сообщение?', cz: 'Dostal jsi mou zprávu?' },
   { kind: 'past', s: 'I ___ my friend at the station.', base: 'meet', a: 'met', ru: 'Я встретил друга на вокзале.', cz: 'Potkal jsem kamaráda na nádraží.' },
   // Future: will / going to
-  { kind: 'future', s: 'Tomorrow it ___ rain.', base: 'will', a: 'will', ru: 'Завтра будет дождь.', cz: 'Zítra bude pršet.' },
+  { kind: 'future', s: 'Tomorrow it ___.', base: 'rain', a: 'will rain', ru: 'Завтра будет дождь.', cz: 'Zítra bude pršet.' },
   { kind: 'future', s: 'I am ___ to visit my grandma.', base: 'go', a: 'going', ru: 'Я собираюсь навестить бабушку.', cz: 'Chystám se navštívit babičku.' },
-  { kind: 'future', s: 'She will ___ you tomorrow.', base: 'call', a: 'call', ru: 'Она позвонит тебе завтра.', cz: 'Zítra ti zavolá.' },
+  { kind: 'future', s: 'She ___ you tomorrow.', base: 'call', a: 'will call', ru: 'Она позвонит тебе завтра.', cz: 'Zítra ti zavolá.' },
   { kind: 'future', s: 'We ___ going to travel in summer.', base: 'be', a: 'are', ru: 'Летом мы собираемся путешествовать.', cz: 'V létě budeme cestovat.' },
-  { kind: 'future', s: 'I think he ___ win.', base: 'will', a: 'will', ru: 'Думаю, он победит.', cz: 'Myslím, že vyhraje.' },
-  { kind: 'future', s: 'They won\'t ___ late.', base: 'be', a: 'be', ru: 'Они не опоздают.', cz: 'Nepřijdou pozdě.' },
+  { kind: 'future', s: 'I think he ___.', base: 'win', a: 'will win', ru: 'Думаю, он победит.', cz: 'Myslím, že vyhraje.' },
+  { kind: 'future', s: 'Next year we ___ a new car.', base: 'buy', a: 'will buy', ru: 'В следующем году мы купим новую машину.', cz: 'Příští rok si koupíme nové auto.' },
+  { kind: 'future', s: 'Don\'t worry, I ___ you.', base: 'help', a: 'will help', ru: 'Не волнуйся, я тебе помогу.', cz: 'Neboj, pomůžu ti.' },
+  { kind: 'future', s: 'They ___ late.', base: 'not be', a: 'will not be', ru: 'Они не опоздают.', cz: 'Nepřijdou pozdě.' },
   // Артикли и предлоги
   { kind: 'article', s: 'I have ___ apple.', base: 'a/an', a: 'an', ru: 'У меня есть яблоко.', cz: 'Mám jablko.' },
   { kind: 'article', s: 'She is ___ teacher.', base: 'a/an', a: 'a', ru: 'Она учитель.', cz: 'Je učitelka.' },
