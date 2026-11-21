@@ -432,6 +432,15 @@ function layerGround(r, lights) {
   let d = `M-20,${H} `;
   for (let x = -20; x <= w; x += 20) d += `L${x},${P(groundY(x))} `;
   s += `<path fill="url(#gGround)" d="${d}L${w},${H}Z"/>`;
+  // нарисованная текстура земли по сезонам (картинки из Gemini подставляет raster.js вместо __TEX_…__)
+  const TEXR = [['spring', -20, 7100], ['summer', 7100, 14400], ['autumn', 14400, 21000], ['winter', 21000, w]];
+  s += `<defs>${TEXR.map(([k]) => `<pattern id="tx-${k}" patternUnits="userSpaceOnUse" width="420" height="420"><image href="__TEX_${k}__" width="420" height="420"/></pattern>`).join('')}
+    <linearGradient id="txFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".55" stop-color="#000" stop-opacity=".45"/></linearGradient></defs>`;
+  for (const [k, a, b] of TEXR) {
+    let td = `M${a},${H} `;
+    for (let x = a; x <= b; x += 20) td += `L${x},${P(groundY(x) + 6)} `;
+    s += `<path fill="url(#tx-${k})" opacity=".92" d="${td}L${b},${H}Z"/><path fill="url(#txFade)" d="${td}L${b},${H}Z"/>`;
+  }
   const grass = new Ink();
   for (let x = -20; x < w; x += 5 + r() * 5) {
     if (x > TEA.x0 - 30 && x < TEA.x1 + 30) continue;

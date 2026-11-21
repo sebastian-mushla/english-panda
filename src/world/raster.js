@@ -11,10 +11,17 @@ const VARS = ['--m1', '--m2', '--m3', '--mist', '--snow', '--leaf1', '--leaf2', 
 
 let css = null, layers = [], scale = 1, gen = 0, running = false, cam = 0, view = 1800, idle = [];
 
+// Текстуры земли: внутри SVG-картинки внешние ссылки не грузятся, поэтому встраиваем их как data:
+const TEX = {};
+const toData = (url) => fetch(url).then((r) => (r.ok ? r.blob() : null)).then((b) => b && new Promise((res) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(b); })).catch(() => null);
 async function sheet() {
-  if (css === null) css = await fetch('styles/world.css').then((r) => r.text()).catch(() => '');
+  if (css === null) {
+    css = await fetch('styles/world.css').then((r) => r.text()).catch(() => '');
+    await Promise.all(['spring', 'summer', 'autumn', 'winter'].map(async (k) => { TEX[k] = (await toData('assets/ground/' + k + '.webp')) || ''; }));
+  }
   return css;
 }
+const withTex = (raw) => (raw.includes('__TEX_') ? raw.replace(/__TEX_(\w+)__/g, (m, k) => TEX[k] || '') : raw);
 
 // Цвета сезона берём с невидимого «пробника»: куски разных глав рисуются в своём сезоне
 const probes = {};
@@ -107,7 +114,7 @@ async function draw(L, i) {
   const x0 = i * CHUNK, cw = Math.min(CHUNK, L.w - x0);
   const pw = Math.ceil(cw * scale * L.q) + 1, ph = Math.ceil(1000 * scale * L.q);
   const worldX = (x0 + CHUNK / 2 - (1 - L.f) * VW / 2) / L.f;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} 0 ${cw} 1000" width="${pw}" height="${ph}" preserveAspectRatio="none"><style>${css}${varsBlock(glowAt(worldX), worldX)}</style>${L.raw}</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} 0 ${cw} 1000" width="${pw}" height="${ph}" preserveAspectRatio="none"><style>${css}${varsBlock(glowAt(worldX), worldX)}</style>${withTex(L.raw)}</svg>`;
   const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
   try {
     const img = await load(url);
