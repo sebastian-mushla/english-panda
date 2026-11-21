@@ -27,16 +27,19 @@ export default function maze(el, ctx) {
   function next() {
     if (round >= items.length) { clearInterval(ghostT); return ctx.finish(true); }
     const it = items[round++];
-    wall = makeMaze(W, H);
     px = 1; py = 1;
-    // плитки — в дальних свободных клетках
-    const free = [];
-    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (!wall[y][x] && x + y > 6) free.push([x, y]);
-    // плитки ставим так, чтобы к каждой можно было дойти, не наступая на другие плитки
-    let spots;
-    for (let k = 0; k < 200; k++) {
-      spots = shuffle(free).slice(0, 4);
-      if (spots.slice(0, 3).every((sp, i) => reach(sp, spots.slice(0, 3).filter((_, j) => j !== i)))) break;
+    // Лабиринт с петлями (не одни коридоры-тупики), плитки ставим так, чтобы к каждой можно было дойти,
+    // не наступая на другие; если не вышло — строим лабиринт заново
+    let spots = null;
+    for (let tries = 0; tries < 30 && !spots; tries++) {
+      wall = makeMaze(W, H);
+      braid();
+      const free = [];
+      for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) if (!wall[y][x] && x + y > 6) free.push([x, y]);
+      for (let k = 0; k < 120; k++) {
+        const sp = shuffle(free).slice(0, 4);
+        if (sp.slice(0, 3).every((p, i) => reach(p, sp.slice(0, 3).filter((_, j) => j !== i)))) { spots = sp; break; }
+      }
     }
     tiles = gramOptions(it).map((text, i) => ({ text, ok: text === it.a, x: spots[i][0], y: spots[i][1] }));
     [gx, gy] = spots[3];
@@ -51,6 +54,16 @@ export default function maze(el, ctx) {
     });
     busy = false;
     draw();
+  }
+
+  // убираем часть внутренних стен между проходами: появляются обходные пути вокруг духа и неверных плиток
+  function braid() {
+    const cand = [];
+    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      if (!wall[y][x]) continue;
+      if ((wall[y][x - 1] === false && wall[y][x + 1] === false) || (wall[y - 1][x] === false && wall[y + 1][x] === false)) cand.push([x, y]);
+    }
+    for (const [x, y] of shuffle(cand).slice(0, Math.round(cand.length * 0.35))) wall[y][x] = false;
   }
 
   // есть ли путь от старта до клетки to в обход клеток block
@@ -84,20 +97,32 @@ export default function maze(el, ctx) {
     draw();
   }
 
+  // встреча с духом: игрок остаётся на месте, а дух улетает в дальний угол (без отката к старту)
+  let safeUntil = 0;
   function hitGhost() {
-    if (px === gx && py === gy) { px = 1; py = 1; ctx.sfx('wrong'); flash(board, 'shake', 400); }
+    if (px !== gx || py !== gy || Date.now() < safeUntil) return;
+    ctx.sfx('wrong'); flash(board, 'shake', 400);
+    let best = [gx, gy], bd = -1;
+    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const d = Math.abs(x - px) + Math.abs(y - py);
+      if (!wall[y][x] && d > bd && !tiles.some((tl) => tl.x === x && tl.y === y)) { bd = d; best = [x, y]; }
+    }
+    [gx, gy] = best;
+    safeUntil = Date.now() + 2500;
   }
 
-  // дух ходит случайно по проходам
+  // дух бродит по проходам, не разворачивается без нужды и не подходит к игроку вплотную
+  let gdx = 0, gdy = 0;
   ghostT = setInterval(() => {
     if (busy || !wall) return;
-    const opts = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => wall[gy + dy]?.[gx + dx] === false);
+    let opts = [[1, 0], [-1, 0], [0, 1], [0, -1]].filter(([dx, dy]) => wall[gy + dy]?.[gx + dx] === false
+      && Math.abs(gx + dx - px) + Math.abs(gy + dy - py) > 1);
+    if (opts.length > 1) opts = opts.filter(([dx, dy]) => dx !== -gdx || dy !== -gdy);
     if (!opts.length) return;
-    const [dx, dy] = opts[Math.floor(Math.random() * opts.length)];
-    gx += dx; gy += dy;
-    hitGhost();
+    [gdx, gdy] = opts[Math.floor(Math.random() * opts.length)];
+    gx += gdx; gy += gdy;
     draw();
-  }, 700);
+  }, 900);
 
   next();
   return { destroy: () => { clearInterval(ghostT); f.destroy(); } };
