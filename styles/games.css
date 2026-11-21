@@ -530,3 +530,7 @@
 .lesson ul { margin: 0 0 10px; padding-left: 1.2em; display: grid; gap: 5px; font-size: .95rem; line-height: 1.35; }
 .lesson-ex { border-collapse: collapse; font-weight: 700; font-size: 1rem; }
 .lesson-ex td { padding: 3px 12px 3px 0; white-space: nowrap; }
+.vtable { border-collapse: collapse; width: 100%; font-size: .95rem; }
+.vtable th { text-align: left; font-size: .7rem; opacity: .7; padding: 0 6px 4px; }
+.vtable td { padding: 4px 6px; border-top: 1px solid rgba(58,42,24,.15); }
+.vtable .vt-m { font-size: .8rem; opacity: .8; }

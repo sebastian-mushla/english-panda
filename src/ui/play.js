@@ -30,7 +30,7 @@ export function runPlay(play, { onExit, onNext }) {
   const { def } = play;
   const stages = def.exam || def.review ? [...def.stages] : ['intro', ...def.stages];
   // перед играми на формы слова сначала урок: игра не должна требовать того, чему ещё не учили
-  if (!def.exam && !def.review && def.gram && stages.some((g) => ['verbform', 'maze', 'sokoban'].includes(g))) stages.splice(1, 0, 'rule');
+  if (!def.exam && !def.review && def.gram && stages.some((g) => ['verbform', 'maze', 'sokoban', 'irregular', 'letters'].includes(g))) stages.splice(1, 0, 'rule');
   const session = newSession();
   const pool = [...play.words, ...play.review];
   let si = 0, mistakes = 0, hints = 0, mounted = null, hintKey = null, hintFn = null, stageWrong = new Set();

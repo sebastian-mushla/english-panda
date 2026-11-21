@@ -1,9 +1,6 @@
 // Неправильные глаголы: дана первая форма (go) — впиши вторую (went) и третью (gone).
 import { t } from '../i18n.js';
-import { TARGET } from '../state.js';
-
-// подписи колонок: у чешского вторая форма — прошедшее время, третья — настоящее (já)
-const COLS = TARGET === 'cz' ? ['Infinitiv', 'Minulý čas · on', 'Přítomný čas · já'] : ['V1', 'V2 · Past', 'V3 · Participle'];
+import { VERB_COLS as COLS } from './gram.js';
 import { shuffle, meaning, esc, wait, flash } from './kit.js';
 import { keyboard, typeLine } from './keyboard.js';
 
