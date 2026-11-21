@@ -523,17 +523,10 @@
 .scell .pcap { font-size: .55rem; }
 .hmask { font-size: 1.25em; font-weight: 800; letter-spacing: .08em; white-space: nowrap; }
 .gap-pic .emo { font-size: 3rem; }
-/* урок грамматики: этап «Правило» и раскрывающаяся кнопка в играх */
+/* урок грамматики: этап «Правило» в начале уровня */
 .rule-stage { display: grid; gap: 14px; max-width: 640px; margin: 0 auto; width: 100%; }
 .lesson { background: var(--paper, #f6ecd4); color: #3a2a18; border-radius: 14px; padding: 14px 18px; text-align: left; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
 .lesson h4 { margin: 0 0 8px; font-size: 1.1rem; }
 .lesson ul { margin: 0 0 10px; padding-left: 1.2em; display: grid; gap: 5px; font-size: .95rem; line-height: 1.35; }
 .lesson-ex { border-collapse: collapse; font-weight: 700; font-size: 1rem; }
 .lesson-ex td { padding: 3px 12px 3px 0; white-space: nowrap; }
-.rulebox { margin-top: 6px; text-align: left; }
-.rulebox summary { cursor: pointer; font-weight: 800; font-size: .9rem; text-align: center; list-style: none; color: #f3e6c8; display: inline-block; padding: 4px 12px; border-radius: 999px; background: rgba(0,0,0,.25); }
-.rulebox { text-align: center; }
-.rulebox summary::-webkit-details-marker { display: none; }
-/* открытое правило — поверх поля, чтобы не сдвигать клавиатуру; закрывается нажатием */
-.rulebox[open] .lesson { position: fixed; left: 12px; right: 12px; top: 14vh; max-width: 620px; margin: 0 auto; max-height: 72vh; overflow: auto; z-index: 60; padding: 12px 14px; box-shadow: 0 12px 40px rgba(0,0,0,.55); cursor: pointer; }
-.rulebox .lesson ul { font-size: .85rem; }

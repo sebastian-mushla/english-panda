@@ -38,9 +38,3 @@ export function lessonHTML(kind) {
   return `<div class="lesson"><h4>${esc(L(ls.title))}</h4><ul>${L(ls.pts).map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
     <table class="lesson-ex en">${ls.ex.map((r) => `<tr>${r.map((c, i) => `<td>${i ? '→ ' : ''}${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
 }
-
-// открытое правило закрывается нажатием на него
-addEventListener('click', (e) => { const ls = e.target.closest('.rulebox[open] .lesson'); if (ls) ls.parentElement.open = false; });
-
-// Бесплатная кнопка «📘 Правило» под заданием: раскрывает урок нужного вида грамматики
-export const ruleBox = (kind) => (LESSONS[TARGET]?.[kind] ? `<details class="rulebox"><summary>📘 ${t('ruleBtn')}</summary>${lessonHTML(kind)}</details>` : '');

@@ -2,7 +2,7 @@
 import { t, L } from '../i18n.js';
 import { shuffle, esc, flash } from './kit.js';
 import { field } from './field.js';
-import { gramPool, gramOptions, ruleBox } from './gram.js';
+import { gramPool, gramOptions } from './gram.js';
 
 const W = 9, H = 7, ROUNDS = 3;
 // звезда каждый раз в новом месте; блоки никогда не стоят прямо под ней, чтобы любой блок требовал пары ходов
@@ -40,7 +40,7 @@ export default function sokoban(el, ctx) {
   function next() {
     if (round >= items.length) return ctx.finish(true);
     it = items[round++];
-    el.querySelector('.fg-task').innerHTML = `<p class="en">${esc(it.s).replace('___', '<u>★</u>')} <i>(${esc(it.base)})</i></p><small>${esc(L(it))}</small>${ruleBox(it.kind)}`;
+    el.querySelector('.fg-task').innerHTML = `<p class="en">${esc(it.s).replace('___', '<u>★</u>')} <i>(${esc(it.base)})</i></p><small>${esc(L(it))}</small>`;
     el.querySelector('.count').textContent = `${round} / ${items.length}`;
     ctx.setHint('sk' + round, (step) => {
       if (step === 1) return { label: t('hint.mean'), text: esc(L(it)), en: false };
