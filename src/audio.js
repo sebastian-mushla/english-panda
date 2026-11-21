@@ -76,6 +76,55 @@ export function startAmbient() {
   windGain = mk('brown', 500, 0.05);
   waterGain = mk('white', 1400, 0);
   setInterval(() => { if (state.sound && Math.random() < 0.5) sfx('chime'); }, 7000);
+  startFlute();
+}
+
+// Тихая флейта: короткие фразы по пентатонике ре-минор с долгими паузами, мягкое эхо
+const FLUTE = [293.66, 349.23, 392, 440, 523.25, 587.33, 698.46];
+let fluteBus = null;
+function startFlute() {
+  const c = ac;
+  fluteBus = c.createGain(); fluteBus.gain.value = 0.05;
+  const echo = c.createDelay(); echo.delayTime.value = 0.42;
+  const fb = c.createGain(); fb.gain.value = 0.38;
+  const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1800;
+  fluteBus.connect(master); fluteBus.connect(echo); echo.connect(lp).connect(fb).connect(echo); lp.connect(master);
+  const phrase = () => {
+    if (state.sound && !document.hidden) {
+      let i = 2 + Math.floor(Math.random() * 3), t = c.currentTime + 0.1;
+      const n = 3 + Math.floor(Math.random() * 4);
+      for (let k = 0; k < n; k++) {
+        i = Math.max(0, Math.min(FLUTE.length - 1, i + [-2, -1, -1, 1, 1, 2][Math.floor(Math.random() * 6)]));
+        const dur = k === n - 1 ? 2.4 : [0.6, 0.9, 1.2][Math.floor(Math.random() * 3)];
+        fluteNote(FLUTE[i], t, dur);
+        t += dur * 0.92;
+      }
+    }
+    setTimeout(phrase, 9000 + Math.random() * 9000);
+  };
+  setTimeout(phrase, 3000);
+}
+function fluteNote(f, t, dur) {
+  const c = ac, o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), g2 = c.createGain();
+  o.type = 'sine'; o.frequency.value = f;
+  o2.type = 'sine'; o2.frequency.value = f * 2; g2.gain.value = 0.12;
+  // вибрато вступает к середине ноты
+  const lfo = c.createOscillator(), ld = c.createGain();
+  lfo.frequency.value = 5; ld.gain.setValueAtTime(0, t); ld.gain.linearRampToValueAtTime(f * 0.006, t + dur * 0.6);
+  lfo.connect(ld); ld.connect(o.frequency); ld.connect(o2.frequency);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(1, t + 0.12);
+  g.gain.setTargetAtTime(0.75, t + 0.12, 0.3);
+  g.gain.setTargetAtTime(0, t + dur - 0.15, 0.12);
+  o.connect(g); o2.connect(g2).connect(g); g.connect(fluteBus);
+  // дыхание в начале ноты
+  const nb = c.createBuffer(1, c.sampleRate * 0.25, c.sampleRate), d = nb.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+  const ns = c.createBufferSource(), nf = c.createBiquadFilter(), ng = c.createGain();
+  ns.buffer = nb; nf.type = 'bandpass'; nf.frequency.value = f * 3; nf.Q.value = 1.5; ng.gain.value = 0.18;
+  ns.connect(nf).connect(ng).connect(fluteBus);
+  for (const x of [o, o2, lfo]) { x.start(t); x.stop(t + dur + 0.6); }
+  ns.start(t);
 }
 
 export function setWater(v) {
