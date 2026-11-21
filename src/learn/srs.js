@@ -22,8 +22,9 @@ export function newSession() { return { right: new Set(), wrong: new Set() }; }
 export function commit(session) {
   const now = Date.now();
   for (const en of new Set([...session.right, ...session.wrong])) {
-    if (!WORDS[en]) continue;
-    const r = rec(en);
+    // правила грамматики (ключи «g:…») повторяются по той же схеме, но в отдельном списке
+    const r = WORDS[en] ? rec(en) : en.startsWith('g:') ? ((state.gram ||= {})[en] ||= { box: 1, due: 0, right: 0, wrong: 0 }) : null;
+    if (!r) continue;
     if (session.wrong.has(en)) { r.box = 1; r.wrong++; r.due = now; }
     else { r.box = Math.min(5, (r.box || 1) + 1); r.right++; r.due = now + INTERVAL[r.box]; }
   }

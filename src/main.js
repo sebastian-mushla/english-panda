@@ -9,7 +9,8 @@ import { openBook } from './ui/book.js';
 import { openShop } from './ui/shop.js';
 import { openDict } from './ui/dictionary.js';
 import { openModal } from './ui/modal.js';
-import { buildPlay, buildReview, isUnlocked, currentLevel, LEVELS } from './learn/curriculum.js';
+import { buildPlay, buildReview, isUnlocked, currentLevel, LEVELS, levelDef } from './learn/curriculum.js';
+import { openPlace, closePlace } from './ui/place.js';
 import { startAmbient } from './audio.js';
 import { checkAch } from './progress.js';
 import { pandaSVG } from './world/panda.js';
@@ -21,10 +22,22 @@ let pendingWalk = null;
 
 function start(n) {
   if (!isUnlocked(n)) return openLevelCard(n, start);
+  // большая тема — вход в место с фазами
+  if (levelDef(n).place) return openPlace(n, startPhase);
   setPaused(true);
   runPlay(buildPlay(n), {
     onExit: back,
     onNext: (k) => setTimeout(() => openLevelCard(k, start), 250),
+  });
+}
+
+function startPhase(n, i) {
+  closePlace();
+  setPaused(true);
+  runPlay(buildPlay(n, i), {
+    // после фазы возвращаемся в то же место; если тема пройдена — в мир
+    onExit: () => { back(); if (!state.levels[n]?.stars?.[0]) openPlace(n, startPhase); },
+    onNext: (k, p) => setTimeout(() => (p != null && p < levelDef(k).phases.length ? startPhase(k, p) : openLevelCard(k, start)), 250),
   });
 }
 

@@ -1,14 +1,15 @@
 // Лобби: горизонтальный мир с параллаксом, камень-уровень на тропе, панды-NPC, карта внизу.
 import { state, save, on, emit } from '../state.js';
 import { t } from '../i18n.js';
-import { W, ZONES, NODE_X, NPC_X, walkY, zoneAt, groundY, CH2_X, CH3_X, CH4_X, FOG_X } from './geo.js';
+import { W, ZONES, NPC_X, walkY, zoneAt, groundY, CH2_X, CH3_X, CH4_X, FOG_X } from './geo.js';
 import { CH3_OPEN, CH4_OPEN } from '../learn/words.js';
 import { buildScene } from './scenery.js';
 import { applyPhase, applySeason } from './sky.js';
 import { setupRaster, updateRaster, rasterIdle } from './raster.js';
 import { stepParticles, setParticleMood } from './particles.js';
 import { pandaSVG } from './panda.js';
-import { LEVELS, isUnlocked, currentLevel } from '../learn/curriculum.js';
+import { LEVELS, isUnlocked, currentLevel, NODE_X, EXAM_N } from '../learn/curriculum.js';
+import { PLACE_ICON } from '../ui/place.js';
 import { setWater, sfx } from '../audio.js';
 
 const $ = (s) => document.querySelector(s);
@@ -185,8 +186,8 @@ function renderOverlay() {
     const x = NODE_X[i], y = walkY(x);
     const done = !!state.levels[l.n]?.stars?.[0], open = isUnlocked(l.n);
     const cls = done ? 'done' : open ? 'current' : 'locked';
-    h += `<button class="node ${cls}${l.exam ? ' exam' : ''}" data-n="${l.n}" style="--x:${x};--y:${y}" aria-label="${t('level')} ${l.n}">
-      <span class="stone"><b>${l.exam ? ({ 1: '春', 2: '夏', 3: '秋', 4: '冬' })[l.ch] : l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}</span>
+    h += `<button class="node ${cls}${l.exam ? ' exam' : ''}${l.place ? ' place' : ''}" data-n="${l.n}" style="--x:${x};--y:${y}" aria-label="${t('level')} ${l.n}">
+      <span class="stone"><b>${l.exam ? ({ 1: '春', 2: '夏', 3: '秋', 4: '冬' })[l.ch] : l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}${l.place ? `<em class="picon">${PLACE_ICON[l.place]}</em>` : ''}</span>
       ${done ? `<span class="nstars">${stars(l.n)}</span>` : ''}</button>`;
   });
   const npc = [
@@ -202,10 +203,10 @@ function renderOverlay() {
   // туман закрывает следующую главу: лето — пока не пройдены Врата весны, потом осень
   // Туман закрывает следующую главу: лето — до Врат весны, осень — до Врат лета (и всегда, если учишь не английский), зима — скоро
   const done = (n) => !!state.levels[n]?.stars?.[0];
-  const [fx, label, sub, text] = !done(10) ? [CH2_X, 'zone.fog1', 'locked', 'fogText']
-    : !done(20) ? [CH3_X, 'zone.fog', 'locked', 'fogText2']
+  const [fx, label, sub, text] = !done(EXAM_N[1]) ? [CH2_X, 'zone.fog1', 'locked', 'fogText']
+    : !done(EXAM_N[2]) ? [CH3_X, 'zone.fog', 'locked', 'fogText2']
       : !CH3_OPEN ? [CH3_X, 'zone.fog', 'soon', 'ch3Locked']
-        : !done(30) ? [CH4_X, 'zone.fog2', 'locked', 'fogText3']
+        : !done(EXAM_N[3]) ? [CH4_X, 'zone.fog2', 'locked', 'fogText3']
           : !CH4_OPEN ? [CH4_X, 'zone.fog2', 'soon', 'ch4Locked']
             : [FOG_X, 'zone.fog3', 'soon', 'fogText4'];
   const fsx = fx + 300;

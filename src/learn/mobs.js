@@ -1,4 +1,10 @@
 // Духи уровней: имя, описание, сила (hp) и рисунок в SVG (поле 100×100).
+// Дух-эмодзи: цветной круг с картинкой
+function em(e, color, ru, uk, cz, tru, tuk, tcz) {
+  return { hp: 6, reward: 15, name: { ru, uk, cz }, text: { ru: tru, uk: tuk, cz: tcz },
+    svg: `<circle cx="50" cy="52" r="40" fill="${color}"/><circle cx="50" cy="52" r="40" fill="#fff" opacity=".12"/><text x="50" y="68" font-size="46" text-anchor="middle">${e}</text>` };
+}
+
 export const MOBS = {
   crane: {
     hp: 5, reward: 10,
@@ -279,6 +285,16 @@ Object.assign(MOBS, {
   icedragon: { hp: 14, reward: 60, name: { ru: 'Ледяной дракон Врат зимы', uk: 'Крижаний дракон Брами зими', cz: 'Ledový drak Brány zimy' },
     text: { ru: 'Страж уровня B2. Говорит только по-чешски, на «Вы» и без единой ошибки в падежах.', uk: 'Вартовий рівня B2. Говорить лише чеською, на «Ви» й без жодної помилки у відмінках.', cz: 'Strážce úrovně B2. Mluví jen česky, vyká a nikdy se nesplete v pádech.' },
     svg: `<path d="M12,70 Q30,30 56,36 Q80,40 88,22 Q90,50 70,58 Q50,66 40,80 Q30,90 12,70Z" fill="#9fd4ec" stroke="#3a7aa0" stroke-width="2.5"/><circle cx="78" cy="28" r="3" fill="#123"/><path d="M84,16 l6,-10 M76,16 l-2,-10" stroke="#dff2ff" stroke-width="3"/><path d="M30,56 l-4,-10 M42,50 l-2,-10 M54,48 l0,-10" stroke="#dff2ff" stroke-width="3"/>` },
+  // Духи тем грамматики A1 (английский): простой рисунок — эмодзи на цветном круге
+  g_be: em('🪞', '#8a6ad0', 'Зеркальный дух', 'Дзеркальний дух', 'Zrcadlový duch', 'Всё время говорит о себе: I am, you are, he is. Без to be молчит.', 'Весь час говорить про себе: I am, you are, he is. Без to be мовчить.', 'Pořád mluví o sobě: I am, you are, he is. Bez to be mlčí.'),
+  g_poss: em('🐦‍⬛', '#3a3a4a', 'Сорока-хозяйка', 'Сорока-господиня', 'Straka hospodyně', 'Всё называет своим: my ring, my spoon. Чужое отдаёт, только если скажешь «your».', 'Усе називає своїм: my ring, my spoon. Чуже віддає, лише якщо скажеш «your».', 'Všechno nazývá svým: my ring, my spoon. Cizí vrátí, jen když řekneš „your“.'),
+  g_plural: em('🐜', '#a0522d', 'Муравей-множитель', 'Мураха-множник', 'Mravenec násobilka', 'Один муравей — ant, а вместе они ants. Особенно гордится словом children.', 'Одна мураха — ant, а разом вони ants. Особливо пишається словом children.', 'Jeden mravenec je ant, spolu jsou ants. Nejvíc je hrdý na slovo children.'),
+  g_have: em('🐹', '#d9a43a', 'Хомяк-запасливый', 'Хом\'як-запасливий', 'Křeček zásobář', 'Have got — его любимые слова. В щёках у него has got всё на свете.', 'Have got — його улюблені слова. У щоках у нього has got усе на світі.', 'Have got jsou jeho oblíbená slova. Ve tvářích has got všechno na světě.'),
+  g_there: em('🧭', '#2f6a8a', 'Дух-указатель', 'Дух-покажчик', 'Duch ukazatel', 'Знает, где что лежит: there is a key, there are two maps.', 'Знає, де що лежить: there is a key, there are two maps.', 'Ví, kde co leží: there is a key, there are two maps.'),
+  g_can: em('🦘', '#c8702e', 'Кенгуру-умелец', 'Кенгуру-вмілець', 'Klokan šikula', 'I can jump, I can run! Только can to не говорит никогда.', 'I can jump, I can run! Лише can to не каже ніколи.', 'I can jump, I can run! Jen can to neřekne nikdy.'),
+  g_ps: em('⏰', '#4a7a5a', 'Сверчок-распорядок', 'Цвіркун-розпорядок', 'Cvrček rozvrh', 'Каждый день одно и то же: he gets up, she drinks tea. Не простит забытое -s.', 'Щодня одне й те саме: he gets up, she drinks tea. Не пробачить забуте -s.', 'Každý den totéž: he gets up, she drinks tea. Neodpustí zapomenuté -s.'),
+  g_prep: em('📦', '#8a6a3a', 'Кот в коробке', 'Кіт у коробці', 'Kocour v krabici', 'То in the box, то on the box, то under the box. Найди его!', 'То in the box, то on the box, то under the box. Знайди його!', 'Jednou in the box, pak on the box, pak under the box. Najdi ho!'),
+  g_wh: em('🦉', '#5a4a8a', 'Сова-почемучка', 'Сова-чомучка', 'Sova zvědavka', 'What? Where? Why? Задаёт вопросы до самого утра.', 'What? Where? Why? Ставить питання до самого ранку.', 'What? Where? Why? Ptá se až do rána.'),
 });
 
 export const mobSVG = (id, cls = '') => `<svg class="mob ${cls}" viewBox="0 0 100 100" aria-hidden="true">${MOBS[id].svg}</svg>`;

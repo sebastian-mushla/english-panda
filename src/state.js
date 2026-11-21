@@ -2,7 +2,8 @@
 // У каждого изучаемого языка своё сохранение: английский — ep.save.v1, русский — ep.save.v1.ru, чешский — ep.save.v1.cz.
 const read = (k, d) => { try { return localStorage.getItem(k) || d; } catch { return d; } };
 export const TARGET = ['en', 'ru', 'cz', 'hu'].includes(read('ep.target', 'en')) ? read('ep.target', 'en') : 'en';
-const KEY = 'ep.save.v1' + (TARGET === 'en' ? '' : '.' + TARGET);
+// v2 — новая программа по темам (старый прогресс не переносится)
+const KEY = 'ep.save.v2' + (TARGET === 'en' ? '' : '.' + TARGET);
 
 const fresh = () => ({
   v: 1,
@@ -11,6 +12,8 @@ const fresh = () => ({
   sound: true,
   coins: 60,
   levels: {},        // {n: {stars:[done, perfect, nohint], plays}}
+  phases: {},        // {'n:i': {stars, plays}} — фазы тем внутри мест (дом, пещера…)
+  gram: {},          // {'g:предложение': {box, due, right, wrong}} — повторение правил
   words: {},         // {en: {box, due, seen, right, wrong}}
   mobs: {},          // {id: count}
   owned: ['hat:none', 'robe:none', 'item:none'],

@@ -4,7 +4,7 @@ import { t, L, nWords } from '../i18n.js';
 import { sfx } from '../audio.js';
 import { THEMES } from '../learn/words.js';
 import { MOBS, mobSVG } from '../learn/mobs.js';
-import { LEVELS, CHAPTERS } from '../learn/curriculum.js';
+import { LEVELS, CHAPTERS, levelDef } from '../learn/curriculum.js';
 import { newSession, commit, knownCount } from '../learn/srs.js';
 import { hintCost } from '../learn/hints.js';
 import { checkAch, dailyStep } from '../progress.js';
@@ -22,7 +22,7 @@ const GAMES = {
   crossword: () => import('../games/crossword.js'), dialog: () => import('../games/dialog.js'), truefalse: () => import('../games/truefalse.js'),
   lantern: () => import('../games/lantern.js'), chain: () => import('../games/chain.js'),
   maze: () => import('../games/maze.js'), letters: () => import('../games/letters.js'), sokoban: () => import('../games/sokoban.js'),
-  rule: () => import('../games/rule.js'), cases: () => import('../games/cases.js'), aspect: () => import('../games/aspect.js'),
+  rule: () => import('../games/rule.js'), check: () => import('../games/check.js'), errorspot: () => import('../games/errorspot.js'), cases: () => import('../games/cases.js'), aspect: () => import('../games/aspect.js'),
   diacritics: () => import('../games/diacritics.js'), sesi: () => import('../games/sesi.js'), tyvy: () => import('../games/tyvy.js'), verbform: () => import('../games/verbform.js'), irregular: () => import('../games/irregular.js'), longsent: () => import('../games/longsent.js'),
   email: () => import('../games/email.js'), chat: () => import('../games/chat.js'), b1test: () => import('../games/b1test.js'),
 };
@@ -31,10 +31,10 @@ const root = document.getElementById('game');
 
 export function runPlay(play, { onExit, onNext }) {
   const { def } = play;
-  const stages = def.exam || def.review ? [...def.stages] : ['intro', ...def.stages];
+  const stages = def.built || def.exam || def.review ? [...def.stages] : ['intro', ...def.stages];
   // перед играми на формы слова сначала урок: игра не должна требовать того, чему ещё не учили
   // (или когда у уровня есть свой урок, например «Местоимения» в главе 1)
-  if (!def.exam && !def.review && def.gram && (stages.some((g) => ['verbform', 'maze', 'sokoban', 'irregular', 'letters', 'cases', 'aspect', 'diacritics', 'sesi', 'tyvy'].includes(g)) || def.gram.split('|').some((k) => LESSONS[TARGET]?.[k]))) stages.splice(1, 0, 'rule');
+  if (!def.built && !def.exam && !def.review && def.gram && (stages.some((g) => ['verbform', 'maze', 'sokoban', 'irregular', 'letters', 'cases', 'aspect', 'diacritics', 'sesi', 'tyvy'].includes(g)) || def.gram.split('|').some((k) => LESSONS[TARGET]?.[k]))) stages.splice(1, 0, 'rule');
   const session = newSession();
   const pool = [...play.words, ...play.review];
   let si = 0, mistakes = 0, hints = 0, mounted = null, hintKey = null, hintFn = null, stageWrong = new Set();
@@ -46,7 +46,7 @@ export function runPlay(play, { onExit, onNext }) {
     return lives.count;
   };
 
-  const title = def.review ? t('reviewTitle') : `${t('level')} ${def.n} · ${def.exam ? t('exam') : L(THEMES[def.theme])}`;
+  const title = def.review ? t('reviewTitle') : `${t('level')} ${def.n}${def.phase != null ? '.' + (def.phase + 1) : ''} · ${def.exam ? t('exam') : def.title ? L(def.title) : L(THEMES[def.theme])}`;
   root.hidden = false;
   root.innerHTML = `<div class="g-bg"></div>
     <header class="g-head">
@@ -142,18 +142,26 @@ export function runPlay(play, { onExit, onNext }) {
     ctx.setHint(null);
     commit(session);
     if (def.review) return reviewResult();
-    const prev = state.levels[def.n] || { stars: [false, false, false], plays: 0 };
+    // фаза темы внутри места хранится отдельно; тема засчитана, когда пройдены все её фазы
+    const isPhase = def.phase != null, store = isPhase ? state.phases : state.levels, key = isPhase ? def.n + ':' + def.phase : def.n;
+    const prev = store[key] || { stars: [false, false, false], plays: 0 };
     const got = win ? [true, mistakes <= 1, hints === 0] : [false, false, false];
     const first = win && !prev.stars[0];
     const stars = prev.stars.map((s, i) => s || got[i]);
     const newStars = got.filter((g, i) => g && !prev.stars[i]).length;
-    state.levels[def.n] = { stars, plays: prev.plays + 1 };
+    store[key] = { stars, plays: prev.plays + 1 };
+    const all = levelDef(def.n);
+    const topicDone = !isPhase || all.phases.every((p, i) => state.phases[def.n + ':' + i]?.stars?.[0]);
+    const topicFirst = first && topicDone && !state.levels[def.n]?.stars?.[0];
+    if (isPhase && topicDone) state.levels[def.n] = { stars: [0, 1, 2].map((j) => all.phases.every((p, i) => state.phases[def.n + ':' + i]?.stars?.[j])), plays: (state.levels[def.n]?.plays || 0) + 1 };
     let reward = 0, caught = false;
     if (win) {
-      reward = first ? 20 + 10 * got.filter(Boolean).length + MOBS[def.mob].reward : 5 + 10 * newStars;
+      reward = first ? 20 + 10 * got.filter(Boolean).length + (topicDone ? MOBS[def.mob].reward : 0) : 5 + 10 * newStars;
       reward = Math.round(reward * (1 + 0.1 * upg('coin')));
-      caught = !state.mobs[def.mob];
-      state.mobs[def.mob] = (state.mobs[def.mob] || 0) + 1;
+      if (topicDone) {
+        caught = !state.mobs[def.mob];
+        state.mobs[def.mob] = (state.mobs[def.mob] || 0) + 1;
+      }
       if (got.every(Boolean)) state.stats.perfect++;
       state.stats.noHintLevels = hints === 0 ? state.stats.noHintLevels + 1 : 0;
       dailyStep('levels');
@@ -162,7 +170,7 @@ export function runPlay(play, { onExit, onNext }) {
     save();
     sfx(win ? 'win' : 'lose');
     const mob = MOBS[def.mob];
-    const hasNext = win && def.n < LEVELS.length;
+    const hasNext = win && (isPhase ? def.phase + 1 < all.phases.length : def.n < LEVELS.length);
     root.querySelector('.g-instr').innerHTML = '';
     area.className = 'g-stage-area st-result';
     area.innerHTML = `<div class="result ${win ? 'win' : 'lose'}">
@@ -196,10 +204,10 @@ export function runPlay(play, { onExit, onNext }) {
       }, 1300);
     }
     checkAch();
-    emit('progress', { level: def.n, first });
+    emit('progress', { level: def.n, first: isPhase ? topicFirst : first, phase: def.phase });
     area.querySelector('.lobby').addEventListener('click', () => { sfx('click'); exit(); });
-    area.querySelector('.again').addEventListener('click', () => { sfx('click'); exit(); onNext?.(def.n); });
-    area.querySelector('.next')?.addEventListener('click', () => { sfx('click'); exit(); onNext?.(def.n + 1); });
+    area.querySelector('.again').addEventListener('click', () => { sfx('click'); exit(); onNext?.(def.n, def.phase); });
+    area.querySelector('.next')?.addEventListener('click', () => { sfx('click'); exit(); isPhase ? onNext?.(def.n, def.phase + 1) : onNext?.(def.n + 1); });
     area.querySelector('.cert')?.addEventListener('click', () => openCertificate(state.certs.find((c) => (c.ch || 1) === def.ch)));
   }
 

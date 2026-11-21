@@ -1,11 +1,14 @@
-// Уровни главы 1. Порядок испытаний: знакомство → узнавание → воспроизведение → дуэль.
-// Перед «Печатью» всегда идёт «Каллиграфия»: сначала увидеть написание из готовых букв, потом печатать по памяти.
-// Позже: генератор глав A2–C2 из банка слов и тем грамматики (≈3000 уровней).
-import { state } from '../state.js';
+// Программа обучения: камни на карте = темы. Словарная тема — уровень с мини-играми и дуэлью.
+// Тема грамматики — «Правило» → узнавание → печать → «Найди ошибку» → проверка (80 %).
+// Большая тема — вход в место (дом, пещера, гора…): внутри свои камни-фазы, каждая со своей проверкой.
+import { state, TARGET } from '../state.js';
 import { BY_THEME, WORDS, themesOf, CH3_OPEN, CH4_OPEN } from './words.js';
 import { dueWords } from './srs.js';
+import { LESSONS } from './lessons.js';
+import { GRAMMAR as EN_A1 } from './en_a1.js';
 
-export const LEVELS = [
+// Старые уровни-образцы: словарные темы берут отсюда игры и духа
+const LEGACY = [
   // Глава 1 «Весна · A1»
   { n: 1, ch: 1, theme: 'greet', stages: ['cards', 'dialog', 'duel'], mob: 'crane' },
   { n: 2, ch: 1, theme: 'numbers', stages: ['spell', 'type', 'duel'], mob: 'lantern' },
@@ -51,6 +54,77 @@ export const LEVELS = [
   { n: 39, ch: 4, theme: 'office', gram: 'tyvy|refl', stages: ['tyvy', 'sesi', 'chat', 'duel'], mob: 'teacrane' },
   { n: 40, ch: 4, theme: 'gate', stages: ['cases', 'aspect', 'diacritics', 'tyvy', 'sesi', 'duel'], mob: 'icedragon', exam: true },
 ];
+
+// Грамматика главы 1 для английского: { g: id, kinds | phases, place, mob }
+const EN_CH1 = [
+  { v: 'greet' },
+  { g: 'be', place: 'house', phases: [['be'], ['beneg']], mob: 'g_be' },
+  { v: 'numbers' },
+  { g: 'possess', kinds: ['pronouns', 'possess'], mob: 'g_poss' },
+  { v: 'colors' },
+  { g: 'plural', kinds: ['plural'], mob: 'g_plural' },
+  { v: 'family' },
+  { g: 'havegot', kinds: ['havegot'], mob: 'g_have' },
+  { v: 'animals' },
+  { g: 'thereis', kinds: ['thereis'], mob: 'g_there' },
+  { v: 'food' },
+  { g: 'can', kinds: ['can'], mob: 'g_can' },
+  { v: 'body' },
+  { g: 'ps', place: 'cave', phases: [['psA'], ['psS'], ['psNeg'], ['psQ']], mob: 'g_ps' },
+  { v: 'nature' },
+  { g: 'prepPlace', kinds: ['prepPlace'], mob: 'g_prep' },
+  { v: 'home' },
+  { g: 'wh', kinds: ['wh'], mob: 'g_wh' },
+];
+
+// Этапы одной фазы грамматики: правило → узнавание → печать (если форма меняется) → найди ошибку → проверка
+export function grammarStages(kinds, i = 0) {
+  // печатать имеет смысл, только если форма в ответе отличается от слова в скобках
+  const changed = EN_A1.filter((g) => kinds.includes(g.kind) && g.a.toLowerCase() !== g.base.toLowerCase()).length >= 4;
+  const recog = i % 2 ? 'sokoban' : 'maze';
+  return ['rule', recog, changed ? 'verbform' : (recog === 'maze' ? 'sokoban' : 'maze'), 'errorspot', 'check'];
+}
+
+function buildLevels() {
+  const out = [];
+  const push = (d) => out.push({ ...d, n: out.length + 1 });
+  const legacy = (ch) => LEGACY.filter((l) => l.ch === ch);
+  for (const ch of [1, 2, 3, 4]) {
+    if (ch === 1 && TARGET === 'en') {
+      for (const it of EN_CH1) {
+        if (it.v) { const l = LEGACY.find((x) => x.theme === it.v); push({ ...l }); continue; }
+        if (it.place) push({ ch, topic: it.g, place: it.place, mob: it.mob, built: true, phases: it.phases.map((k, i) => ({ gram: k.join('|'), stages: grammarStages(k, i) })) });
+        else push({ ch, topic: it.g, gram: it.kinds.join('|'), mob: it.mob, built: true, stages: grammarStages(it.kinds) });
+      }
+      push({ ...legacy(1).find((l) => l.exam) });
+    } else for (const l of legacy(ch)) push({ ...l });
+  }
+  return out;
+}
+export const LEVELS = buildLevels();
+// Номер экзамена каждой главы (для тумана и свитков)
+export const EXAM_N = Object.fromEntries(LEVELS.filter((l) => l.exam).map((l) => [l.ch, l.n]));
+
+// Позиции камней: темы главы ровно распределены по её зонам, экзамен — у врат
+const CH_SPAN = { 1: [380, 6760], 2: [7400, 14050], 3: [14800, 20650], 4: [21450, 27350] };
+export const NODE_X = (() => {
+  const xs = [];
+  for (const ch of [1, 2, 3, 4]) {
+    const list = LEVELS.filter((l) => l.ch === ch), [a, b] = CH_SPAN[ch];
+    const k = list.length - 1;
+    list.forEach((l, i) => { xs[l.n - 1] = l.exam ? b : Math.round(a + (b - 500 - a) * (k > 1 ? i / (k - 1) : 0)); });
+  }
+  return xs;
+})();
+
+// Заголовок темы грамматики — из урока первой фазы
+export function topicTitle(def) {
+  const k = (def.phases ? def.phases[0].gram : def.gram || '').split('|').filter((x) => LESSONS[TARGET]?.[x]).pop();
+  return k ? LESSONS[TARGET][k].title : null;
+}
+export const phaseTitle = (def, i) => LESSONS[TARGET]?.[def.phases[i].gram.split('|').pop()]?.title;
+export const phaseDone = (n, i) => !!state.phases?.[n + ':' + i]?.stars?.[0];
+
 export const CHAPTERS = {
   1: { season: 'spring', cefr: 'A1', name: { ru: 'Весна', cz: 'Jaro' } },
   2: { season: 'summer', cefr: 'A2', name: { ru: 'Лето', cz: 'Léto' } },
@@ -88,8 +162,12 @@ const shuffle = (a) => {
 export { shuffle };
 
 // Набор слов для запуска уровня: новые слова темы + слова, которым пора на повторение
-export function buildPlay(n) {
-  const def = levelDef(n);
+export function buildPlay(n, phase = null) {
+  let def = levelDef(n);
+  if (def.built) {
+    if (phase != null) def = { ...def, ...def.phases[phase], phase, title: phaseTitle(def, phase) };
+    return { def: { ...def, title: def.title || topicTitle(def) }, words: [], review: dueWords([], 3), themes: [], others: [] };
+  }
   const chThemes = themesOf(def.ch);
   if (def.exam) {
     // экзамен главы: по 2 слова из каждой темы главы, сначала самые слабые

@@ -2,7 +2,7 @@
 import { t, L } from '../i18n.js';
 import { shuffle, esc, wait, flash } from './kit.js';
 import { keyboard, typeLine } from './keyboard.js';
-import { gramPool } from './gram.js';
+import { gramPool, ruleText } from './gram.js';
 
 export default function verbform(el, ctx) {
   // задания, где ответ совпадает со словом в скобках (They ___ (live) → live), путают: в печати их не даём
@@ -36,7 +36,7 @@ export default function verbform(el, ctx) {
       onDone: async () => { busy = true; slots.classList.add('ok'); ctx.right(key); await wait(1000); next(); },
     });
     ctx.setHint('vf' + it.s, (step) => {
-      if (step === 1) return { label: t('hint.rule'), text: esc(t('rule.' + it.kind)), en: false };
+      if (step === 1) return { label: t('hint.rule'), text: esc(ruleText(it.kind)), en: false };
       line.reveal();
       return { label: t('hint.3'), text: t('hint.act') };
     });

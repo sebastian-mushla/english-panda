@@ -558,3 +558,13 @@
 .ty-pair .msg.npc { background: rgba(246,236,212,.15); } .ty-pair .msg.me { background: var(--paper, #f6ecd4); color: #3a2a18; }
 .ty-pair .slots { display: inline-flex; vertical-align: middle; }
 @media (max-height: 860px) { .cw-row { padding: 2px 8px; font-size: .85rem; } .cw-head { font-size: 1.1rem; } }
+/* проверка темы и «Найди ошибку» */
+.check { gap: 12px; }
+.ck-bar { width: min(520px, 100%); height: 6px; border-radius: 3px; background: rgba(255,255,255,.15); overflow: hidden; }
+.ck-bar i { display: block; height: 100%; background: #f2c14e; }
+.ck-slot { display: inline-flex; vertical-align: middle; }
+.ck-result { display: grid; justify-items: center; gap: 10px; padding: 26px; border-radius: 18px; background: var(--paper, #f6ecd4); color: #3a2a18; text-align: center; }
+.ck-result b { font-size: 3rem; } .ck-result.pass b { color: #2f7a3a; } .ck-result.fail b { color: #a3301e; }
+.errspot { width: min(560px, 100%); display: grid; gap: 14px; justify-items: center; }
+.es-w { padding: 0 4px; border-radius: 6px; background: rgba(242,193,78,.25); } .es-w.bad { background: rgba(200,55,42,.45); text-decoration: line-through; } .es-w.ok { background: rgba(80,160,90,.45); text-decoration: none; }
+.es-btns { display: flex; gap: 12px; }

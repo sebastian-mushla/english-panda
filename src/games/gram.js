@@ -5,12 +5,13 @@ import { t, L } from '../i18n.js';
 import { TARGET } from '../state.js';
 import { LESSONS } from '../learn/lessons.js';
 import * as CZ4 from '../learn/words4cz.js';
+import * as ENA1 from '../learn/en_a1.js';
 import { CH3 } from '../learn/ch3.js';
 
 // Задания уровня: по виду грамматики (def.gram = 'past' | 'present|future' ...); экзамен — всё вперемешку
 export function gramPool(ctx) {
   const kinds = (ctx.def.gram || 'present|past|future|article|prep|compare').split('|');
-  return [...CH3.GRAMMAR, ...(TARGET === 'cz' ? CZ4.GRAMMAR : [])].filter((g) => kinds.includes(g.kind));
+  return [...CH3.GRAMMAR, ...(TARGET === 'cz' ? CZ4.GRAMMAR : []), ...(TARGET === 'en' ? ENA1.GRAMMAR : [])].filter((g) => kinds.includes(g.kind));
 }
 
 // Неверная, но правдоподобная форма
@@ -51,4 +52,12 @@ export function verbTableHTML(words) {
   return `<div class="lesson"><h4>📜 ${esc(t('verbTable'))}</h4>
     <table class="vtable"><tr><th></th>${VERB_COLS.map((c) => `<th>${esc(c)}</th>`).join('')}<th></th></tr>
     ${rows.map(([e, a, b, c, m]) => `<tr><td>${e}</td><td class="en"><b>${esc(a)}</b></td><td class="en">${esc(b)}</td><td class="en">${esc(c)}</td><td class="vt-m">${esc(m)}</td></tr>`).join('')}</table></div>`;
+}
+
+// Короткое правило для подсказки: своя строка «rule.вид», иначе пункты урока темы
+export function ruleText(kind) {
+  const s = t('rule.' + kind);
+  if (s !== 'rule.' + kind) return s;
+  const ls = LESSONS[TARGET]?.[kind];
+  return ls ? L(ls.pts).join(' ') : '';
 }
