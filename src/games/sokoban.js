@@ -4,7 +4,9 @@ import { shuffle, esc, flash } from './kit.js';
 import { field } from './field.js';
 import { gramPool, gramOptions } from './gram.js';
 
-const W = 9, H = 7, ROUNDS = 3, SLOT = [4, 1];
+const W = 9, H = 7, ROUNDS = 3;
+// звезда каждый раз в новом месте; блоки никогда не стоят прямо под ней, чтобы любой блок требовал пары ходов
+const SLOT = [4, 1];
 
 export default function sokoban(el, ctx) {
   const items = shuffle(gramPool(ctx)).slice(0, ROUNDS);
@@ -28,8 +30,10 @@ export default function sokoban(el, ctx) {
   }
 
   function place() {
-    px = 4; py = 5;
-    blocks = gramOptions(it).map((text, i) => ({ text, ok: text === it.a, x: 2 + i * 2, y: 3 }));
+    SLOT[0] = 1 + Math.floor(Math.random() * (W - 2));
+    const xs = shuffle([2, 3, 4, 5, 6].filter((x) => x !== SLOT[0])).slice(0, 3);
+    px = 1 + Math.floor(Math.random() * (W - 2)); py = 5;
+    blocks = gramOptions(it).map((text, i) => ({ text, ok: text === it.a, x: xs[i], y: 3 }));
     draw();
   }
 
