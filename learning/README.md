@@ -20,5 +20,7 @@
 - Словарь: старые ~210 слов + `src/learn/words_ext.js` — 22 темы по 10 слов (A1: school, days, rooms, fruit; A2: shopping, health, sport, kitchen, feelings, transport; B1: work, environment, media, money, people, study; B2: society, science, law, business, arts, ideas). Камни вставляются в главы автоматически (`withWords` в curriculum.js).
 - Не сделано: словарь до целей (A1 ~500, A2 ~1000, B1 ~2000, B2 ~3000) — добавлять новые темы в words_ext.js
 
+- C1 (глава 5 «Вторая весна», зоны cloud / jade / sky / c1gate): EN — `en_c1.js` (инверсия, cleft, subjunctive, should have / needn't have, would rather / it's time, причастные обороты, связки C1); CZ — `cz_c1.js` (jenž, přechodníky, причастия, кратные глаголы, oba / dvoje, союзы C1); слова — 4 темы C1 в words_ext.js. Фоны зон C1 ещё не нарисованы.
+
 ## Мои пожелания
 - (дописывай сюда)

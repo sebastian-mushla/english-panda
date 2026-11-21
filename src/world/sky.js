@@ -115,7 +115,7 @@ export function applyPhase(centerX, viewW) {
 
 export const SEASONS = ['spring', 'summer', 'autumn', 'winter'];
 // «По главе»: весна в главе 1, лето в главе 2, осень в тумане главы 3
-const CH_SEASON = { 1: 'spring', 2: 'summer', 3: 'autumn', 4: 'winter' };
+const CH_SEASON = { 1: 'spring', 2: 'summer', 3: 'autumn', 4: 'winter', 5: 'spring', 6: 'spring' };
 export function seasonAt(x) {
   return state.view.season === 'auto' ? CH_SEASON[chapterAt(x)] || 'spring' : state.view.season;
 }

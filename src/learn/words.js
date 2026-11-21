@@ -236,6 +236,8 @@ if (TARGET === 'cz') {
 // Глава 4 «Зима · B2»: у английского — темы грамматики B2; у чешского ещё и слова:
 // глаголы-пары видов, существительные с падежами, трудные буквы, se / si, официальная речь
 export const CH4_OPEN = TARGET === 'cz' || TARGET === 'en';
+// Глава 5 «C1» — английский и чешский
+export const CH5_OPEN = TARGET === 'cz' || TARGET === 'en';
 if (TARGET === 'cz') {
   const add = (theme, name, list) => {
     THEMES[theme] = name;
@@ -264,7 +266,7 @@ if (TARGET === 'en' || TARGET === 'cz') {
     CHAPTER[theme] = ch;
     BY_THEME[theme] = EXT_RAW[theme].map(([en, emoji, ru, uk, cz, exEn, exCz]) => {
       const id = WORDS[en] ? 'x:' + en : en;
-      const w = { en: id, emoji, ru, uk, cz, theme, cefr: ['A1', 'A2', 'B1', 'B2'][ch - 1], riddle: null,
+      const w = { en: id, emoji, ru, uk, cz, theme, cefr: ['A1', 'A2', 'B1', 'B2', 'C1'][ch - 1], riddle: null,
         t: TARGET === 'cz' ? cz : en, ex: TARGET === 'cz' ? exCz : exEn };
       BY_TARGET[w.t.toLowerCase()] ||= w;
       return (WORDS[id] = w);

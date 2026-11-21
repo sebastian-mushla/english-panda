@@ -2,7 +2,7 @@
 // размытие дальнего и переднего плана. Цвета сезона приходят из CSS-переменных.
 // Мелкие одинаковые детали (листья, трава, цветы) собираются в один <path> на цвет, чтобы DOM был лёгким.
 // Каждый источник света кладёт свечение в отдельный слой света (lights) с тем же параллаксом.
-import { W, H, lx, groundY, bridgeY, RIVER, TEA, LAKE, FERRY, ICE, CH3_X, CH4_X, FOG_X } from './geo.js';
+import { W, H, lx, groundY, bridgeY, RIVER, TEA, LAKE, FERRY, ICE, CH3_X, CH4_X, CH5_X, FOG_X } from './geo.js';
 import { pandaG, PANDA_DEFS } from './panda.js';
 
 const P = (n) => Math.round(n * 10) / 10;
@@ -433,8 +433,8 @@ function layerGround(r, lights) {
   for (let x = -20; x <= w; x += 20) d += `L${x},${P(groundY(x))} `;
   s += `<path fill="url(#gGround)" d="${d}L${w},${H}Z"/>`;
   // нарисованная текстура земли по сезонам (картинки из Gemini подставляет raster.js вместо __TEX_…__)
-  const TEXR = [['spring', -20, 7100], ['summer', 7100, 14400], ['autumn', 14400, 21000], ['winter', 21000, w]];
-  s += `<defs>${TEXR.map(([k]) => `<pattern id="tx-${k}" patternUnits="userSpaceOnUse" width="420" height="420"><image href="__TEX_${k}__" width="420" height="420"/></pattern>`).join('')}
+  const TEXR = [['spring', -20, 7100], ['summer', 7100, 14400], ['autumn', 14400, 21000], ['winter', 21000, 27700], ['spring', 27700, w]];
+  s += `<defs>${[...new Set(TEXR.map(([k]) => k))].map((k) => `<pattern id="tx-${k}" patternUnits="userSpaceOnUse" width="420" height="420"><image href="__TEX_${k}__" width="420" height="420"/></pattern>`).join('')}
     <linearGradient id="txFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".55" stop-color="#000" stop-opacity=".45"/></linearGradient></defs>`;
   for (const [k, a, b] of TEXR) {
     let td = `M${a},${H} `;
@@ -780,7 +780,7 @@ function midWinter(f, r, ink, lights) {
   const hill = `M${P(h - 420)},940 Q${P(h - 280)},520 ${P(h - 60)},430 L${P(h + 60)},430 Q${P(h + 280)},520 ${P(h + 420)},940Z`;
   s += `<path d="${hill}" fill="url(#gCliff)"/><path d="${hill}" fill="#fff" opacity=".35"/>`;
   s += pagoda(h, 440, 0.8, lights, 4);
-  for (let x = lx(25600, f); x < lx(FOG_X, f); x += 120 + r() * 160) if (Math.abs(x - h) > 420) s += snowPine(x, 900, 0.7 + r() * 0.4, ink);
+  for (let x = lx(25600, f); x < lx(CH5_X, f); x += 120 + r() * 160) if (Math.abs(x - h) > 420) s += snowPine(x, 900, 0.7 + r() * 0.4, ink);
   return s;
 }
 
@@ -806,7 +806,7 @@ function groundWinter(r, ink, lights) {
   for (const x of [25700, 25980, 26750]) s += snowPine(x, groundY(x) + 4, 1.2, ink);
   s += decoPanda(26600, groundY(26600) - 4, 0.8, { hat: 'scholar', robe: 'monk', item: 'staff' }, true) + stoneLantern(26150, groundY(26150) - 2, lights);
   // снег на земле всей главы
-  for (let x = CH4_X; x < FOG_X; x += 24 + r() * 30) if (x < x0 - 20 || x > x1 + 20) ink.add('wsnow', ell(x, groundY(x) + 6, 30 + r() * 30, 7 + r() * 4));
+  for (let x = CH4_X; x < CH5_X; x += 24 + r() * 30) if (x < x0 - 20 || x > x1 + 20) ink.add('wsnow', ell(x, groundY(x) + 6, 30 + r() * 30, 7 + r() * 4));
   // Врата зимы
   s += gate(27350, groundY(27350) + 4, lights, '冬');
   return s;

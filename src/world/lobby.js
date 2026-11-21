@@ -1,8 +1,8 @@
 // Лобби: горизонтальный мир с параллаксом, камень-уровень на тропе, панды-NPC, карта внизу.
 import { state, save, on, emit } from '../state.js';
 import { t } from '../i18n.js';
-import { W, ZONES, NPC_X, walkY, zoneAt, groundY, CH2_X, CH3_X, CH4_X, FOG_X } from './geo.js';
-import { CH3_OPEN, CH4_OPEN } from '../learn/words.js';
+import { W, ZONES, NPC_X, walkY, zoneAt, groundY, CH2_X, CH3_X, CH4_X, CH5_X, FOG_X } from './geo.js';
+import { CH3_OPEN, CH4_OPEN, CH5_OPEN } from '../learn/words.js';
 import { ADMIN_OPEN } from '../adminFlags.js';
 import { buildScene } from './scenery.js';
 import { applyPhase, applySeason } from './sky.js';
@@ -210,7 +210,7 @@ function renderOverlay() {
       return;
     }
     h += `<button class="node ${cls}${l.exam ? ' exam' : ''}" data-n="${l.n}" style="--x:${x};--y:${y}" aria-label="${t('level')} ${l.n}">
-      <span class="stone"><b>${l.exam ? ({ 1: '春', 2: '夏', 3: '秋', 4: '冬' })[l.ch] : l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}</span>
+      <span class="stone"><b>${l.exam ? ({ 1: '春', 2: '夏', 3: '秋', 4: '冬', 5: '玉' })[l.ch] : l.n}</b>${open ? '' : '<em class="lock">🔒</em>'}</span>
       ${done ? `<span class="nstars">${stars(l.n)}</span>` : ''}</button>`;
   });
   const npc = [
@@ -232,7 +232,9 @@ function renderOverlay() {
       : !CH3_OPEN ? [CH3_X, 'zone.fog', 'soon', 'ch3Locked']
         : !done(EXAM_N[3]) ? [CH4_X, 'zone.fog2', 'locked', 'fogText3']
           : !CH4_OPEN ? [CH4_X, 'zone.fog2', 'soon', 'ch4Locked']
-            : [FOG_X, 'zone.fog3', 'soon', 'fogText4'];
+            : !done(EXAM_N[4]) ? [CH5_X, 'zone.fog3', 'locked', 'fogText5']
+              : !CH5_OPEN ? [CH5_X, 'zone.fog3', 'soon', 'fogText4']
+                : [FOG_X, 'zone.fog4', 'soon', 'fogText6'];
   const fsx = fx + 300;
   h += `<div class="fogwall" style="--x:${fx - 20};--fw:${W - fx + 200}"></div>
     <div class="fogsign" style="--x:${fsx};--y:${groundY(fsx)}"><b>${t(label)}</b><span>${t(sub)}</span><small>${t(text)}</small></div>`;

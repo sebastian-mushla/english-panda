@@ -3,7 +3,7 @@
 // Большая тема — вход в место (дом, пещера, гора…): внутри свои камни-фазы, каждая со своей проверкой.
 import { state, TARGET, save } from '../state.js';
 import { ADMIN_OPEN } from '../adminFlags.js';
-import { BY_THEME, WORDS, themesOf, CH3_OPEN, CH4_OPEN } from './words.js';
+import { BY_THEME, WORDS, themesOf, CH3_OPEN, CH4_OPEN, CH5_OPEN } from './words.js';
 import { dueWords } from './srs.js';
 import { LESSONS } from './lessons.js';
 import { GRAMMAR as EN_A1 } from './en_a1.js';
@@ -12,9 +12,11 @@ import { GRAMMAR as EN_B1 } from './en_b1.js';
 import { GRAMMAR as EN_B2 } from './en_b2.js';
 import { GRAMMAR as CZ_AB } from './cz_ab.js';
 import { GRAMMAR as CZ_B } from './cz_b.js';
+import { GRAMMAR as EN_C1 } from './en_c1.js';
+import { GRAMMAR as CZ_C1 } from './cz_c1.js';
 
 // Задания тем грамматики изучаемого языка (для английского A1–B2, для чешского A1–B2)
-export const TOPIC_GRAMMAR = TARGET === 'en' ? [...EN_A1, ...EN_A2, ...EN_B1, ...EN_B2] : TARGET === 'cz' ? [...CZ_AB, ...CZ_B] : [];
+export const TOPIC_GRAMMAR = TARGET === 'en' ? [...EN_A1, ...EN_A2, ...EN_B1, ...EN_B2, ...EN_C1] : TARGET === 'cz' ? [...CZ_AB, ...CZ_B, ...CZ_C1] : [];
 
 // Старые уровни-образцы: словарные темы берут отсюда игры и духа
 const LEGACY = [
@@ -85,6 +87,7 @@ const PROGRAM = {
       T_('phrasal2', ['phrasal2'], 'g_phr2'), T_('linkers2', ['linkers2'], 'g_link2'), T_('tags', ['tags'], 'g_tags'),
       { exam: ['ppc', 'pastPerf', 'futCont', 'deduct', 'cond3', 'mixed', 'wish', 'passive2', 'repS', 'repQ', 'repC', 'rel2', 'phrasal2', 'linkers2', 'tags'], mob: 'icedragon' }],
   },
+  // 5 — дописывается ниже вместе с en (см. PROGRAM.en[5] / PROGRAM.cz[5])
   cz: {
     1: [{ L: 1 }, P_('cz_byt', 'house', [['cz_byt'], ['cz_mit']], 'g_cz_byt'), { L: 2 }, T_('cz_rod', ['cz_rod'], 'g_cz_rod'), { L: 3 }, T_('cz_konj', ['cz_konj'], 'g_cz_konj'),
       { L: 4 }, T_('cz_priv', ['cz_priv'], 'g_cz_priv'), { L: 5 }, T_('cz_akuz', ['cz_akuz'], 'g_cz_akuz'), { L: 6 }, T_('cz_neg', ['cz_neg'], 'g_cz_neg'), { L: 7 }, { L: 8 }, { L: 9 }, { L: 10 }],
@@ -96,6 +99,13 @@ const PROGRAM = {
       { L: 35 }, { L: 36 }, T_('cz_conj', ['cz_conj'], 'g_cz_conj'), { L: 37 }, { L: 38 }, { L: 39 }, { L: 40 }],
   },
 };
+PROGRAM.en[5] = [P_('c1inv', 'library', [['inversion'], ['cleft']], 'g_inv'), T_('subj', ['subj'], 'g_subj'),
+  P_('c1modal', 'mountain', [['modalPast'], ['rather']], 'g_mpast'), T_('partCl', ['partCl'], 'g_part'), T_('linkersC1', ['linkersC1'], 'g_linkC1'),
+  { exam: ['inversion', 'cleft', 'subj', 'modalPast', 'rather', 'partCl', 'linkersC1'], mob: 'g_c1exam' }];
+PROGRAM.cz[5] = [P_('cz_kniz', 'library', [['cz_jenz'], ['cz_prech']], 'g_cz_jenz'), T_('cz_pric', ['cz_pric'], 'g_cz_prech'),
+  T_('cz_iter', ['cz_iter'], 'g_cz_iter'), T_('cz_oba', ['cz_oba'], 'g_cz_oba'), T_('cz_spoj2', ['cz_spoj2'], 'g_cz_spoj2'),
+  { exam: ['cz_jenz', 'cz_prech', 'cz_pric', 'cz_iter', 'cz_oba', 'cz_spoj2'], mob: 'g_c1exam' }];
+
 // Словарные темы из words_ext: игры по кругу, чтобы темы не повторялись одинаково
 const W_STAGES = [['cards', 'spell', 'duel'], ['fishing', 'type', 'duel'], ['baskets', 'gap', 'duel'], ['truefalse', 'spell', 'duel'],
   ['chain', 'lantern', 'duel'], ['wordsearch', 'type', 'duel'], ['crossword', 'gap', 'duel'], ['rush', 'spell', 'duel']];
@@ -111,8 +121,8 @@ function withWords(list, themes) {
   return [...out, list[list.length - 1]];
 }
 const EXT_BY_CH = { 1: ['school', 'days', 'rooms', 'fruit'], 2: ['shopping', 'health', 'sport', 'kitchen', 'feelings', 'transport'],
-  3: ['work', 'environment', 'media', 'money', 'people', 'study'], 4: ['society', 'science', 'law', 'business', 'arts', 'ideas'] };
-for (const tg of ['en', 'cz']) for (const ch of [1, 2, 3, 4]) {
+  3: ['work', 'environment', 'media', 'money', 'people', 'study'], 4: ['society', 'science', 'law', 'business', 'arts', 'ideas'], 5: ['mind', 'speech', 'academic', 'world'] };
+for (const tg of ['en', 'cz']) for (const ch of [1, 2, 3, 4, 5]) {
   if (PROGRAM[tg][ch]) PROGRAM[tg][ch] = withWords(PROGRAM[tg][ch], EXT_BY_CH[ch]);
   else PROGRAM[tg][ch] = withWords([...LEGACY.filter((l) => l.ch === ch).map((l) => ({ L: l.n }))], EXT_BY_CH[ch]);
 }
@@ -130,7 +140,7 @@ export function grammarStages(kinds, i = 0) {
 function buildLevels() {
   const out = [];
   const push = (d) => out.push({ ...d, n: out.length + 1 });
-  for (const ch of [1, 2, 3, 4]) {
+  for (const ch of [1, 2, 3, 4, 5]) {
     const prog = PROGRAM[TARGET]?.[ch];
     if (!prog) { for (const l of LEGACY.filter((x) => x.ch === ch)) push({ ...l }); continue; }
     for (const it of prog) {
@@ -157,10 +167,10 @@ if ((state.prog || 0) < 5 && (TARGET === 'en' || TARGET === 'cz')) {
 export const EXAM_N = Object.fromEntries(LEVELS.filter((l) => l.exam).map((l) => [l.ch, l.n]));
 
 // Позиции камней: темы главы ровно распределены по её зонам, экзамен — у врат
-const CH_SPAN = { 1: [380, 6760], 2: [7400, 14050], 3: [14800, 20650], 4: [21450, 27350] };
+const CH_SPAN = { 1: [380, 6760], 2: [7400, 14050], 3: [14800, 20650], 4: [21450, 27350], 5: [28100, 33050] };
 export const NODE_X = (() => {
   const xs = [];
-  for (const ch of [1, 2, 3, 4]) {
+  for (const ch of [1, 2, 3, 4, 5]) {
     const list = LEVELS.filter((l) => l.ch === ch), [a, b] = CH_SPAN[ch];
     const k = list.length - 1;
     list.forEach((l, i) => {
@@ -186,6 +196,7 @@ export const CHAPTERS = {
   2: { season: 'summer', cefr: 'A2', name: { ru: 'Лето', cz: 'Léto' } },
   3: { season: 'autumn', cefr: 'B1', name: { ru: 'Осень', cz: 'Podzim' } },
   4: { season: 'winter', cefr: 'B2', name: { ru: 'Зима', uk: 'Зима', cz: 'Zima' } },
+  5: { season: 'spring', cefr: 'C1', name: { ru: 'Вторая весна', uk: 'Друга весна', cz: 'Druhé jaro' } },
 };
 
 export const levelDef = (n) => LEVELS[n - 1];
@@ -201,7 +212,8 @@ export function levelWords(def) {
 export function isUnlocked(n) {
   if (ADMIN_OPEN) return true;
   if (levelDef(n)?.ch === 3 && !CH3_OPEN) return false; // глава 3 — только для английского и чешского
-  if (levelDef(n)?.ch === 4 && !CH4_OPEN) return false; // глава 4 — пока только для чешского
+  if (levelDef(n)?.ch === 4 && !CH4_OPEN) return false; // глава 4 — английский и чешский
+  if (levelDef(n)?.ch === 5 && !CH5_OPEN) return false; // глава 5 «C1» — английский и чешский
   return n === 1 || !!state.levels[n - 1]?.stars?.[0];
 }
 

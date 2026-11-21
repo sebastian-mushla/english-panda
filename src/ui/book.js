@@ -51,7 +51,7 @@ export function openCertificate(c) {
   const m = openModal(`<div class="certificate" id="cert-print">
       <div class="cert-roll"></div>
       <div class="cert-body">
-        <div class="seal">${({ 1: '春', 2: '夏', 3: '秋', 4: '冬' })[c.ch || 1]}</div>
+        <div class="seal">${({ 1: '春', 2: '夏', 3: '秋', 4: '冬', 5: '玉' })[c.ch || 1]}</div>
         <h2>${t('certTitle')}</h2>
         <p>${t('certConfirms')}</p>
         <div class="cert-name">${c.name || state.name || '🐼'}</div>

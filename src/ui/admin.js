@@ -35,7 +35,7 @@ export function initAdmin({ start, startPhase, runStage, focus }) {
       <section class="adm-row"><label><input type="checkbox" id="adm-open" ${ADMIN_OPEN ? 'checked' : ''}> Открыть всё</label>
         <button data-a="coins">+1000 🪙</button><button data-a="mobs">Все духи</button><button data-a="done">Пройти всё</button><button data-a="reset" class="adm-red">Сброс</button></section>
       <input id="adm-q" placeholder="Поиск: номер, тема, игра…">
-      <div class="adm-list">${[1, 2, 3, 4].map((ch) => `<h4>Глава ${ch} · ${CHAPTERS[ch].cefr}</h4>` + LEVELS.filter((l) => l.ch === ch).map((l) => {
+      <div class="adm-list">${[1, 2, 3, 4, 5].map((ch) => `<h4>Глава ${ch} · ${CHAPTERS[ch].cefr}</h4>` + LEVELS.filter((l) => l.ch === ch).map((l) => {
         const done = state.levels[l.n]?.stars?.[0] ? '✅' : '';
         const parts = l.phases ? l.phases.map((p, i) => ({ i, name: `Фаза ${i + 1}: ${L(phaseTitle(l, i)) || p.gram}` })) : [{ i: null, name: '' }];
         return `<div class="adm-lv" data-q="${esc((l.n + ' ' + title(l) + ' ' + (l.gram || '') + ' ' + JSON.stringify(l.stages || l.phases)).toLowerCase())}">
