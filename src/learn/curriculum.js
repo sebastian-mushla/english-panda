@@ -10,9 +10,10 @@ import { GRAMMAR as EN_A2 } from './en_a2.js';
 import { GRAMMAR as EN_B1 } from './en_b1.js';
 import { GRAMMAR as EN_B2 } from './en_b2.js';
 import { GRAMMAR as CZ_AB } from './cz_ab.js';
+import { GRAMMAR as CZ_B } from './cz_b.js';
 
-// Задания тем грамматики изучаемого языка (для английского A1–B2, для чешского A1–B1)
-export const TOPIC_GRAMMAR = TARGET === 'en' ? [...EN_A1, ...EN_A2, ...EN_B1, ...EN_B2] : TARGET === 'cz' ? CZ_AB : [];
+// Задания тем грамматики изучаемого языка (для английского A1–B2, для чешского A1–B2)
+export const TOPIC_GRAMMAR = TARGET === 'en' ? [...EN_A1, ...EN_A2, ...EN_B1, ...EN_B2] : TARGET === 'cz' ? [...CZ_AB, ...CZ_B] : [];
 
 // Старые уровни-образцы: словарные темы берут отсюда игры и духа
 const LEGACY = [
@@ -88,7 +89,10 @@ const PROGRAM = {
       { L: 4 }, T_('cz_priv', ['cz_priv'], 'g_cz_priv'), { L: 5 }, T_('cz_akuz', ['cz_akuz'], 'g_cz_akuz'), { L: 6 }, T_('cz_neg', ['cz_neg'], 'g_cz_neg'), { L: 7 }, { L: 8 }, { L: 9 }, { L: 10 }],
     2: [{ L: 11 }, P_('cz_time', 'mountain', [['cz_minuly'], ['cz_budouci']], 'g_cz_time'), { L: 12 }, T_('cz_lokal', ['cz_lokal'], 'g_cz_lokal'), { L: 13 }, T_('cz_plural', ['cz_plural'], 'g_cz_plural'),
       { L: 14 }, T_('cz_adj', ['cz_adj'], 'g_cz_adj'), { L: 15 }, T_('cz_imper', ['cz_imper'], 'g_cz_imper'), { L: 16 }, T_('cz_pohyb', ['cz_pohyb'], 'g_cz_pohyb'), { L: 17 }, { L: 18 }, { L: 19 }, { L: 20 }],
-    3: [{ L: 21 }, { L: 22 }, P_('cz_modal', 'library', [['cz_modal'], ['cz_kdyby']], 'g_cz_modal'), { L: 23 }, { L: 24 }, T_('cz_cmp', ['cz_cmp'], 'g_cz_cmp'), { L: 25 }, { L: 26 }, { L: 27 }, { L: 28 }, { L: 29 }, { L: 30 }],
+    3: [{ L: 21 }, P_('cz_pady', 'cave', [['cz_gen'], ['cz_dat'], ['cz_instr']], 'g_cz_pady'), { L: 22 }, P_('cz_modal', 'library', [['cz_modal'], ['cz_kdyby']], 'g_cz_modal'), { L: 23 }, T_('cz_num', ['cz_num'], 'g_cz_num'),
+      { L: 24 }, T_('cz_cmp', ['cz_cmp'], 'g_cz_cmp'), { L: 25 }, { L: 26 }, { L: 27 }, { L: 28 }, { L: 29 }, { L: 30 }],
+    4: [{ L: 31 }, { L: 32 }, T_('cz_plcase', ['cz_plcase'], 'g_cz_plcase'), { L: 33 }, P_('cz_pass', 'temple', [['cz_pass'], ['cz_ktery']], 'g_cz_pass'), { L: 34 }, T_('cz_enkl', ['cz_enkl'], 'g_cz_enkl'),
+      { L: 35 }, { L: 36 }, T_('cz_conj', ['cz_conj'], 'g_cz_conj'), { L: 37 }, { L: 38 }, { L: 39 }, { L: 40 }],
   },
 };
 const EXAM_TITLE = { ru: 'Экзамен главы', uk: 'Іспит розділу', cz: 'Zkouška kapitoly' };
@@ -120,11 +124,11 @@ export const LEVELS = buildLevels();
 
 // Переход на программу до B2: номера уровней сдвинулись (у английского после главы 1, у чешского везде),
 // поэтому сдвинутый прогресс сбрасываем, а пойманные духи и слова остаются
-if (state.prog !== 3 && (TARGET === 'en' || TARGET === 'cz')) {
-  const from = TARGET === 'en' ? 20 : 2;
+if ((state.prog || 0) < 4 && (TARGET === 'en' || TARGET === 'cz')) {
+  const from = TARGET === 'en' ? (state.prog === 3 ? 999 : 20) : (state.prog === 3 ? 34 : 2);
   for (const k of Object.keys(state.levels || {})) if (+k >= from) delete state.levels[k];
   for (const k of Object.keys(state.phases || {})) if (+k.split(':')[0] >= from) delete state.phases[k];
-  state.prog = 3;
+  state.prog = 4;
   save();
 }
 // Номер экзамена каждой главы (для тумана и свитков)

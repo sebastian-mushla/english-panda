@@ -302,7 +302,8 @@ import { MOBS as M_A2 } from './en_a2.js';
 import { MOBS as M_B1 } from './en_b1.js';
 import { MOBS as M_B2 } from './en_b2.js';
 import { MOBS as M_CZ } from './cz_ab.js';
-for (const [id, e, c, ru, uk, cz] of [...M_A2, ...M_B1, ...M_B2, ...M_CZ]) {
+import { MOBS as M_CZB } from './cz_b.js';
+for (const [id, e, c, ru, uk, cz] of [...M_A2, ...M_B1, ...M_B2, ...M_CZ, ...M_CZB]) {
   MOBS[id] = em(e, c, ru, uk, cz || ru, 'Хранитель темы. Отпустит, только если ты знаешь правило.', 'Хранитель теми. Відпустить, лише якщо ти знаєш правило.', 'Strážce tématu. Pustí tě, jen když znáš pravidlo.');
 }
 
