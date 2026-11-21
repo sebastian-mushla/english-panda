@@ -16,7 +16,8 @@ const $ = (s) => document.querySelector(s);
 let s = 1, viewW = 1800, cam = state.cam || 0, target = cam, paused = false;
 // Фоны зон из картинок: x и w в единицах слоя (мир × f), высота — весь экран
 // Каждая картинка лежит на слое f = 0.6 и видна, пока камера в своей зоне; края уходят в туман и перекрываются с соседями
-const ART_ZONES = ['bamboo', 'falls', 'village', 'tea', 'gate', 'terraces', 'lake', 'market', 'monastery'];
+const ART_ZONES = ['bamboo', 'falls', 'village', 'tea', 'gate', 'terraces', 'lake', 'market', 'monastery', 'sgate', 'maple', 'harvest',
+  'ferry', 'academy', 'agate', 'snowwood', 'icelake', 'lanternfest', 'hermit', 'wgate', 'fog3'];
 const ART_BG = ZONES.filter((z) => ART_ZONES.includes(z.id)).map((z) => (z.x0 === 0
   ? { src: 'assets/zones/' + z.id + '.webp', f: 0.6, x: 0, w: 2900, first: true }
   : { src: 'assets/zones/' + z.id + '.webp', f: 0.6, x: Math.round(z.x0 * 0.6 - 500), w: Math.round((z.x1 - z.x0) * 0.6 + 2000) }));
