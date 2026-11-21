@@ -21,7 +21,7 @@ export const letterCount = (word) => word.replace(/ /g, '').length;
 
 // Общая лесенка для одного слова; act — что игра делает на третьей ступени
 export function wordHint(word, step, act) {
-  const mean = L({ ru: word.ru, cz: word.cz });
+  const mean = L({ ru: word.ru, uk: word.uk, cz: word.cz });
   if (step === 1) {
     const m = mask(word.t, (i, k) => k === 0);
     return { label: t('hint.1'), text: `${word.emoji} <b>${esc(mean)}</b> → <span class="en hmask">${esc(m)}</span> <small>(${t('hint.letters', { n: letterCount(word.t) })})</small>`, en: false };

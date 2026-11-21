@@ -1,10 +1,10 @@
 // Письмо: собери e-mail по ситуации — для каждой части выбери фразу нужного стиля (дружеский или официальный).
 import { t, L } from '../i18n.js';
-import { EMAILS } from '../learn/words3.js';
+import { CH3 } from '../learn/ch3.js';
 import { shuffle, pick, esc, wait, flash } from './kit.js';
 
 export default function email(el, ctx) {
-  const mail = pick(EMAILS);
+  const mail = pick(CH3.EMAILS);
   let i = 0, busy = false;
 
   el.innerHTML = `<div class="email">
@@ -44,7 +44,7 @@ export default function email(el, ctx) {
       }
     }));
     ctx.setHint('em' + i, (step) => {
-      if (step === 1) return { label: t('hint.rule'), text: esc(t(mail.subject === 'Thank you!' ? 'rule.informal' : 'rule.formal')), en: false };
+      if (step === 1) return { label: t('hint.rule'), text: esc(t(mail.formal ? 'rule.formal' : 'rule.informal')), en: false };
       const bad = [...opts.querySelectorAll('.dl-opt')].filter((b) => !choices[+b.dataset.k].ok && !b.disabled);
       if (step === 2 && bad[0]) { bad[0].disabled = true; bad[0].classList.add('gone'); return { label: t('hint.3'), text: t('hint.act') }; }
       opts.querySelectorAll('.dl-opt').forEach((b) => { if (choices[+b.dataset.k].ok) b.classList.add('glow'); });

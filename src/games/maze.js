@@ -1,6 +1,5 @@
 // Лабиринт: доберись до плитки с правильной формой слова. По лабиринту бродит дух — не попадайся.
 import { t, L } from '../i18n.js';
-import { GRAMMAR } from '../learn/words3.js';
 import { shuffle, esc, flash } from './kit.js';
 import { field, makeMaze } from './field.js';
 import { gramPool, gramOptions } from './gram.js';

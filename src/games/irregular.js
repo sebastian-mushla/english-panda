@@ -1,5 +1,9 @@
 // Неправильные глаголы: дана первая форма (go) — впиши вторую (went) и третью (gone).
 import { t } from '../i18n.js';
+import { TARGET } from '../state.js';
+
+// подписи колонок: у чешского вторая форма — прошедшее время, третья — настоящее (já)
+const COLS = TARGET === 'cz' ? ['Infinitiv', 'Minulý čas · on', 'Přítomný čas · já'] : ['V1', 'V2 · Past', 'V3 · Participle'];
 import { shuffle, meaning, esc, wait, flash } from './kit.js';
 import { keyboard, typeLine } from './keyboard.js';
 
@@ -10,7 +14,7 @@ export default function irregular(el, ctx) {
 
   el.innerHTML = `<div class="typer irreg">
       <div class="ir-card"><span class="emo"></span><span class="ir-mean"></span></div>
-      <div class="ir-table en"><div><small>V1</small><b class="ir-v1"></b></div><div><small>V2 · Past</small><span class="slots ir-v2"></span></div><div><small>V3 · Participle</small><span class="slots ir-v3"></span></div></div>
+      <div class="ir-table en"><div><small>${COLS[0]}</small><b class="ir-v1"></b></div><div><small>${COLS[1]}</small><span class="slots ir-v2"></span></div><div><small>${COLS[2]}</small><span class="slots ir-v3"></span></div></div>
       <div class="count"></div>
       <div class="kb"></div>
     </div>`;

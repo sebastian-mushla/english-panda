@@ -1,6 +1,5 @@
 // Сбор букв: панда ходит по полю и собирает буквы слова по порядку. Для неправильных глаголов — форму прошедшего времени.
 import { t } from '../i18n.js';
-import { IRREGULAR } from '../learn/words3.js';
 import { shuffle, meaning, esc, flash } from './kit.js';
 import { field } from './field.js';
 import { DECOY } from '../learn/lang.js';

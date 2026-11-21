@@ -112,7 +112,7 @@ export const LONG = [
 export const EMAILS = [
   {
     task: { ru: 'Напиши другу Тому: поблагодари за подарок и позови в гости в субботу.', cz: 'Napiš kamarádovi Tomovi: poděkuj za dárek a pozvi ho v sobotu na návštěvu.' },
-    to: 'tom@mail.com', subject: 'Thank you!',
+    to: 'tom@mail.com', subject: 'Thank you!', formal: false,
     parts: [
       { label: { ru: 'Приветствие', cz: 'Oslovení' }, ok: 'Hi Tom,', bad: ['Dear Sir or Madam,', 'To whom it may concern,'] },
       { label: { ru: 'Благодарность', cz: 'Poděkování' }, ok: 'Thank you so much for the great birthday present!', bad: ['I am writing to complain about your service.', 'Please find the invoice attached.'] },
@@ -123,7 +123,7 @@ export const EMAILS = [
   },
   {
     task: { ru: 'Напиши в отель: хочешь забронировать номер на две ночи и спрашиваешь про завтрак.', cz: 'Napiš do hotelu: chceš rezervovat pokoj na dvě noci a ptáš se na snídani.' },
-    to: 'info@lotushotel.com', subject: 'Room booking',
+    to: 'info@lotushotel.com', subject: 'Room booking', formal: true,
     parts: [
       { label: { ru: 'Приветствие', cz: 'Oslovení' }, ok: 'Dear Sir or Madam,', bad: ['Hey guys!', 'Hi bro,'] },
       { label: { ru: 'Цель письма', cz: 'Účel dopisu' }, ok: 'I would like to book a double room for two nights from 12 to 14 October.', bad: ['What\'s up? Long time no see!', 'Thanks for the cool party yesterday.'] },
@@ -134,7 +134,7 @@ export const EMAILS = [
   },
   {
     task: { ru: 'Напиши учителю: ты заболел и завтра не придёшь, спроси про домашнее задание.', cz: 'Napiš učiteli: jsi nemocný, zítra nepřijdeš, zeptej se na domácí úkol.' },
-    to: 'mr.li@school.com', subject: 'Absence tomorrow',
+    to: 'mr.li@school.com', subject: 'Absence tomorrow', formal: true,
     parts: [
       { label: { ru: 'Приветствие', cz: 'Oslovení' }, ok: 'Dear Mr Li,', bad: ['Yo teacher!', 'Hi sweetie,'] },
       { label: { ru: 'Причина', cz: 'Důvod' }, ok: 'I am sorry, but I am ill and I cannot come to school tomorrow.', bad: ['I won the lottery and I am rich now.', 'Your lesson was boring.'] },

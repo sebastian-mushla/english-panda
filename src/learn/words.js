@@ -2,6 +2,7 @@ import { TARGET } from '../state.js';
 import { RIDDLES } from './words-i18n.js';
 import { THEMES2, RAW2, SENTENCES2 } from './words2.js';
 import { IRREGULAR, REGULAR, pastRegular } from './words3.js';
+import * as CZ3 from './words3cz.js';
 import { HU, HU_SENT } from './hu.js';
 import { UK } from './uk.js';
 
@@ -197,8 +198,8 @@ for (const [theme, rows] of Object.entries(RAW2)) {
 }
 // Глава 3 «Осень · B1» — грамматика английского, есть только при изучении английского.
 // Глаголы становятся словами главы: t — первая форма, v2/v3 — прошедшее время и причастие. Id с префиксом «v:», чтобы не совпасть с A2.
-export const CH3_OPEN = TARGET === 'en';
-if (CH3_OPEN) {
+export const CH3_OPEN = TARGET === 'en' || TARGET === 'cz';
+if (TARGET === 'en') {
   const add = (theme, name, list) => {
     THEMES[theme] = name;
     CHAPTER[theme] = 3;
@@ -212,6 +213,23 @@ if (CH3_OPEN) {
   add('irr1', { ru: 'Неправильные глаголы I', cz: 'Nepravidelná slovesa I', en: 'Irregular verbs I' }, IRREGULAR.slice(0, 23));
   add('irr2', { ru: 'Неправильные глаголы II', cz: 'Nepravidelná slovesa II', en: 'Irregular verbs II' }, IRREGULAR.slice(23));
   add('reg', { ru: 'Правильные глаголы', cz: 'Pravidelná slovesa', en: 'Regular verbs' }, REGULAR.map(([v, ru, cz, e]) => [v, pastRegular(v), pastRegular(v), ru, cz, e]));
+}
+// Чешская глава 3: t — инфинитив, v2 — прошедшее время (on), v3 — настоящее время (já)
+if (TARGET === 'cz') {
+  const add = (theme, name, list) => {
+    THEMES[theme] = name;
+    CHAPTER[theme] = 3;
+    BY_THEME[theme] = list.map(([v1, v2, v3, ru, uk, emoji]) => {
+      const w = { en: 'v:' + v1, emoji, ru, uk, cz: v1, theme, cefr: 'B1', t: v1, v2, v3,
+        riddle: `Minulý čas: ${v2} · já: ${v3}`, ex: 'Dnes chci ___.' };
+      BY_TARGET[v1] ||= w;
+      return (WORDS[w.en] = w);
+    });
+  };
+  add('irr1', { ru: 'Глаголы с особыми формами I', uk: 'Дієслова з особливими формами I', cz: 'Slovesa I', en: 'Czech verbs I' }, CZ3.IRREGULAR.slice(0, 22));
+  add('irr2', { ru: 'Глаголы с особыми формами II', uk: 'Дієслова з особливими формами II', cz: 'Slovesa II', en: 'Czech verbs II' }, CZ3.IRREGULAR.slice(22));
+  add('reg', { ru: 'Глаголы на -at', uk: 'Дієслова на -at', cz: 'Slovesa na -at', en: 'Verbs in -at' },
+    CZ3.REGULAR.map(([v, ru, uk, e]) => [v, CZ3.pastRegular(v), CZ3.presentRegular(v), ru, uk, e]));
 }
 // Понятнее картинки: эмодзи, которые сами по себе не читались (банк, школа, «большой» = слон)
 const EMOJI = {
@@ -231,5 +249,5 @@ for (const w of Object.values(WORDS)) {
 export const themesOf = (ch) => Object.keys(THEMES).filter((th) => CHAPTER[th] === ch);
 // Предложение темы: [на изучаемом языке, на родном]
 // Венгерский берём из HU_SENT, украинский — из UK по русскому тексту
-const inLang = (s, l) => (l === 'hu' ? HU_SENT[s[0]] : l === 'uk' ? UK[s[1]] ?? s[1] : s[TI[l]]);
+const inLang = (s, l) => (l === 'hu' ? HU_SENT[s[0]] : l === 'uk' ? s[3] ?? UK[s[1]] ?? s[1] : s[TI[l]]);
 export const sentence = (s, native) => [inLang(s, TARGET), inLang(s, native)];

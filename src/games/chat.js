@@ -1,11 +1,11 @@
 // Чат-квест: переписка в мессенджере (отель, кафе, собеседование). Где-то выбираешь ответ, где-то допечатываешь слово.
 import { t, L } from '../i18n.js';
-import { CHATS } from '../learn/words3.js';
+import { CH3 } from '../learn/ch3.js';
 import { shuffle, pick, esc, wait, flash } from './kit.js';
 import { keyboard, typeLine } from './keyboard.js';
 
 export default function chat(el, ctx) {
-  const q = pick(CHATS);
+  const q = pick(CH3.CHATS);
   let i = 0, busy = true, line = null;
 
   el.innerHTML = `<div class="chat">

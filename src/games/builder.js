@@ -2,7 +2,7 @@
 import { t } from '../i18n.js';
 import { state } from '../state.js';
 import { SENTENCES, BY_TARGET, BY_THEME, sentence } from '../learn/words.js';
-import { LONG } from '../learn/words3.js';
+import { CH3 } from '../learn/ch3.js';
 import { shuffle, pick, esc, wait, flash } from './kit.js';
 
 const KEEP = new Set(['I', 'Mei', 'Мэй']);
@@ -13,7 +13,7 @@ function tokens(en) {
 
 export default function builder(el, ctx) {
   // «Длинные предложения» главы 3: B1-фразы из 8–12 слов
-  const list = ctx.long ? shuffle(LONG).slice(0, 3).map((s) => ({ s, th: ctx.def.theme in BY_THEME ? ctx.def.theme : 'reg' }))
+  const list = ctx.long ? shuffle(CH3.LONG).slice(0, 3).map((s) => ({ s, th: ctx.def.theme in BY_THEME ? ctx.def.theme : 'reg' }))
     : ctx.themes.length > 1
     ? shuffle(ctx.themes).slice(0, 3).map((th) => ({ s: pick(SENTENCES[th]), th }))
     : shuffle(SENTENCES[ctx.themes[0]]).map((s) => ({ s, th: ctx.themes[0] }));

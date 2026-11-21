@@ -1,18 +1,19 @@
 // Пробный тест B1: чтение текста с вопросами и грамматика. В конце — результат в процентах.
 import { t } from '../i18n.js';
-import { READING, GRAMMAR } from '../learn/words3.js';
+import { CH3 } from '../learn/ch3.js';
+import { TARGET } from '../state.js';
 import { shuffle, esc, wait, flash } from './kit.js';
 import { gramOptions } from './gram.js';
 
 export default function b1test(el, ctx) {
-  const reading = READING.q.map((q) => ({ part: 'read', q: q.q, ok: q.ok, opts: shuffle([q.ok, ...q.bad]) }));
-  const grammar = shuffle(GRAMMAR).slice(0, 6).map((g) => ({ part: 'gram', q: g.s.replace('___', '_____'), ok: g.a, opts: gramOptions(g) }));
+  const reading = CH3.READING.q.map((q) => ({ part: 'read', q: q.q, ok: q.ok, opts: shuffle([q.ok, ...q.bad]) }));
+  const grammar = shuffle(CH3.GRAMMAR).slice(0, 6).map((g) => ({ part: 'gram', q: g.s.replace('___', '_____'), ok: g.a, opts: gramOptions(g) }));
   const items = [...reading, ...grammar];
   let i = 0, score = 0, busy = false;
 
   el.innerHTML = `<div class="b1test">
-      <div class="bt-head"><b>B1 · Practice test</b><span class="bt-prog"></span></div>
-      <div class="bt-text en"><p>${esc(READING.text)}</p></div>
+      <div class="bt-head"><b>${TARGET === 'cz' ? 'B1 · Zkušební test' : 'B1 · Practice test'}</b><span class="bt-prog"></span></div>
+      <div class="bt-text en"><p>${esc(CH3.READING.text)}</p></div>
       <div class="bt-q en"></div>
       <div class="bt-opts"></div>
     </div>`;

@@ -8,7 +8,7 @@ export const shuffle = (a) => {
   return a;
 };
 export const pick = (a) => a[Math.floor(Math.random() * a.length)];
-export const meaning = (w) => L({ ru: w.ru, cz: w.cz });
+export const meaning = (w) => L({ ru: w.ru, uk: w.uk, cz: w.cz });
 export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 // Картинка слова; для неоднозначных картинок — ещё и значение на родном языке

@@ -57,7 +57,7 @@ export function levelWords(def) {
 }
 
 export function isUnlocked(n) {
-  if (levelDef(n)?.ch === 3 && !CH3_OPEN) return false; // глава 3 — только для английского
+  if (levelDef(n)?.ch === 3 && !CH3_OPEN) return false; // глава 3 — только для английского и чешского
   return n === 1 || !!state.levels[n - 1]?.stars?.[0];
 }
 
