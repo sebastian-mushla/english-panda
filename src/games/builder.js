@@ -15,7 +15,8 @@ export default function builder(el, ctx) {
   // «Длинные предложения» главы 3: B1-фразы из 8–12 слов
   const list = ctx.long ? shuffle(CH3.LONG).slice(0, 3).map((s) => ({ s, th: ctx.def.theme in BY_THEME ? ctx.def.theme : 'reg' }))
     : ctx.themes.length > 1
-    ? shuffle(ctx.themes).slice(0, 3).map((th) => ({ s: pick(SENTENCES[th]), th }))
+    // только темы, у которых есть готовые фразы (у новых словарных тем их нет)
+    ? shuffle(ctx.themes.filter((th) => SENTENCES[th]?.length)).slice(0, 3).map((th) => ({ s: pick(SENTENCES[th]), th }))
     : shuffle(SENTENCES[ctx.themes[0]]).map((s) => ({ s, th: ctx.themes[0] }));
   const total = list.length;
   let cur, answer, pool, busy;

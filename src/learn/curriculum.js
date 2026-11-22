@@ -246,8 +246,9 @@ export function buildPlay(n, phase = null) {
   }
   const words = levelWords(def);
   // соседние темы для «Корзин» и «Рыбалки»: сначала уже пройденные
-  const done = LEVELS.filter((l) => l.n < n && !l.exam).map((l) => l.theme);
-  const others = shuffle(done.length ? done.slice(-4) : chThemes.filter((th) => th !== def.theme)).filter((th) => th !== def.theme);
+  // только словарные темы (у тем грамматики нет слов, «Корзины» на них падали)
+  const done = LEVELS.filter((l) => l.n < n && !l.exam && BY_THEME[l.theme]?.length).map((l) => l.theme);
+  const others = shuffle(done.length ? done.slice(-4) : chThemes.filter((th) => th !== def.theme)).filter((th) => th !== def.theme && BY_THEME[th]?.length);
   return { def, words, review: dueWords(words.map((w) => w.en), 3), themes: [def.theme], others };
 }
 
