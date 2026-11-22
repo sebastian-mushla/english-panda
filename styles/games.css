@@ -583,4 +583,35 @@
 .stage-fail { margin: auto; display: grid; gap: 14px; justify-items: center; text-align: center; color: var(--cream); max-width: 420px; font-weight: 700; }
 
 /* Большой экран компьютера: весь экран игры увеличен (--gz считает main.js), чтобы не было мелко */
-body:not(.phone) #game { zoom: var(--gz, 1); inset: auto; left: 0; top: 0; width: calc(100vw / var(--gz, 1)); height: calc(100vh / var(--gz, 1)); }
+#game { zoom: var(--gz, 1); inset: auto; left: 0; top: 0; width: calc(100vw / var(--gz, 1)); height: calc(100vh / var(--gz, 1)); }
+
+/* ---------- Симметрия и крупность на планшете и компьютере ----------
+   Без клавиатуры задание стоит по центру экрана (раньше прижималось к низу и оставляло пол-экрана пустым);
+   карточка задания и кнопки ответов растут вместе с экраном. */
+.typer:not(:has(.kb)) { justify-content: center; }
+.typer:not(:has(.kb)) > .sentence, .typer:not(:has(.kb)) > .prompt { margin-top: 0; }
+.typer > .sentence { width: min(900px, 100%); }
+.sentence p { font-size: clamp(1.1rem, min(5.2vw, 3.8dvh), 3rem); }
+.sentence small, .vf-tr { font-size: clamp(.9rem, 2.2dvh, 1.4rem); }
+.vf-base { font-size: clamp(1rem, 2.8dvh, 1.8rem); }
+/* варианты ответа: в ряд и крупно (при трёх-четырёх коротких — одной строкой, длинные переносятся) */
+.typer .dl-opts, .check .dl-opts, .es .dl-opts { width: min(900px, 100%); grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: clamp(8px, 1.6dvh, 16px); }
+.typer .dl-opt, .check .dl-opt { text-align: center; font-size: clamp(1.1rem, 3dvh, 2rem); padding: clamp(12px, 2.4dvh, 24px) 16px; }
+.ck-bar { width: min(900px, 100%); }
+.count { font-size: clamp(.9rem, 2dvh, 1.3rem); }
+.errspot { height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: clamp(12px, 2.4dvh, 26px); }
+.errspot > .sentence { width: min(900px, 100%); }
+.errspot .es-btns { width: min(900px, 100%); } .errspot .es-btns .btn { flex: 1; font-size: clamp(1.1rem, 3dvh, 1.9rem); padding: clamp(12px, 2.2dvh, 22px); }
+.errspot .dl-opts { width: min(900px, 100%); grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+.errspot .dl-opt { text-align: center; font-size: clamp(1.1rem, 3dvh, 2rem); }
+/* Правило, «Каллиграфия», лабиринт и сокобан: крупнее и шире на больших экранах */
+.rule-stage { max-width: min(900px, 100%); }
+.rule-stage .lesson h4 { font-size: clamp(1.2rem, 2.8dvh, 1.9rem); }
+.rule-stage .lesson li { font-size: clamp(.95rem, 2.1dvh, 1.35rem); line-height: 1.45; }
+.rule-stage .lesson-ex td, .rule-stage .vtable td { font-size: clamp(.95rem, 2.1dvh, 1.35rem); padding: clamp(3px, .7dvh, 8px) 10px; }
+.spell { gap: clamp(12px, 2.6dvh, 28px); }
+.spell .prompt .mean { font-size: clamp(1.4rem, 4dvh, 2.6rem); }
+.spell .tile { width: clamp(44px, min(12vw, 8dvh), 84px); height: clamp(44px, min(12vw, 8dvh), 84px); font-size: clamp(1.3rem, 4dvh, 2.4rem); }
+.spell .slot { width: clamp(36px, min(10vw, 7dvh), 70px); height: clamp(40px, 7.5dvh, 76px); font-size: clamp(1.2rem, 4dvh, 2.2rem); }
+.fg-task { font-size: clamp(1rem, 2.6dvh, 1.6rem); }
+.fg-task p { font-size: clamp(1.1rem, 3dvh, 1.9rem); }

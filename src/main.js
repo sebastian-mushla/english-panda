@@ -80,10 +80,10 @@ initHud({ book: () => openBook(), shop: () => openShop(), dict: () => openDict(s
 // Звук можно включить только после первого жеста пользователя
 addEventListener('pointerdown', () => { if (state.sound) startAmbient(); }, { once: true });
 
-// Масштаб экрана игры на компьютере: интерфейс рассчитан примерно на 1100 × 800, на большом мониторе
-// увеличиваем до 2×, на маленьком окне не уменьшаем
+// Масштаб экрана игры: интерфейс рассчитан примерно на 820 × 800; на планшете и большом мониторе
+// увеличиваем до 2×, на телефоне и маленьком окне не уменьшаем
 function gameZoom() {
-  const z = Math.max(1, Math.min(2, innerHeight / 800, innerWidth / 1100));
+  const z = Math.max(1, Math.min(2, innerHeight / 800, innerWidth / 820));
   document.documentElement.style.setProperty('--gz', z.toFixed(3));
 }
 gameZoom();
