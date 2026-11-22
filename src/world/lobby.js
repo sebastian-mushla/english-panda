@@ -129,9 +129,10 @@ function applyCam(force) {
   }
   // телефон: фон зоны медленно проезжает от левого края картинки к правому, пока идёшь по зоне (только transform)
   if (artFix) {
-    const c = cam + viewW / 2, z = zoneAt(c), p = Math.max(0, Math.min(1, (c - z.x0) / (z.x1 - z.x0)));
+    const c = cam + viewW / 2, id = artZoneAt(c), z = ZONES.find((q) => q.id === id), p = Math.max(0, Math.min(1, (c - z.x0) / (z.x1 - z.x0)));
     const tx = -p * Math.max(0, innerHeight * ART_RATIO - innerWidth);
     for (const img of artFix) img.style.transform = `translate3d(${tx.toFixed(1)}px,0,0)`;
+    if (id !== artWant && (ART_ZONES.includes(id) || artWant)) showArtFix(id);
   }
   const mm = $('#mm-view');
   if (mm) { mm.style.left = (cam / W * 100) + '%'; mm.style.width = (viewW / W * 100) + '%'; }
@@ -147,25 +148,41 @@ function applyCam(force) {
   }
 }
 
-// телефон: фон зоны — неподвижная картинка; при смене зоны новая плавно проявляется поверх старой
+// телефон: фон зоны — неподвижная картинка; при смене зоны новая плавно проявляется поверх старой.
+// Берём только последнюю запрошенную картинку: раньше при быстрой прокрутке поздно загруженные
+// картинки прошлых зон перебивали нужную, и за одну зону мелькало несколько фонов
+let artWant = '';
 function showArtFix(id) {
   if (!artFix) return;
   const has = ART_ZONES.includes(id);
   setArtCover(has);
   document.body.classList.toggle('artcover', has); // анимации дальних слоёв (брызги, туман водопада) прячем под фоном
-  const next = artFix[1 - artCur], cur = artFix[artCur];
+  artWant = has ? id : '';
+  const cur = artFix[artCur], next = artFix[1 - artCur];
   if (!has) { cur.classList.remove('on'); next.classList.remove('on'); return; }
-  if (cur.classList.contains('on') && cur.dataset.id === id) return;
+  if (cur.dataset.id === id) { cur.classList.add('on'); next.classList.remove('on'); return; }
   next.dataset.id = id;
-  next.onload = () => { next.classList.add('on'); cur.classList.remove('on'); artCur = 1 - artCur; };
+  next.onload = () => {
+    if (artWant !== id || next.dataset.id !== id) return; // устарело: уже нужна другая зона
+    next.classList.add('on'); cur.classList.remove('on'); artCur = 1 - artCur;
+  };
   next.src = 'assets/zones/' + id + '.webp';
+}
+
+// зона для фона телефона: с запасом, чтобы фон не прыгал туда-сюда на самой границе зон
+let artZone = '';
+function artZoneAt(c) {
+  const z = zoneAt(c);
+  if (!artZone || z.id === artZone) return (artZone = z.id);
+  const old = ZONES.find((q) => q.id === artZone);
+  if (old && c > old.x0 - 250 && c < old.x1 + 250) return artZone;
+  return (artZone = z.id);
 }
 
 function updateZone(force) {
   const center = cam + viewW / 2, z = zoneAt(center);
   if (z.id !== zoneId || force) {
     zoneId = z.id;
-    showArtFix(z.id);
     const s2 = applySeason(center); // сезон «по главе» меняется при переходе между главами
     if (s2 !== season) { season = s2; lastPhaseCam = -1e9; }
     handlers.onZone?.(z);
