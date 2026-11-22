@@ -568,3 +568,15 @@
 .errspot { width: min(560px, 100%); display: grid; gap: 14px; justify-items: center; }
 .es-w { padding: 0 4px; border-radius: 6px; background: rgba(242,193,78,.25); } .es-w.bad { background: rgba(200,55,42,.45); text-decoration: line-through; } .es-w.ok { background: rgba(80,160,90,.45); text-decoration: none; }
 .es-btns { display: flex; gap: 12px; }
+
+/* Клавиатура: ⌫ и пробел в последнем ряду, варианты букв (á, ö, ř) по долгому нажатию */
+.kbd { position: relative; }
+.key.has-var { position: relative; }
+.key.has-var::after { content: ''; position: absolute; top: 4px; right: 5px; width: 5px; height: 5px; border-radius: 50%; background: var(--gold, #d9a43a); }
+.key.space { max-width: 64px; flex: 1.3; font-size: 1.1rem; }
+.kvar { position: absolute; z-index: 5; display: flex; gap: 4px; padding: 5px; transform: translateY(-110%);
+  background: #3a2a18; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,.45); }
+.kvar .key { flex: none; width: 46px; max-width: none; }
+
+/* Скоропись: на телефоне листья компактнее, поле выше (клавиатура стала на ряд ниже) */
+@media (max-width: 600px) { .leaf { width: 92px; padding: 8px 6px 10px; } .leaf .emo { font-size: 1.5rem; } .leaf b { font-size: .8rem; } }

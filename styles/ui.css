@@ -289,3 +289,5 @@ img.pl-bg { object-fit: cover; }
 #adm .adm-st .chip { font-size: 11px; padding: 2px 6px; background: #f1ead6; }
 #adm-tog { position: fixed; left: 56px; bottom: 80px; z-index: 9000; border: 0; border-radius: 14px; padding: 6px 12px; font: 900 12px Nunito, sans-serif; background: #6a6a6a; color: #fff; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,.35); }
 #adm-tog.on { background: #2f9a4a; }
+/* во время игры и внутри мест админ-кнопки не перекрывают клавиатуру */
+body:has(#game:not([hidden])) #adm-btn, body:has(#game:not([hidden])) #adm-tog, body:has(#place) #adm-btn, body:has(#place) #adm-tog { display: none; }

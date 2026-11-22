@@ -25,9 +25,15 @@ export const SEAL = { en: '英', ru: '俄', cz: '捷', hu: '匈' }[TARGET];
 export const ROWS = {
   en: ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'],
   ru: ['йцукенгшщзхъ', 'фывапролджэ', 'ячсмитьбюё'],
-  cz: ['ěščřžýáíéůú', 'qwertzuiop', 'asdfghjkl', 'yxcvbnmňďťó'],
-  hu: ['öüóőúéáűí', 'qwertzuiop', 'asdfghjkl', 'yxcvbnm'],
+  cz: ['qwertzuiop', 'asdfghjkl', 'yxcvbnm'],
+  hu: ['qwertzuiop', 'asdfghjkl', 'yxcvbnm'],
 }[TARGET];
+
+// Буквы с диакритикой — по долгому нажатию на базовую букву (как на телефоне): отдельный ряд съедал место на экране
+export const VARIANTS = {
+  cz: { a: 'á', c: 'č', d: 'ď', e: 'éě', i: 'í', n: 'ň', o: 'ó', r: 'ř', s: 'š', t: 'ť', u: 'úů', y: 'ý', z: 'ž' },
+  hu: { a: 'á', e: 'é', i: 'í', o: 'óöő', u: 'úüű' },
+}[TARGET] || {};
 
 const ALPHA = {
   en: /^[a-z]$/,

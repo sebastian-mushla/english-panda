@@ -30,8 +30,10 @@ export default function rush(el, ctx) {
     const node = document.createElement('div');
     node.className = 'leaf';
     node.innerHTML = `<span class="emo">${w.emoji}</span><b>${esc(meaning(w))}</b><em class="en"></em>`;
-    node.style.left = `${8 + Math.random() * 70}%`;
     field.append(node);
+    // лист целиком внутри поля (с запасом на покачивание), а не «от 8 до 78 %» — на узком экране он уезжал за край
+    const room = Math.max(0, field.clientWidth - node.offsetWidth - 40);
+    node.style.left = `${20 + Math.random() * room}px`;
     leaves.push({ id: ++id, w, node, born: now, sway: Math.random() * 6 });
     setHint();
   }
@@ -72,7 +74,7 @@ export default function rush(el, ctx) {
         if (lives <= 0) return end(false);
         continue;
       }
-      l.node.style.transform = `translate(${Math.sin(now / 700 + l.sway) * 18}px, ${p * (h - 70)}px) rotate(${Math.sin(now / 900 + l.sway) * 8}deg)`;
+      l.node.style.transform = `translate(${Math.sin(now / 700 + l.sway) * 12}px, ${p * (h - 70)}px) rotate(${Math.sin(now / 900 + l.sway) * 8}deg)`;
     }
   }
 

@@ -1,24 +1,53 @@
 // Экранная клавиатура изучаемого языка + физическая клавиатура. Общая для игр с печатью.
-import { ROWS, keyLetter, norm } from '../learn/lang.js';
+import { ROWS, VARIANTS, keyLetter, norm } from '../learn/lang.js';
 export { keyLetter };
 
 // onKey получает 'a'..'z', ' ' или 'back'
 export function keyboard(el, onKey) {
   el.classList.add('kbd');
-  el.innerHTML = ROWS.map((r, i) => `<div class="krow">${[...r].map((c) => `<button class="key" data-k="${c}">${c}</button>`).join('')}${i === ROWS.length - 1 ? '<button class="key wide" data-k="back">⌫</button>' : ''}</div>`).join('') +
-    '<div class="krow"><button class="key space" data-k=" ">space</button></div>';
-  const btn = (k) => el.querySelector(`.key[data-k="${k === ' ' ? ' ' : k}"]`);
+  const last = ROWS.length - 1;
+  // пробел и ⌫ — в последнем ряду; у букв с вариантами (á, ö, ř…) точка-подсказка, варианты по долгому нажатию
+  el.innerHTML = ROWS.map((r, i) => `<div class="krow">${i === last ? '<button class="key space" data-k=" ">␣</button>' : ''}${[...r].map((c) => `<button class="key${VARIANTS[c] ? ' has-var' : ''}" data-k="${c}">${c}</button>`).join('')}${i === last ? '<button class="key wide" data-k="back">⌫</button>' : ''}</div>`).join('') +
+    '<div class="kvar" hidden></div>';
+  const pop = el.querySelector('.kvar');
+  const btn = (k) => el.querySelector(`.key[data-k="${k === ' ' ? ' ' : k}"]`) || pop.querySelector(`[data-k="${k}"]`);
   const press = (k) => {
     const b = btn(k);
     if (b) { b.classList.add('down'); setTimeout(() => b.classList.remove('down'), 110); }
     onKey(k);
   };
+  let holdT = 0, held = null;
+  const closePop = () => { pop.hidden = true; pop.innerHTML = ''; };
+  function openPop(b) {
+    const k = b.dataset.k;
+    pop.innerHTML = [k, ...VARIANTS[k]].map((c) => `<button class="key" data-k="${c}">${c}</button>`).join('');
+    const r = b.getBoundingClientRect(), er = el.getBoundingClientRect();
+    pop.style.left = Math.max(0, Math.min(er.width - pop.offsetWidth, r.left - er.left + r.width / 2)) + 'px';
+    pop.style.top = (r.top - er.top) + 'px';
+    pop.hidden = false;
+    pop.style.left = Math.max(0, Math.min(er.width - pop.offsetWidth, r.left - er.left + r.width / 2 - pop.offsetWidth / 2)) + 'px';
+  }
   el.addEventListener('pointerdown', (e) => {
     const b = e.target.closest('.key');
     if (!b) return;
     e.preventDefault();
+    if (b.parentElement === pop) { closePop(); press(b.dataset.k); return; }
+    closePop();
+    if (VARIANTS[b.dataset.k]) {
+      held = b;
+      holdT = setTimeout(() => { openPop(b); held = null; }, 330);
+      return;
+    }
     press(b.dataset.k);
   });
+  // короткое нажатие на букву с вариантами — обычная буква
+  el.addEventListener('pointerup', (e) => {
+    if (!held) return;
+    clearTimeout(holdT);
+    const b = held; held = null;
+    press(b.dataset.k);
+  });
+  el.addEventListener('pointercancel', () => { clearTimeout(holdT); held = null; });
   const onDoc = (e) => {
     if (e.target.closest?.('input,textarea')) return;
     const k = keyLetter(e);
