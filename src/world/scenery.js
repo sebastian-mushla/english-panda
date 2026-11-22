@@ -442,7 +442,7 @@ function layerGround(r, lights) {
     s += `<path fill="url(#tx-${k})" opacity=".92" d="${td}L${b},${H}Z"/><path fill="url(#txFade)" d="${td}L${b},${H}Z"/>`;
   }
   const grass = new Ink();
-  for (let x = -20; x < w; x += 5 + r() * 5) {
+  for (let x = -20; x < w; x += LITE ? 16 + r() * 10 : 5 + r() * 5) {
     if (x > TEA.x0 - 30 && x < TEA.x1 + 30) continue;
     if (x > RIVER.x0 + 20 && x < RIVER.x1 - 20) continue;
     if (x > LAKE.x0 + 20 && x < LAKE.x1 - 20) continue;
@@ -860,7 +860,10 @@ const DEFS = `<defs>
   ${PANDA_DEFS}
 </defs>`;
 
-export function buildScene() {
+// lite — телефон: реже трава и цветы (меньше элементов в каждом куске слоя земли)
+let LITE = false;
+export function buildScene(lite = false) {
+  LITE = lite;
   const r = rng(20261120);
   FX = {};
   const lights = { 0.3: [], 0.6: [], 1: [], 1.4: [] };

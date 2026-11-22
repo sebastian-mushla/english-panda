@@ -6,7 +6,7 @@ import { CH3_OPEN, CH4_OPEN, CH5_OPEN } from '../learn/words.js';
 import { ADMIN_OPEN } from '../adminFlags.js';
 import { buildScene } from './scenery.js';
 import { applyPhase, applySeason } from './sky.js';
-import { setupRaster, updateRaster, rasterIdle } from './raster.js';
+import { setupRaster, updateRaster, rasterIdle, setArtCover } from './raster.js';
 import { stepParticles, setParticleMood } from './particles.js';
 import { pandaSVG } from './panda.js';
 import { LEVELS, isUnlocked, currentLevel, NODE_X, EXAM_N } from '../learn/curriculum.js';
@@ -22,11 +22,12 @@ const ART_ZONES = ['bamboo', 'falls', 'village', 'tea', 'gate', 'terraces', 'lak
 const ART_BG = ZONES.filter((z) => ART_ZONES.includes(z.id)).map((z) => (z.x0 === 0
   ? { src: 'assets/zones/' + z.id + '.webp', f: 0.6, x: 0, w: 2900, first: true }
   : { src: 'assets/zones/' + z.id + '.webp', f: 0.6, x: Math.round(z.x0 * 0.6 - 500), w: Math.round((z.x1 - z.x0) * 0.6 + 2000) }));
-let PHONE = false, artImgs = [], layerEls = [], rasterLayers = [], rasterS = 0, overlay, playerEl, handlers = {}, zoneId = '', lastPhaseCam = -1e9, season = 'spring', lastPhase = null;
+const ART_RATIO = 1024 / 434; // пропорции картинок зон
+let PHONE = false, artFix = null, artCur = 0, artImgs = [], layerEls = [], rasterLayers = [], rasterS = 0, overlay, playerEl, handlers = {}, zoneId = '', lastPhaseCam = -1e9, season = 'spring', lastPhase = null;
 
 export function initLobby(h) {
   handlers = h;
-  const scene = buildScene();
+  const scene = buildScene(innerWidth < 760 || matchMedia('(pointer: coarse)').matches);
   const root = $('#layers');
   // Все статичные слои (горы, роща, земля, передний план, свет) рисуются в картинки-куски (raster.js).
   // Живыми SVG остаются только маленькие анимации (струи водопада, рябь, пламя).
@@ -35,22 +36,27 @@ export function initLobby(h) {
   const Q = { 0.12: phone ? 0.45 : 0.55, 0.3: phone ? 0.55 : 0.65, 0.6: phone ? 0.7 : 0.8, 1: phone ? 1 : Math.min(devicePixelRatio || 1, 1.25), 1.4: 0.5 };
   root.innerHTML = scene.layers.map((L) => `<div class="layer" data-f="${L.f}" data-raster></div>` +
     (L.fx ? `<div class="layer fxlayer" data-f="${L.f}">${L.fx}</div>` : '')).join('');
-  // нарисованные фоны зон (картинки) лежат над средним планом и уходят в туман справа
-  // все фоны зон — в одном слое; картинка загружается, только когда рядом камера, и выгружается вдали
-  // (21 широкая картинка сразу не помещалась в память телефона)
-  root.querySelectorAll('.layer[data-raster]')[2].insertAdjacentHTML('afterend', `<div class="layer artbg" data-f="0.6">${ART_BG.map((b) =>
-    `<img class="${b.first ? 'first' : ''}" data-src="${b.src}" data-x="${b.x}" data-w="${b.w}" alt="" decoding="async" style="left:calc(var(--s)*${b.x}px);width:calc(var(--s)*${b.w}px)">`).join('')}
-    ${ART_BG.slice(1).map((b) => `<i class="artseam" style="left:calc(var(--s)*${b.x - 170}px)"></i>`).join('')}
-</div>`);
-  artImgs = [...root.querySelectorAll('.artbg img')];
+  // нарисованные фоны зон (картинки) лежат над средним планом.
+  // Компьютер: широкий слой с параллаксом, картинки грузятся только рядом с камерой.
+  // Телефон: один неподвижный фон текущей зоны на весь экран с плавной сменой — движущиеся широкие картинки лагали
+  const midEl = root.querySelectorAll('.layer[data-raster]')[2];
+  if (phone) {
+    midEl.insertAdjacentHTML('afterend', '<div id="artfix"><img alt="" decoding="async"><img alt="" decoding="async"></div>');
+    artFix = [...root.querySelectorAll('#artfix img')];
+  } else {
+    midEl.insertAdjacentHTML('afterend', `<div class="layer artbg" data-f="0.6">${ART_BG.map((b) =>
+      `<img class="${b.first ? 'first' : ''}" data-src="${b.src}" data-x="${b.x}" data-w="${b.w}" alt="" decoding="async" style="left:calc(var(--s)*${b.x}px);width:calc(var(--s)*${b.w}px)">`).join('')}</div>`);
+    artImgs = [...root.querySelectorAll('.artbg img')];
+  }
   const rEls = root.querySelectorAll('.layer[data-raster]');
-  rasterLayers = scene.layers.map((L, i) => ({ f: L.f, w: L.w, raw: L.raw, el: rEls[i], q: Q[L.f] }));
+  // на телефоне передний план (бамбук у самого края экрана) не рисуем: самый дорогой слой при прокрутке
+  rasterLayers = scene.layers.map((L, i) => ({ f: L.f, w: L.w, raw: L.raw, el: rEls[i], q: Q[L.f] })).filter((L) => !(phone && L.f === 1.4));
   // слои света идут над тонировкой, чтобы фонари светились ночью
   const lightsRoot = document.createElement('div');
   lightsRoot.id = 'lights';
   lightsRoot.innerHTML = scene.lights.map((L) => `<div class="layer lightlayer" data-f="${L.f}"></div>`).join('');
   $('#tint').after(lightsRoot);
-  lightsRoot.querySelectorAll('.lightlayer').forEach((el, i) => rasterLayers.push({ ...scene.lights[i], el, q: phone ? 0.35 : 0.5 }));
+  lightsRoot.querySelectorAll('.lightlayer').forEach((el, i) => { if (!(phone && scene.lights[i].f === 1.4)) rasterLayers.push({ ...scene.lights[i], el, q: phone ? 0.35 : 0.5 }); });
   document.body.classList.toggle('phone', phone);
   PHONE = phone;
   overlay = document.createElement('div');
@@ -121,6 +127,12 @@ function applyCam(force) {
     if (L.svg) L.svg.setAttribute('viewBox', `${(cam * L.f).toFixed(1)} 0 ${viewW.toFixed(1)} 1000`);
     else L.el.style.transform = `translate3d(${(-cam * L.f * s).toFixed(1)}px,0,0)`;
   }
+  // телефон: фон зоны медленно проезжает от левого края картинки к правому, пока идёшь по зоне (только transform)
+  if (artFix) {
+    const c = cam + viewW / 2, z = zoneAt(c), p = Math.max(0, Math.min(1, (c - z.x0) / (z.x1 - z.x0)));
+    const tx = -p * Math.max(0, innerHeight * ART_RATIO - innerWidth);
+    for (const img of artFix) img.style.transform = `translate3d(${tx.toFixed(1)}px,0,0)`;
+  }
   const mm = $('#mm-view');
   if (mm) { mm.style.left = (cam / W * 100) + '%'; mm.style.width = (viewW / W * 100) + '%'; }
   // небо, свет и зона пересчитываются не каждый кадр: на телефоне раз в ~40 единиц пути
@@ -135,10 +147,25 @@ function applyCam(force) {
   }
 }
 
+// телефон: фон зоны — неподвижная картинка; при смене зоны новая плавно проявляется поверх старой
+function showArtFix(id) {
+  if (!artFix) return;
+  const has = ART_ZONES.includes(id);
+  setArtCover(has);
+  document.body.classList.toggle('artcover', has); // анимации дальних слоёв (брызги, туман водопада) прячем под фоном
+  const next = artFix[1 - artCur], cur = artFix[artCur];
+  if (!has) { cur.classList.remove('on'); next.classList.remove('on'); return; }
+  if (cur.classList.contains('on') && cur.dataset.id === id) return;
+  next.dataset.id = id;
+  next.onload = () => { next.classList.add('on'); cur.classList.remove('on'); artCur = 1 - artCur; };
+  next.src = 'assets/zones/' + id + '.webp';
+}
+
 function updateZone(force) {
   const center = cam + viewW / 2, z = zoneAt(center);
   if (z.id !== zoneId || force) {
     zoneId = z.id;
+    showArtFix(z.id);
     const s2 = applySeason(center); // сезон «по главе» меняется при переходе между главами
     if (s2 !== season) { season = s2; lastPhaseCam = -1e9; }
     handlers.onZone?.(z);

@@ -314,3 +314,10 @@ body.phone .node.entrance .ent-img { -webkit-mask-image: none; mask-image: none;
 .artseam { display: none; position: absolute; top: 0; height: 100%; width: calc(var(--s) * 340px);
   background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--mist) 45%, transparent) 50%, transparent); }
 body.phone .artseam { display: block; }
+
+/* Телефон: неподвижный фон текущей зоны, плавная смена */
+#artfix { position: absolute; inset: 0; pointer-events: none; }
+#artfix img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; opacity: 0; transition: opacity .8s ease; }
+#artfix img.on { opacity: 1; }
+#artfix img { inset: auto; top: 0; left: 0; height: 100%; width: auto; max-width: none; object-fit: fill; will-change: transform, opacity; }
+body.phone.artcover .fxlayer[data-f="0.6"], body.phone.artcover .fxlayer[data-f="0.3"], body.phone.artcover .fxlayer[data-f="0.12"] { display: none; }

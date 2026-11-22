@@ -75,13 +75,11 @@ export function updateRaster(camX, viewW) {
 }
 
 // Следующий нужный кусок: ближайший к центру экрана
-// Телефон: слои дальше фона-картинки (f ≤ 0.6) полностью закрыты нарисованными фонами зон —
-// там, где фоны есть (главы 1–4 и туман C2), эти слои не растрируем вообще: меньше памяти и работы
-const ART_FROM = 0, ART_TO = 27700, ART_FROM2 = 33300;
+// Телефон: дальние слои (f ≤ 0.6) закрыты неподвижным фоном зоны — пока он есть, эти слои не растрируем
+let artCover = false;
+export function setArtCover(v) { if (v !== artCover) { artCover = v; updateRaster(cam, view); } }
 export function covered(L) {
-  if (!document.body.classList.contains('phone') || L.f > 0.6 || L.light) return false;
-  const c = cam + view / 2;
-  return (c > ART_FROM + view && c < ART_TO - view * 1.5) || c > ART_FROM2 + view * 1.5;
+  return artCover && L.f <= 0.6 && document.body.classList.contains('phone');
 }
 function nextTask() {
   let best = null;
