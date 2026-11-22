@@ -2,7 +2,7 @@
 import { IRREGULAR, pastRegular } from '../learn/words3.js';
 import { shuffle, esc } from './kit.js';
 import { t, L } from '../i18n.js';
-import { TARGET } from '../state.js';
+import { TARGET, state } from '../state.js';
 import { LESSONS } from '../learn/lessons.js';
 import * as CZ4 from '../learn/words4cz.js';
 import { TOPIC_GRAMMAR } from '../learn/curriculum.js';
@@ -11,7 +11,9 @@ import { CH3 } from '../learn/ch3.js';
 // Задания уровня: по виду грамматики (def.gram = 'past' | 'present|future' ...); экзамен — всё вперемешку
 export function gramPool(ctx) {
   const kinds = (ctx.def.gram || 'present|past|future|article|prep|compare').split('|');
-  return [...CH3.GRAMMAR, ...(TARGET === 'cz' ? CZ4.GRAMMAR : []), ...TOPIC_GRAMMAR].filter((g) => kinds.includes(g.kind));
+  const pool = [...CH3.GRAMMAR, ...(TARGET === 'cz' ? CZ4.GRAMMAR : []), ...TOPIC_GRAMMAR].filter((g) => kinds.includes(g.kind));
+  // чех учит чешский: перевод предложения не нужен (пустая строка вместо русского)
+  return state.lang === TARGET ? pool.map((g) => ({ ...g, cz: '' })) : pool;
 }
 
 // Неверная, но правдоподобная форма

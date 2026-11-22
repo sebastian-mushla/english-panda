@@ -52,7 +52,8 @@ export function save() {
 
 // Смена языка интерфейса и изучаемого языка: язык обучения = отдельное сохранение, поэтому перезагрузка
 export function setLanguages(native, target) {
-  if (native === target) target = 'en';
+  // свой язык учить можно только чешский (для чехов: та же программа с правилами на чешском)
+  if (native === target && target !== 'cz') target = 'en';
   state.lang = native;
   try {
     localStorage.setItem(KEY, JSON.stringify(state));

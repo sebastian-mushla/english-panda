@@ -1,4 +1,5 @@
-import { TARGET } from '../state.js';
+import { TARGET, state } from '../state.js';
+const LANG_SELF = state.lang === TARGET;
 import { RIDDLES } from './words-i18n.js';
 import { THEMES2, RAW2, SENTENCES2 } from './words2.js';
 import { IRREGULAR, REGULAR, pastRegular } from './words3.js';
@@ -273,6 +274,9 @@ if (TARGET === 'en' || TARGET === 'cz') {
     });
   }
 }
+// Чех учит чешский: перевод слова на «родной» совпал бы с самим словом и выдавал ответ — вместо него загадка (или ничего)
+if (TARGET === 'cz' && LANG_SELF) for (const w of Object.values(WORDS)) w.cz = w.riddle || '';
+
 // Понятнее картинки: эмодзи, которые сами по себе не читались (банк, школа, «большой» = слон)
 const EMOJI = {
   goodbye: '👋🚪', 'good night': '🌙😴', 'thank you': '🎁🙏', sorry: '🙇', sunny: '🌞', warm: '🌡️🙂',

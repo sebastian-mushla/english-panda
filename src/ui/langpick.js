@@ -8,7 +8,7 @@ const SELF = { ru: 'Русский', uk: 'Українська', cz: 'Čeština'
 export function langPickHTML() {
   return `<div class="langpick">
     <div class="row"><span>${t('iSpeak')}</span><div class="chips">${NATIVES.map((l) => `<button class="chip ${state.lang === l ? 'on' : ''}" data-native="${l}">${FLAG[l]} ${SELF[l]}</button>`).join('')}</div></div>
-    <div class="row"><span>${t('iLearn')}</span><div class="chips">${TARGETS.map((l) => `<button class="chip ${TARGET === l ? 'on' : ''}" data-target="${l}" ${l === state.lang ? 'disabled' : ''}>${FLAG[l]} ${LANG_NAME[l][state.lang]}</button>`).join('')}</div></div>
+    <div class="row"><span>${t('iLearn')}</span><div class="chips">${TARGETS.map((l) => `<button class="chip ${TARGET === l ? 'on' : ''}" data-target="${l}" ${l === state.lang && l !== 'cz' ? 'disabled' : ''}>${FLAG[l]} ${LANG_NAME[l][state.lang]}</button>`).join('')}</div></div>
   </div>`;
 }
 
