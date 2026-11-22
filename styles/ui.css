@@ -291,3 +291,10 @@ img.pl-bg { object-fit: cover; }
 #adm-tog.on { background: #2f9a4a; }
 /* во время игры и внутри мест админ-кнопки не перекрывают клавиатуру */
 body:has(#game:not([hidden])) #adm-btn, body:has(#game:not([hidden])) #adm-tog, body:has(#place) #adm-btn, body:has(#place) #adm-tog { display: none; }
+
+/* Словарь → Правила: пройденные уроки раскрываются по нажатию на заголовок */
+.rules-list { display: grid; gap: 10px; margin-top: 10px; }
+.rule-item { background: rgba(255,250,235,.6); border-radius: 12px; padding: 4px 12px; }
+.rule-item summary { cursor: pointer; font-weight: 900; padding: 8px 0; list-style: none; }
+.rule-item summary::before { content: '▸ '; color: var(--red); } .rule-item[open] summary::before { content: '▾ '; }
+.rule-item .lesson { box-shadow: none; margin-bottom: 10px; }

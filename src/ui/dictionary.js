@@ -8,6 +8,21 @@ import { sfx, speakWord, canSpeak } from '../audio.js';
 import { IPA, RU_STRESS } from '../learn/phonetics.js';
 import { TARGET } from '../state.js';
 import { esc, fillEx, meaning } from '../games/kit.js';
+import { LEVELS } from '../learn/curriculum.js';
+import { LESSONS } from '../learn/lessons.js';
+import { lessonHTML, verbTableHTML } from '../games/gram.js';
+
+// Пройденные правила: уроки тем и фаз, где уже есть хотя бы одна звезда (по порядку программы)
+function doneRules() {
+  const out = [];
+  const add = (k) => { if (LESSONS[TARGET]?.[k] && !out.includes(k)) out.push(k); };
+  for (const l of LEVELS) {
+    if (l.phases) l.phases.forEach((ph, i) => { if (state.phases[l.n + ':' + i]?.stars?.[0]) ph.gram.split('|').forEach(add); });
+    else if (l.gram && !l.exam && state.levels[l.n]?.stars?.[0]) l.gram.split('|').forEach(add);
+  }
+  return out;
+}
+const verbsDone = () => LEVELS.some((l) => l.ch === 3 && !l.built && state.levels[l.n]?.stars?.[0] && /irr/.test(l.theme));
 
 // Транскрипция: английский — IPA, русский — ударение, чешский — ударение на первом слоге
 function phon(w) {
@@ -21,8 +36,9 @@ export function openDict(onReview) {
   let theme = 'all', q = '';
   const m = board({
     title: t('dict'), icon: '📜', cls: 'dict',
-    tabs: [{ id: 'words', label: t('dict') }],
-    render(_, panel) {
+    tabs: [{ id: 'words', label: t('dict') }, { id: 'rules', label: '📘 ' + t('rulesTab') }],
+    render(tab, panel) {
+      if (tab === 'rules') return renderRules(panel);
       const known = Object.keys(state.words).filter((en) => WORDS[en]);
       if (!known.length) { panel.innerHTML = `<p class="empty">${t('dictEmpty')}</p>`; return; }
       const themes = [...new Set(known.map((en) => WORDS[en].theme))];
@@ -62,5 +78,18 @@ export function openDict(onReview) {
         onReview(list8);
       });
     },
+  });
+}
+
+// Вкладка «Правила»: таблицы и объяснения пройденных тем — заголовок раскрывает урок
+function renderRules(panel) {
+  const ks = doneRules();
+  if (!ks.length && !verbsDone()) { panel.innerHTML = `<p class="empty">${t('rulesEmpty')}</p>`; return; }
+  panel.innerHTML = `<input class="search" type="search" placeholder="${t('search')}">
+    <div class="rules-list">${verbsDone() ? `<details class="rule-item"><summary>📜 ${esc(t('verbTable'))}</summary>${verbTableHTML([])}</details>` : ''}
+    ${ks.map((k) => `<details class="rule-item" data-q="${esc(L(LESSONS[TARGET][k].title).toLowerCase())}"><summary>${esc(L(LESSONS[TARGET][k].title))}</summary>${lessonHTML(k)}</details>`).join('')}</div>`;
+  panel.querySelector('.search').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    panel.querySelectorAll('.rule-item[data-q]').forEach((d) => (d.hidden = q && !d.dataset.q.includes(q) && !d.textContent.toLowerCase().includes(q)));
   });
 }
