@@ -35,6 +35,15 @@ export const VARIANTS = {
   hu: { a: 'á', e: 'é', i: 'í', o: 'óöő', u: 'úüű' },
 }[TARGET] || {};
 
+// Физические клавиши национальной раскладки: подпись на экранной кнопке (ПК) и ввод с английской раскладки
+export const PHYS = {
+  cz: { 'ě': ['2', 'Digit2'], 'š': ['3', 'Digit3'], 'č': ['4', 'Digit4'], 'ř': ['5', 'Digit5'], 'ž': ['6', 'Digit6'], 'ý': ['7', 'Digit7'],
+    'á': ['8', 'Digit8'], 'í': ['9', 'Digit9'], 'é': ['0', 'Digit0'], 'ú': ['[', 'BracketLeft'], 'ů': [';', 'Semicolon'] },
+  hu: { 'ö': ['0', 'Digit0'], 'ü': ['-', 'Minus'], 'ó': ['=', 'Equal'], 'ő': ['[', 'BracketLeft'], 'ú': [']', 'BracketRight'],
+    'é': [';', 'Semicolon'], 'á': ["'", 'Quote'], 'ű': ['\\', 'Backslash'], 'í': ['`', 'Backquote'] },
+}[TARGET] || {};
+const BY_CODE = Object.fromEntries(Object.entries(PHYS).map(([ch, [, code]]) => [code, ch]));
+
 const ALPHA = {
   en: /^[a-z]$/,
   ru: /^[а-яё]$/,
@@ -57,6 +66,7 @@ export function keyLetter(e) {
   const k = (e.key || '').toLowerCase();
   if (k.length === 1 && ALPHA.test(k)) return k;
   if (TARGET === 'ru') return RU_BY_CODE[e.code] || null;
+  if (BY_CODE[e.code]) return BY_CODE[e.code]; // 2 → ě, ' → á … при английской раскладке
   const m = /^Key([A-Z])$/.exec(e.code || '');
   return m ? m[1].toLowerCase() : null;
 }

@@ -3,7 +3,7 @@
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-const PAIRS = [['en', 'ru'], ['en', 'uk'], ['en', 'cz'], ['cz', 'ru'], ['cz', 'uk'], ['cz', 'cz'], ['ru', 'uk'], ['ru', 'cz'], ['hu', 'ru']];
+const PAIRS = [['en', 'ru'], ['en', 'uk'], ['en', 'cz'], ['cz', 'ru'], ['cz', 'uk'], ['cz', 'cz'], ['ru', 'uk'], ['ru', 'cz'], ['hu', 'ru'], ['hu', 'uk'], ['hu', 'cz']];
 const self = fileURLToPath(import.meta.url);
 
 if (process.env.PAIR) {

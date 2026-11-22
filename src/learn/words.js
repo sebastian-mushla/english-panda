@@ -8,6 +8,7 @@ import * as CZ4 from './words4cz.js';
 import { HU, HU_SENT } from './hu.js';
 import { UK } from './uk.js';
 import { EXT_THEMES, EXT_RAW } from './words_ext.js';
+import { HU_EXT } from './hu_ext.js';
 
 // Банк слов A1. Формат строки: [en, emoji, ru, cz, загадка на простом английском, пример с пропуском ___].
 export const THEMES = {
@@ -201,7 +202,7 @@ for (const [theme, rows] of Object.entries(RAW2)) {
 }
 // Глава 3 «Осень · B1» — грамматика английского, есть только при изучении английского.
 // Глаголы становятся словами главы: t — первая форма, v2/v3 — прошедшее время и причастие. Id с префиксом «v:», чтобы не совпасть с A2.
-export const CH3_OPEN = TARGET === 'en' || TARGET === 'cz';
+export const CH3_OPEN = TARGET === 'en' || TARGET === 'cz' || TARGET === 'hu';
 if (TARGET === 'en') {
   const add = (theme, name, list) => {
     THEMES[theme] = name;
@@ -236,9 +237,9 @@ if (TARGET === 'cz') {
 }
 // Глава 4 «Зима · B2»: у английского — темы грамматики B2; у чешского ещё и слова:
 // глаголы-пары видов, существительные с падежами, трудные буквы, se / si, официальная речь
-export const CH4_OPEN = TARGET === 'cz' || TARGET === 'en';
+export const CH4_OPEN = TARGET === 'cz' || TARGET === 'en' || TARGET === 'hu';
 // Глава 5 «C1» — английский и чешский
-export const CH5_OPEN = TARGET === 'cz' || TARGET === 'en';
+export const CH5_OPEN = TARGET === 'cz' || TARGET === 'en' || TARGET === 'hu';
 if (TARGET === 'cz') {
   const add = (theme, name, list) => {
     THEMES[theme] = name;
@@ -261,14 +262,14 @@ if (TARGET === 'cz') {
     CZ4.OFFICE.map(([t, ru, uk, emoji]) => ({ en: 'o:' + t, t, ru, uk, emoji, ex: 'To je ___.' })));
 }
 // Дополнительный словарь A1–B2 (только английский и чешский). Если id уже занят старым словом — приставка «x:»
-if (TARGET === 'en' || TARGET === 'cz') {
+if (TARGET === 'en' || TARGET === 'cz' || TARGET === 'hu') {
   for (const [theme, { ch, name }] of Object.entries(EXT_THEMES)) {
     THEMES[theme] = name;
     CHAPTER[theme] = ch;
     BY_THEME[theme] = EXT_RAW[theme].map(([en, emoji, ru, uk, cz, exEn, exCz]) => {
       const id = WORDS[en] ? 'x:' + en : en;
       const w = { en: id, emoji, ru, uk, cz, theme, cefr: ['A1', 'A2', 'B1', 'B2', 'C1'][ch - 1], riddle: null,
-        t: TARGET === 'cz' ? cz : en, ex: TARGET === 'cz' ? exCz : exEn };
+        t: TARGET === 'cz' ? cz : TARGET === 'hu' ? HU_EXT[en][0] : en, ex: TARGET === 'cz' ? exCz : TARGET === 'hu' ? HU_EXT[en][1] : exEn };
       BY_TARGET[w.t.toLowerCase()] ||= w;
       return (WORDS[id] = w);
     });

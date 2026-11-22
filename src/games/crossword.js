@@ -4,7 +4,7 @@ import { t } from '../i18n.js';
 import { shuffle, meaning, esc, wait, flash } from './kit.js';
 import { wordHint } from '../learn/hints.js';
 import { norm } from '../learn/lang.js';
-import { keyboard } from './keyboard.js';
+import { keyboard, needLetters } from './keyboard.js';
 
 // Жадная раскладка: каждое следующее слово пересекает уже стоящие по общей букве
 function layout(words) {
@@ -84,6 +84,7 @@ export default function crossword(el, ctx) {
   function select(p) {
     if (!p || p.solved) return;
     cur = p;
+    needLetters(p.w.t);
     el.querySelectorAll('.xw-cell').forEach((c) => c.classList.remove('on'));
     el.querySelectorAll('.xw-clue').forEach((c) => c.classList.toggle('on', +c.dataset.n === p.n));
     for (let i = 0; i < p.len; i++) cell(...cellOf(p, i)).classList.add('on');

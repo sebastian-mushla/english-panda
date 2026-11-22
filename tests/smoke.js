@@ -3,7 +3,7 @@
 // или ?smoke=all — все пары подряд. Итог: на экране и в window.__SMOKE.
 import { state, TARGET, setLanguages } from '../src/state.js';
 
-const ALL = ['en-ru', 'en-uk', 'en-cz', 'cz-ru', 'cz-uk', 'cz-cz', 'ru-uk', 'hu-ru'];
+const ALL = ['en-ru', 'en-uk', 'en-cz', 'cz-ru', 'cz-uk', 'cz-cz', 'ru-uk', 'hu-ru', 'hu-cz'];
 // ?smoke=cz-uk,hu-ru — несколько пар через запятую
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -13,6 +13,8 @@ export async function runSmoke(arg) {
   // режим админа нужен, чтобы пройти все уровни, а не только открытые в сохранении
   if (localStorage.getItem('ep.admin.open') !== '1') { localStorage.setItem('ep.admin.open', '1'); sessionStorage.setItem('ep.smokeq', JSON.stringify(queue)); return location.reload(); }
   if (TARGET !== T || state.lang !== N) { sessionStorage.setItem('ep.smokeq', JSON.stringify(queue)); return setLanguages(N, T); }
+  // тест без звука: иначе щелчки и музыка слышны у того, кто рядом
+  (await import('../src/audio.js')).setSound(false);
   const box = document.createElement('pre');
   box.id = 'smoke';
   box.style.cssText = 'position:fixed;z-index:99999;left:8px;bottom:8px;max-width:90vw;max-height:40vh;overflow:auto;background:#111c;color:#cfc;font:12px monospace;padding:8px;border-radius:8px';

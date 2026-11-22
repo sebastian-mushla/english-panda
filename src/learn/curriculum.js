@@ -14,9 +14,11 @@ import { GRAMMAR as CZ_AB } from './cz_ab.js';
 import { GRAMMAR as CZ_B } from './cz_b.js';
 import { GRAMMAR as EN_C1 } from './en_c1.js';
 import { GRAMMAR as CZ_C1 } from './cz_c1.js';
+import { GRAMMAR as HU_AB } from './hu_ab.js';
+import { GRAMMAR as HU_B } from './hu_b.js';
 
 // Задания тем грамматики изучаемого языка (для английского A1–B2, для чешского A1–B2)
-export const TOPIC_GRAMMAR = TARGET === 'en' ? [...EN_A1, ...EN_A2, ...EN_B1, ...EN_B2, ...EN_C1] : TARGET === 'cz' ? [...CZ_AB, ...CZ_B, ...CZ_C1] : [];
+export const TOPIC_GRAMMAR = TARGET === 'en' ? [...EN_A1, ...EN_A2, ...EN_B1, ...EN_B2, ...EN_C1] : TARGET === 'cz' ? [...CZ_AB, ...CZ_B, ...CZ_C1] : TARGET === 'hu' ? [...HU_AB, ...HU_B] : [];
 
 // Старые уровни-образцы: словарные темы берут отсюда игры и духа
 const LEGACY = [
@@ -102,6 +104,21 @@ const PROGRAM = {
 PROGRAM.en[5] = [P_('c1inv', 'library', [['inversion'], ['cleft']], 'g_inv'), T_('subj', ['subj'], 'g_subj'),
   P_('c1modal', 'mountain', [['modalPast'], ['rather']], 'g_mpast'), T_('partCl', ['partCl'], 'g_part'), T_('linkersC1', ['linkersC1'], 'g_linkC1'),
   { exam: ['inversion', 'cleft', 'subj', 'modalPast', 'rather', 'partCl', 'linkersC1'], mob: 'g_c1exam' }];
+// Венгерский: главы 1–2 — старые словарные уровни + грамматика; главы 3–5 — только новые темы (старых данных B1+ у венгерского нет)
+const EX = (kinds, mob) => ({ exam: kinds, mob });
+PROGRAM.hu = {
+  1: [{ L: 1 }, P_('hu_van', 'house', [['hu_van'], ['hu_art']], 'g_hu_van'), { L: 2 }, T_('hu_plur', ['hu_plur'], 'g_hu_plur'), { L: 3 }, T_('hu_konj', ['hu_konj'], 'g_hu_konj'),
+    { L: 4 }, T_('hu_acc', ['hu_acc'], 'g_hu_acc'), { L: 5 }, T_('hu_neg', ['hu_neg'], 'g_hu_neg'), { L: 6 }, T_('hu_poss', ['hu_poss'], 'g_hu_poss'),
+    { L: 7 }, T_('hu_nekem', ['hu_nekem'], 'g_hu_poss'), { L: 8 }, { L: 9 }, { L: 10 }],
+  2: [{ L: 11 }, P_('hu_case', 'cave', [['hu_inner'], ['hu_surf'], ['hu_near']], 'g_hu_case'), { L: 12 }, { L: 13 }, P_('hu_time', 'mountain', [['hu_past'], ['hu_fut']], 'g_hu_time'),
+    { L: 14 }, { L: 15 }, { L: 16 }, { L: 17 }, { L: 18 }, { L: 19 }, { L: 20 }],
+  3: [P_('hu_def', 'temple', [['hu_def'], ['hu_pref']], 'g_hu_def'), P_('hu_mod', 'library', [['hu_hat'], ['hu_cond']], 'g_hu_mod'),
+    T_('hu_imp', ['hu_imp'], 'g_hu_mod'), T_('hu_kell', ['hu_kell'], 'g_hu_mod'), EX(['hu_def', 'hu_pref', 'hu_hat', 'hu_cond', 'hu_imp', 'hu_kell'], 'qilin')],
+  4: [T_('hu_dat', ['hu_dat'], 'g_hu_dat'), T_('hu_instr', ['hu_instr'], 'g_hu_dat'), T_('hu_part', ['hu_part'], 'g_hu_part'), T_('hu_cmp', ['hu_cmp'], 'g_hu_cmp'),
+    EX(['hu_dat', 'hu_instr', 'hu_part', 'hu_cmp'], 'icedragon')],
+  5: [P_('hu_c1', 'house', [['hu_caus'], ['hu_va']], 'g_hu_c1'), T_('hu_focus', ['hu_focus'], 'g_hu_style'), T_('hu_conj2', ['hu_conj2'], 'g_hu_style'),
+    T_('hu_pass', ['hu_pass'], 'g_hu_style'), EX(['hu_caus', 'hu_va', 'hu_focus', 'hu_conj2', 'hu_pass'], 'g_c1exam')],
+};
 PROGRAM.cz[5] = [P_('cz_kniz', 'library', [['cz_jenz'], ['cz_prech']], 'g_cz_jenz'), T_('cz_pric', ['cz_pric'], 'g_cz_prech'),
   T_('cz_iter', ['cz_iter'], 'g_cz_iter'), T_('cz_oba', ['cz_oba'], 'g_cz_oba'), T_('cz_spoj2', ['cz_spoj2'], 'g_cz_spoj2'),
   { exam: ['cz_jenz', 'cz_prech', 'cz_pric', 'cz_iter', 'cz_oba', 'cz_spoj2'], mob: 'g_c1exam' }];
@@ -122,7 +139,7 @@ function withWords(list, themes) {
 }
 const EXT_BY_CH = { 1: ['school', 'days', 'rooms', 'fruit'], 2: ['shopping', 'health', 'sport', 'kitchen', 'feelings', 'transport'],
   3: ['work', 'environment', 'media', 'money', 'people', 'study'], 4: ['society', 'science', 'law', 'business', 'arts', 'ideas'], 5: ['mind', 'speech', 'academic', 'world'] };
-for (const tg of ['en', 'cz']) for (const ch of [1, 2, 3, 4, 5]) {
+for (const tg of ['en', 'cz', 'hu']) for (const ch of [1, 2, 3, 4, 5]) {
   if (PROGRAM[tg][ch]) PROGRAM[tg][ch] = withWords(PROGRAM[tg][ch], EXT_BY_CH[ch]);
   else PROGRAM[tg][ch] = withWords([...LEGACY.filter((l) => l.ch === ch).map((l) => ({ L: l.n }))], EXT_BY_CH[ch]);
 }
@@ -157,6 +174,13 @@ export const LEVELS = buildLevels();
 
 // Номера уровней сдвигались (программа до B2, затем новые словарные темы), поэтому прогресс уровней
 // у английского и чешского сбрасываем один раз; пойманные духи, слова и монеты остаются
+// венгерский получил полную программу: его уровни тоже сдвинулись (один раз)
+if ((state.prog || 0) < 6 && TARGET === 'hu') {
+  state.levels = {};
+  state.phases = {};
+  state.prog = 6;
+  save();
+}
 if ((state.prog || 0) < 5 && (TARGET === 'en' || TARGET === 'cz')) {
   state.levels = {};
   state.phases = {};

@@ -305,8 +305,10 @@ import { MOBS as M_CZ } from './cz_ab.js';
 import { MOBS as M_CZB } from './cz_b.js';
 import { MOBS as M_C1 } from './en_c1.js';
 import { MOBS as M_CZC1 } from './cz_c1.js';
+import { MOBS as M_HUA } from './hu_ab.js';
+import { MOBS as M_HUB } from './hu_b.js';
 import { EXT_THEMES, EXT_RAW } from './words_ext.js';
-for (const [id, e, c, ru, uk, cz] of [...M_A2, ...M_B1, ...M_B2, ...M_CZ, ...M_CZB, ...M_C1, ...M_CZC1, ['g_c1exam', '🐲', '#2f8a6a', 'Нефритовый дракон', 'Нефритовий дракон', 'Nefritový drak']]) {
+for (const [id, e, c, ru, uk, cz] of [...M_A2, ...M_B1, ...M_B2, ...M_CZ, ...M_CZB, ...M_C1, ...M_CZC1, ...M_HUA, ...M_HUB, ['g_c1exam', '🐲', '#2f8a6a', 'Нефритовый дракон', 'Нефритовий дракон', 'Nefritový drak']]) {
   MOBS[id] = em(e, c, ru, uk, cz || ru, 'Хранитель темы. Отпустит, только если ты знаешь правило.', 'Хранитель теми. Відпустить, лише якщо ти знаєш правило.', 'Strážce tématu. Pustí tě, jen když znáš pravidlo.');
 }
 

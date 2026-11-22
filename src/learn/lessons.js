@@ -7,6 +7,8 @@ import { LESSONS as CZ_B } from './cz_b.js';
 import { LESSONS as EN_C1 } from './en_c1.js';
 import { LESSONS as CZ_C1 } from './cz_c1.js';
 import { CZ_NATIVE } from './cz_native.js';
+import { LESSONS as HU_AB } from './hu_ab.js';
+import { LESSONS as HU_B } from './hu_b.js';
 
 // Мини-уроки грамматики главы 3: показываются перед играми на формы слова и по кнопке «📘 Правило».
 // Для каждого изучаемого языка (en / cz) и вида грамматики: заголовок, пункты объяснения (ru / uk) и таблица примеров.
@@ -326,6 +328,7 @@ export const LESSONS = {
 // уроки английского A1 по темам
 Object.assign(LESSONS.en, EN_A1, EN_A2, EN_B1, EN_B2, EN_C1);
 Object.assign(LESSONS.cz, CZ_AB, CZ_B, CZ_C1);
+LESSONS.hu = { ...HU_AB, ...HU_B };
 // для чехов, которые учат чешский: название и výklad česky; в таблице примеров — только чешская колонка
 for (const [k, [title, pts]] of Object.entries(CZ_NATIVE)) {
   const ls = LESSONS.cz[k];

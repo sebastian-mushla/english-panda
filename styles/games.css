@@ -615,3 +615,10 @@
 .spell .slot { width: clamp(36px, min(10vw, 7dvh), 70px); height: clamp(40px, 7.5dvh, 76px); font-size: clamp(1.2rem, 4dvh, 2.2rem); }
 .fg-task { font-size: clamp(1rem, 2.6dvh, 1.6rem); }
 .fg-task p { font-size: clamp(1.1rem, 3dvh, 1.9rem); }
+
+/* Ряд нужных букв с диакритикой над клавиатурой: крупно, на ПК в углу — клавиша раскладки */
+.kacc { display: flex; justify-content: center; gap: clamp(6px, 1.4vw, 12px); }
+.kacc .key { position: relative; flex: none; width: clamp(48px, 13vw, 76px); max-width: none; height: clamp(40px, 6.6dvh, 64px);
+  font-size: clamp(1.2rem, 3.4dvh, 1.8rem); background: linear-gradient(180deg, #fff6d8, #f2d98f); border-color: var(--gold, #d9a43a); }
+.kacc .key sup { display: none; position: absolute; top: 3px; left: 6px; font-size: .62rem; font-weight: 800; color: #8a6a3a; line-height: 1; }
+body:not(.phone) .kacc .key sup { display: block; }

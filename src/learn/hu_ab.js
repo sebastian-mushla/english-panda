@@ -1,0 +1,270 @@
+// Венгерский A1–A2: грамматика по темам. Формат — как в en_a1.js, виды с приставкой hu_.
+const G = (kind, rows) => rows.map(([s, base, a, w, ru, uk, cz]) => ({ kind, s, base, a, w, ru, uk, cz }));
+const T = (ru, uk, cz) => ({ ru, uk, cz });
+
+export const GRAMMAR = [
+  // ── A1 ──
+  ...G('hu_van', [
+    ['Én tanár ___.', 'van', 'vagyok', ['vagy', 'vannak'], 'Я учитель.', 'Я вчитель.', 'Jsem učitel.'],
+    ['Te diák ___.', 'van', 'vagy', ['vagyok', 'vagyunk'], 'Ты студент.', 'Ти студент.', 'Jsi student.'],
+    ['Hol ___ a könyv?', 'van', 'van', ['vagy', 'vannak'], 'Где книга?', 'Де книжка?', 'Kde je kniha?'],
+    ['Mi otthon ___.', 'van', 'vagyunk', ['vagytok', 'vannak'], 'Мы дома.', 'Ми вдома.', 'Jsme doma.'],
+    ['Ti fáradtak ___?', 'van', 'vagytok', ['vagyunk', 'vagy'], 'Вы устали?', 'Ви втомилися?', 'Jste unavení?'],
+    ['A gyerekek a parkban ___.', 'van', 'vannak', ['van', 'vagyunk'], 'Дети в парке.', 'Діти в парку.', 'Děti jsou v parku.'],
+    ['Péter ___.', 'orvos (van?)', 'orvos', ['van orvos', 'orvos van'], 'Петер врач (без van!).', 'Петер лікар (без van!).', 'Petr je lékař (bez van!).'],
+    ['Ő Budapesten ___.', 'van', 'van', ['vagyok', 'vannak'], 'Он в Будапеште.', 'Він у Будапешті.', 'Je v Budapešti.'],
+  ]),
+  ...G('hu_art', [
+    ['___ ház nagy.', 'a / az', 'A', ['Az', 'Egy'], 'Дом большой.', 'Будинок великий.', 'Ten dům je velký.'],
+    ['___ alma piros.', 'a / az', 'Az', ['A', 'Egy'], 'Яблоко красное.', 'Яблуко червоне.', 'To jablko je červené.'],
+    ['Ez ___ könyv.', 'egy', 'egy', ['az', 'a'], 'Это (одна) книга.', 'Це (одна) книжка.', 'To je (nějaká) kniha.'],
+    ['___ iskola messze van.', 'a / az', 'Az', ['A', 'Egy'], 'Школа далеко.', 'Школа далеко.', 'Škola je daleko.'],
+    ['___ macska alszik.', 'a / az', 'A', ['Az', 'Egy'], 'Кошка спит.', 'Кішка спить.', 'Kočka spí.'],
+    ['___ óra drága.', 'a / az', 'Az', ['A', 'Egy'], 'Часы дорогие.', 'Годинник дорогий.', 'Hodinky jsou drahé.'],
+    ['Van ___ kutyám.', 'egy', 'egy', ['a', 'az'], 'У меня есть собака.', 'У мене є собака.', 'Mám psa.'],
+    ['___ ember kedves.', 'a / az', 'Az', ['A', 'Egy'], 'Человек добрый.', 'Людина добра.', 'Ten člověk je milý.'],
+  ]),
+  ...G('hu_plur', [
+    ['Két ___ van itt.', 'ház (mn.)', 'ház', ['házak', 'házok'], 'Здесь два дома (после числа — ед. ч.!).', 'Тут два будинки (після числа — одн.!).', 'Jsou tu dva domy (po číslovce j. č.!).'],
+    ['A ___ nagyok.', 'ház', 'házak', ['házok', 'házek'], 'Дома большие.', 'Будинки великі.', 'Domy jsou velké.'],
+    ['A ___ érdekesek.', 'könyv', 'könyvek', ['könyvok', 'könyvak'], 'Книги интересные.', 'Книжки цікаві.', 'Knihy jsou zajímavé.'],
+    ['Az ___ újak.', 'asztal', 'asztalok', ['asztalak', 'asztalek'], 'Столы новые.', 'Столи нові.', 'Stoly jsou nové.'],
+    ['A ___ szépek.', 'virág', 'virágok', ['virágek', 'virágak'], 'Цветы красивые.', 'Квіти гарні.', 'Květiny jsou krásné.'],
+    ['A ___ édesek.', 'alma', 'almák', ['almak', 'almaok'], 'Яблоки сладкие.', 'Яблука солодкі.', 'Jablka jsou sladká.'],
+    ['A ___ kicsik.', 'gyerek', 'gyerekek', ['gyerekok', 'gyerekak'], 'Дети маленькие.', 'Діти маленькі.', 'Děti jsou malé.'],
+    ['A ___ okosak.', 'diák', 'diákok', ['diákek', 'diákak'], 'Студенты умные.', 'Студенти розумні.', 'Studenti jsou chytří.'],
+  ]),
+  ...G('hu_konj', [
+    ['Én magyarul ___.', 'beszél', 'beszélek', ['beszélsz', 'beszél'], 'Я говорю по-венгерски.', 'Я говорю угорською.', 'Mluvím maďarsky.'],
+    ['Te mit ___?', 'olvas', 'olvasol', ['olvasok', 'olvas'], 'Что ты читаешь?', 'Що ти читаєш?', 'Co čteš?'],
+    ['Anna a konyhában ___.', 'főz', 'főz', ['főzök', 'főznek'], 'Анна готовит на кухне.', 'Анна готує на кухні.', 'Anna vaří v kuchyni.'],
+    ['Mi Budapesten ___.', 'lakik', 'lakunk', ['laktok', 'laknak'], 'Мы живём в Будапеште.', 'Ми живемо в Будапешті.', 'Bydlíme v Budapešti.'],
+    ['Ti angolul ___?', 'tanul', 'tanultok', ['tanulunk', 'tanulnak'], 'Вы учите английский?', 'Ви вчите англійську?', 'Učíte se anglicky?'],
+    ['Ők a parkban ___.', 'játszik', 'játszanak', ['játszik', 'játszunk'], 'Они играют в парке.', 'Вони граються в парку.', 'Hrají si v parku.'],
+    ['Én sokat ___.', 'dolgozik', 'dolgozom', ['dolgozol', 'dolgozik'], 'Я много работаю.', 'Я багато працюю.', 'Hodně pracuju.'],
+    ['Te hol ___?', 'él', 'élsz', ['élek', 'él'], 'Где ты живёшь?', 'Де ти живеш?', 'Kde žiješ?'],
+  ]),
+  ...G('hu_acc', [
+    ['Kérek egy ___.', 'kávé', 'kávét', ['kávé', 'kávéot'], 'Мне кофе, пожалуйста.', 'Мені каву, будь ласка.', 'Prosím kávu.'],
+    ['Olvasok egy ___.', 'könyv', 'könyvet', ['könyv', 'könyvot'], 'Я читаю книгу.', 'Я читаю книжку.', 'Čtu knihu.'],
+    ['Látom a ___.', 'ház', 'házat', ['ház', 'házt'], 'Я вижу дом.', 'Я бачу будинок.', 'Vidím dům.'],
+    ['Eszem egy ___.', 'alma', 'almát', ['alma', 'almat'], 'Я ем яблоко.', 'Я їм яблуко.', 'Jím jablko.'],
+    ['Kérsz ___?', 'víz', 'vizet', ['víz', 'vízt'], 'Хочешь воды?', 'Хочеш води?', 'Chceš vodu?'],
+    ['Veszek ___.', 'kenyér', 'kenyeret', ['kenyér', 'kenyért'], 'Я покупаю хлеб.', 'Я купую хліб.', 'Kupuju chleba.'],
+    ['Ismered ___?', 'Péter', 'Pétert', ['Péter', 'Péteret'], 'Ты знаешь Петера?', 'Ти знаєш Петера?', 'Znáš Petra?'],
+    ['Iszom egy ___.', 'tea', 'teát', ['tea', 'teat'], 'Я пью чай.', 'Я п\'ю чай.', 'Piju čaj.'],
+  ]),
+  ...G('hu_neg', [
+    ['Én ___ értem.', 'nem', 'nem', ['nincs', 'ne'], 'Я не понимаю.', 'Я не розумію.', 'Nerozumím.'],
+    ['Péter ___ otthon.', 'nincs', 'nincs', ['nem', 'nem van'], 'Петера нет дома.', 'Петра немає вдома.', 'Petr není doma.'],
+    ['Ő ___ orvos.', 'nem', 'nem', ['nincs', 'ne'], 'Он не врач.', 'Він не лікар.', 'Není lékař.'],
+    ['A gyerekek ___ itt.', 'nincs', 'nincsenek', ['nincs', 'nem'], 'Детей здесь нет.', 'Дітей тут немає.', 'Děti tu nejsou.'],
+    ['___ kenyér.', 'nincs', 'Nincs', ['Nem', 'Nem van'], 'Хлеба нет.', 'Хліба немає.', 'Není chleba.'],
+    ['Én ___ szeretem a tejet.', 'nem', 'nem', ['nincs', 'se'], 'Я не люблю молоко.', 'Я не люблю молоко.', 'Nemám rád mléko.'],
+    ['Ma ___ hideg.', 'nem', 'nincs', ['nem', 'nem van'], 'Сегодня не холодно.', 'Сьогодні не холодно.', 'Dnes není zima.'],
+    ['Én ___ fáradt vagyok.', 'nem', 'nem', ['nincs', 'ne'], 'Я не устал.', 'Я не втомився.', 'Nejsem unavený.'],
+  ]),
+  ...G('hu_poss', [
+    ['Ez a ___. (én, ház)', 'ház', 'házam', ['házad', 'háza'], 'Это мой дом.', 'Це мій будинок.', 'To je můj dům.'],
+    ['Hol a ___? (te, táska)', 'táska', 'táskád', ['táskám', 'táskája'], 'Где твоя сумка?', 'Де твоя сумка?', 'Kde je tvoje taška?'],
+    ['Ez Anna ___. (könyv)', 'könyv', 'könyve', ['könyvem', 'könyved'], 'Это книга Анны.', 'Це книжка Анни.', 'To je Annina kniha.'],
+    ['A ___ kedves. (én, anya)', 'anya', 'anyám', ['anyád', 'anyja'], 'Моя мама добрая.', 'Моя мама добра.', 'Moje máma je milá.'],
+    ['Új a ___? (te, autó)', 'autó', 'autód', ['autóm', 'autója'], 'Твоя машина новая?', 'Твоя машина нова?', 'Je tvoje auto nové?'],
+    ['Péter ___ fekete. (kutya)', 'kutya', 'kutyája', ['kutyám', 'kutyád'], 'Собака Петера чёрная.', 'Собака Петра чорний.', 'Petrův pes je černý.'],
+    ['A ___ itt van. (mi, tanár)', 'tanár', 'tanárunk', ['tanárom', 'tanáruk'], 'Наш учитель здесь.', 'Наш учитель тут.', 'Náš učitel je tady.'],
+    ['Szép a ___. (én, szoba)', 'szoba', 'szobám', ['szobád', 'szobája'], 'Моя комната красивая.', 'Моя кімната гарна.', 'Můj pokoj je hezký.'],
+  ]),
+  ...G('hu_nekem', [
+    ['___ van egy kutyám.', 'én', 'Nekem', ['Neked', 'Neki'], 'У меня есть собака.', 'У мене є собака.', 'Mám psa.'],
+    ['___ van autód?', 'te', 'Neked', ['Nekem', 'Neki'], 'У тебя есть машина?', 'У тебе є машина?', 'Máš auto?'],
+    ['Annának ___ testvére.', 'van', 'van', ['vannak', 'nincsen van'], 'У Анны есть брат/сестра.', 'В Анни є брат/сестра.', 'Anna má sourozence.'],
+    ['Nekem ___ időm.', 'nincs', 'nincs', ['nem', 'nem van'], 'У меня нет времени.', 'У мене немає часу.', 'Nemám čas.'],
+    ['___ van pénze.', 'ő', 'Neki', ['Nekem', 'Neked'], 'У него есть деньги.', 'У нього є гроші.', 'Má peníze.'],
+    ['Van ___? (te, toll)', 'toll', 'tollad', ['tollam', 'tolla'], 'У тебя есть ручка?', 'У тебе є ручка?', 'Máš pero?'],
+    ['Nekem van egy ___. (macska)', 'macska', 'macskám', ['macskád', 'macska'], 'У меня есть кошка.', 'У мене є кішка.', 'Mám kočku.'],
+    ['___ van két gyerekünk.', 'mi', 'Nekünk', ['Nektek', 'Nekik'], 'У нас двое детей.', 'У нас двоє дітей.', 'Máme dvě děti.'],
+  ]),
+  // ── A2 ──
+  ...G('hu_inner', [
+    ['A szobá___ vagyok.', '-ban / -ben', 'ban', ['ben', 'ba'], 'Я в комнате.', 'Я в кімнаті.', 'Jsem v pokoji.'],
+    ['Az iskolá___ megyek.', '-ba / -be', 'ba', ['be', 'ban'], 'Я иду в школу.', 'Я йду до школи.', 'Jdu do školy.'],
+    ['A kert___ jövök.', '-ból / -ből', 'ből', ['ból', 'ben'], 'Я иду из сада.', 'Я йду з саду.', 'Jdu ze zahrady.'],
+    ['Budapest___ lakom.', '-en / -ben', 'en', ['ben', 'ba'], 'Я живу в Будапеште (Budapesten!).', 'Я живу в Будапешті (Budapesten!).', 'Bydlím v Budapešti (Budapesten!).'],
+    ['Bécs___ utazom.', '-ba / -be', 'be', ['ba', 'ben'], 'Я еду в Вену.', 'Я їду до Відня.', 'Jedu do Vídně.'],
+    ['A házból kijön. — Honnan? A ház___.', '-ból / -ből', 'ból', ['ből', 'ban'], 'Из дома.', 'З дому.', 'Z domu.'],
+    ['A könyv a táská___ van.', '-ban / -ben', 'ban', ['ben', 'ba'], 'Книга в сумке.', 'Книжка в сумці.', 'Kniha je v tašce.'],
+    ['A virág a kert___ van.', '-ban / -ben', 'ben', ['ban', 'be'], 'В саду.', 'У саду.', 'Na zahradě.'],
+  ]),
+  ...G('hu_surf', [
+    ['A könyv az asztal___ van.', '-on / -en / -ön', 'on', ['en', 'ön'], 'Книга на столе.', 'Книжка на столі.', 'Kniha je na stole.'],
+    ['Teszem az asztal___.', '-ra / -re', 'ra', ['re', 'on'], 'Кладу на стол.', 'Кладу на стіл.', 'Dávám to na stůl.'],
+    ['Leveszem a polc___.', '-ról / -ről', 'ról', ['ről', 'ra'], 'Снимаю с полки.', 'Знімаю з полиці.', 'Beru to z police.'],
+    ['A képet a fal___ nézem.', '-on / -en / -ön', 'on', ['en', 'ön'], 'Смотрю на картину на стене.', 'Дивлюся на картину на стіні.', 'Dívám se na obraz na zdi.'],
+    ['Szegeden lakunk. — Hol? Szeged___.', '-en', 'en', ['on', 'ön'], 'В Сегеде.', 'У Сегеді.', 'V Szegedu.'],
+    ['A földre esett. — Hová? A föld___.', '-re', 're', ['ra', 'ön'], 'Упало на землю.', 'Упало на землю.', 'Spadlo na zem.'],
+    ['A széken ülsz. — Hol? A szék___.', '-en', 'en', ['on', 're'], 'На стуле.', 'На стільці.', 'Na židli.'],
+    ['Mit tudsz Magyarország___?', '-ról / -ről', 'ról', ['ről', 'on'], 'Что ты знаешь о Венгрии?', 'Що ти знаєш про Угорщину?', 'Co víš o Maďarsku?'],
+  ]),
+  ...G('hu_near', [
+    ['Az orvos___ voltam.', '-nál / -nél', 'nál', ['nél', 'hoz'], 'Я был у врача.', 'Я був у лікаря.', 'Byl jsem u lékaře.'],
+    ['Megyek a barátom___.', '-hoz / -hez / -höz', 'hoz', ['hez', 'höz'], 'Я иду к другу.', 'Я йду до друга.', 'Jdu ke kamarádovi.'],
+    ['Péter___ jövök.', '-tól / -től', 'től', ['tól', 'hez'], 'Я иду от Петера.', 'Я йду від Петра.', 'Jdu od Petra.'],
+    ['A szomszéd___ megyek.', '-hoz / -hez / -höz', 'hoz', ['hez', 'höz'], 'Иду к соседу.', 'Іду до сусіда.', 'Jdu k sousedovi.'],
+    ['A fodrász___ vagyok.', '-nál / -nél', 'nál', ['nél', 'tól'], 'Я у парикмахера.', 'Я в перукаря.', 'Jsem u kadeřníka.'],
+    ['Kaptam egy levelet anyá___.', '-tól / -től', 'tól', ['től', 'hoz'], 'Я получил письмо от мамы.', 'Я отримав листа від мами.', 'Dostal jsem dopis od mámy.'],
+    ['Megyek a fül___.', '-hoz / -hez / -höz', 'höz', ['hoz', 'hez'], 'Подношу к уху.', 'Підношу до вуха.', 'K uchu.'],
+    ['A tanár___ tanulok.', '-tól / -től', 'tól', ['től', 'nál'], 'Учусь у учителя.', 'Вчуся в учителя.', 'Učím se od učitele.'],
+  ]),
+  ...G('hu_past', [
+    ['Tegnap moziban ___.', 'voltam', 'voltam', ['vagyok', 'leszek'], 'Вчера я был в кино.', 'Учора я був у кіно.', 'Včera jsem byl v kině.'],
+    ['Mit ___ tegnap? (te, csinál)', 'csinál', 'csináltál', ['csináltam', 'csinált'], 'Что ты делал вчера?', 'Що ти робив учора?', 'Co jsi dělal včera?'],
+    ['Anna levelet ___. (ír)', 'ír', 'írt', ['írtam', 'írtál'], 'Анна написала письмо.', 'Анна написала листа.', 'Anna napsala dopis.'],
+    ['Mi pizzát ___. (eszik)', 'eszik', 'ettünk', ['ettem', 'ettek'], 'Мы ели пиццу.', 'Ми їли піцу.', 'Jedli jsme pizzu.'],
+    ['Ők későn ___. (jön)', 'jön', 'jöttek', ['jött', 'jöttünk'], 'Они пришли поздно.', 'Вони прийшли пізно.', 'Přišli pozdě.'],
+    ['Én sokat ___. (tanul)', 'tanul', 'tanultam', ['tanultál', 'tanult'], 'Я много учился.', 'Я багато вчився.', 'Hodně jsem se učil.'],
+    ['Péter otthon ___. (van)', 'van', 'volt', ['voltam', 'volt van'], 'Петер был дома.', 'Петер був удома.', 'Petr byl doma.'],
+    ['Hová ___? (ti, megy)', 'megy', 'mentetek', ['mentünk', 'mentek'], 'Куда вы пошли?', 'Куди ви пішли?', 'Kam jste šli?'],
+  ]),
+  ...G('hu_fut', [
+    ['Holnap moziba ___ menni.', 'fog', 'fogok', ['fogsz', 'fog'], 'Завтра я пойду в кино.', 'Завтра я піду в кіно.', 'Zítra půjdu do kina.'],
+    ['Mit ___ csinálni? (te)', 'fog', 'fogsz', ['fogok', 'fogunk'], 'Что ты будешь делать?', 'Що ти робитимеш?', 'Co budeš dělat?'],
+    ['Holnap esni ___.', 'fog', 'fog', ['fogok', 'fognak'], 'Завтра будет дождь.', 'Завтра буде дощ.', 'Zítra bude pršet.'],
+    ['Mi ___ dolgozni.', 'fog', 'fogunk', ['fogtok', 'fognak'], 'Мы будем работать.', 'Ми працюватимемо.', 'Budeme pracovat.'],
+    ['Holnap ___. (én, jön)', 'jön', 'jövök', ['jöttem', 'jön'], 'Завтра приду (будущее через настоящее).', 'Завтра прийду (майбутнє через теперішній).', 'Zítra přijdu.'],
+    ['Ők ___ utazni Rómába.', 'fog', 'fognak', ['fog', 'fogunk'], 'Они поедут в Рим.', 'Вони поїдуть до Рима.', 'Pojedou do Říma.'],
+    ['Leszek orvos. — Én orvos ___.', 'lesz', 'leszek', ['vagyok', 'voltam'], 'Я буду врачом.', 'Я буду лікарем.', 'Budu lékař.'],
+    ['Holnap otthon ___. (ő)', 'lesz', 'lesz', ['van', 'volt'], 'Завтра он будет дома.', 'Завтра він буде вдома.', 'Zítra bude doma.'],
+  ]),
+];
+
+export const LESSONS = {
+  hu_van: {
+    title: T('Глагол «быть»: vagyok, vagy, van', 'Дієслово «бути»: vagyok, vagy, van', 'Sloveso „být“: vagyok, vagy, van'),
+    pts: {
+      ru: ['én vagyok, te vagy, ő van, mi vagyunk, ti vagytok, ők vannak.', 'В 3-м лице «кто/что такое» van НЕ ставится: Péter orvos (Петер — врач).', 'van нужен для «где»: Péter otthon van (Петер дома).'],
+      uk: ['én vagyok, te vagy, ő van, mi vagyunk, ti vagytok, ők vannak.', 'У 3-й особі «хто/що» van НЕ ставиться: Péter orvos (Петер — лікар).', 'van потрібен для «де»: Péter otthon van (Петер удома).'],
+      cz: ['én vagyok, te vagy, ő van, mi vagyunk, ti vagytok, ők vannak.', 'Ve 3. osobě u „kdo/co je“ se van NEPÍŠE: Péter orvos (Petr je lékař).', 'van je potřeba u „kde“: Péter otthon van (Petr je doma).'],
+    },
+    ex: [['én', 'vagyok'], ['te', 'vagy'], ['ő', 'van'], ['mi', 'vagyunk'], ['ti', 'vagytok'], ['ők', 'vannak']],
+  },
+  hu_art: {
+    title: T('Артикли: a, az, egy', 'Артиклі: a, az, egy', 'Členy: a, az, egy'),
+    pts: {
+      ru: ['Определённый артикль: a перед согласной (a ház), az перед гласной (az alma).', 'Неопределённый: egy (один, какой-то): egy könyv.', 'Рода в венгерском нет — артикль одинаковый для всех слов.'],
+      uk: ['Означений артикль: a перед приголосною (a ház), az перед голосною (az alma).', 'Неозначений: egy (один, якийсь): egy könyv.', 'Роду в угорській немає — артикль однаковий для всіх слів.'],
+      cz: ['Určitý člen: a před souhláskou (a ház), az před samohláskou (az alma).', 'Neurčitý: egy (jeden, nějaký): egy könyv.', 'Maďarština nemá rod — člen je pro všechna slova stejný.'],
+    },
+    ex: [['a', 'a ház, a macska'], ['az', 'az alma, az iskola'], ['egy', 'egy könyv']],
+  },
+  hu_plur: {
+    title: T('Множественное число: -k', 'Множина: -k', 'Množné číslo: -k'),
+    pts: {
+      ru: ['Множественное — суффикс -k, часто с соединительной гласной: ház → házak, könyv → könyvek, asztal → asztalok.', 'Гармония гласных: «задние» слова (a, o, u) → -ok/-ak, «передние» (e, i, ö, ü) → -ek/-ök.', 'После числа и слов sok, kevés — единственное число: két ház, sok könyv.'],
+      uk: ['Множина — суфікс -k, часто зі сполучною голосною: ház → házak, könyv → könyvek, asztal → asztalok.', 'Гармонія голосних: «задні» слова (a, o, u) → -ok/-ak, «передні» (e, i, ö, ü) → -ek/-ök.', 'Після числа і слів sok, kevés — однина: két ház, sok könyv.'],
+      cz: ['Množné číslo má příponu -k, často se spojovací samohláskou: ház → házak, könyv → könyvek, asztal → asztalok.', 'Vokálová harmonie: „zadní“ slova (a, o, u) → -ok/-ak, „přední“ (e, i, ö, ü) → -ek/-ök.', 'Po číslovce a slovech sok, kevés — jednotné číslo: két ház, sok könyv.'],
+    },
+    ex: [['ház', 'házak'], ['könyv', 'könyvek'], ['asztal', 'asztalok'], ['alma', 'almák']],
+  },
+  hu_konj: {
+    title: T('Спряжение в настоящем', 'Дієвідміна в теперішньому', 'Časování v přítomném čase'),
+    pts: {
+      ru: ['Задние глаголы: olvasok, olvasol, olvas, olvasunk, olvastok, olvasnak.', 'Передние: beszélek, beszélsz, beszél, beszélünk, beszéltek, beszélnek.', 'ik-глаголы (lakik, dolgozik): в «я» часто -om/-em: dolgozom, lakom.'],
+      uk: ['Задні дієслова: olvasok, olvasol, olvas, olvasunk, olvastok, olvasnak.', 'Передні: beszélek, beszélsz, beszél, beszélünk, beszéltek, beszélnek.', 'ik-дієслова (lakik, dolgozik): у «я» часто -om/-em: dolgozom, lakom.'],
+      cz: ['Zadní slovesa: olvasok, olvasol, olvas, olvasunk, olvastok, olvasnak.', 'Přední: beszélek, beszélsz, beszél, beszélünk, beszéltek, beszélnek.', 'ik-slovesa (lakik, dolgozik): v 1. os. často -om/-em: dolgozom, lakom.'],
+    },
+    ex: [['én', 'olvasok · beszélek'], ['te', 'olvasol · beszélsz'], ['ő', 'olvas · beszél'], ['mi', 'olvasunk · beszélünk'], ['ők', 'olvasnak · beszélnek']],
+  },
+  hu_acc: {
+    title: T('Винительный: -t', 'Знахідний: -t', 'Akuzativ: -t'),
+    pts: {
+      ru: ['Кого? Что? — суффикс -t: kávé → kávét, alma → almát (a → á, e → é).', 'После согласной часто соединительная гласная: ház → házat, könyv → könyvet.', 'Особые: víz → vizet, kenyér → kenyeret.'],
+      uk: ['Кого? Що? — суфікс -t: kávé → kávét, alma → almát (a → á, e → é).', 'Після приголосної часто сполучна голосна: ház → házat, könyv → könyvet.', 'Особливі: víz → vizet, kenyér → kenyeret.'],
+      cz: ['Koho? Co? — přípona -t: kávé → kávét, alma → almát (a → á, e → é).', 'Po souhlásce často spojovací samohláska: ház → házat, könyv → könyvet.', 'Zvláštní: víz → vizet, kenyér → kenyeret.'],
+    },
+    ex: [['alma', 'almát'], ['ház', 'házat'], ['könyv', 'könyvet'], ['víz', 'vizet']],
+  },
+  hu_neg: {
+    title: T('Отрицание: nem, nincs', 'Заперечення: nem, nincs', 'Zápor: nem, nincs'),
+    pts: {
+      ru: ['nem — «не» перед словом: nem értem, nem orvos.', 'nincs (мн. nincsenek) — «нет, не находится» вместо nem van: Péter nincs otthon.', 'Запрет (не делай!) — ne: Ne menj!'],
+      uk: ['nem — «не» перед словом: nem értem, nem orvos.', 'nincs (мн. nincsenek) — «немає, не перебуває» замість nem van: Péter nincs otthon.', 'Заборона (не роби!) — ne: Ne menj!'],
+      cz: ['nem — „ne“ před slovem: nem értem, nem orvos.', 'nincs (mn. č. nincsenek) — „není“ místo nem van: Péter nincs otthon.', 'Zákaz (nedělej!) — ne: Ne menj!'],
+    },
+    ex: [['nem', 'nem értem'], ['nincs', 'nincs otthon'], ['nincsenek', 'nincsenek itt']],
+  },
+  hu_poss: {
+    title: T('Мой, твой: -m, -d, -a/-e', 'Мій, твій: -m, -d, -a/-e', 'Můj, tvůj: -m, -d, -a/-e'),
+    pts: {
+      ru: ['Принадлежность — суффикс у слова: házam (мой дом), házad (твой), háza (его/её).', 'Мы / вы / они: házunk, házatok, házuk.', '«Дом Анны»: Anna háza (у владеемого -a/-e).'],
+      uk: ['Належність — суфікс у слова: házam (мій дім), házad (твій), háza (його/її).', 'Ми / ви / вони: házunk, házatok, házuk.', '«Дім Анни»: Anna háza (у того, чим володіють, -a/-e).'],
+      cz: ['Přivlastnění je přípona: házam (můj dům), házad (tvůj), háza (jeho/její).', 'My / vy / oni: házunk, házatok, házuk.', '„Annin dům“: Anna háza (vlastněné má -a/-e).'],
+    },
+    ex: [['én', 'házam'], ['te', 'házad'], ['ő', 'háza'], ['mi', 'házunk'], ['ők', 'házuk']],
+  },
+  hu_nekem: {
+    title: T('«У меня есть»: nekem van', '«У мене є»: nekem van', '„Mám“: nekem van'),
+    pts: {
+      ru: ['Глагола «иметь» нет: nekem van egy kutyám — «мне есть моя собака».', 'nekem, neked, neki, nekünk, nektek, nekik + van/nincs + слово с притяжательным суффиксом.', 'Нет: nincs időm (у меня нет времени).'],
+      uk: ['Дієслова «мати» немає: nekem van egy kutyám — «мені є мій собака».', 'nekem, neked, neki, nekünk, nektek, nekik + van/nincs + слово з присвійним суфіксом.', 'Немає: nincs időm (у мене немає часу).'],
+      cz: ['Sloveso „mít“ chybí: nekem van egy kutyám — „mně je můj pes“.', 'nekem, neked, neki, nekünk, nektek, nekik + van/nincs + slovo s přivlastňovací příponou.', 'Zápor: nincs időm (nemám čas).'],
+    },
+    ex: [['nekem van', 'kutyám'], ['neked van', 'autód'], ['neki nincs', 'pénze']],
+  },
+  hu_inner: {
+    title: T('Внутри: -ban, -ba, -ból', 'Усередині: -ban, -ba, -ból', 'Uvnitř: -ban, -ba, -ból'),
+    pts: {
+      ru: ['Где? -ban/-ben (a szobában). Куда? -ba/-be (az iskolába). Откуда? -ból/-ből (a házból).', 'Вариант выбирается по гармонии гласных: задние → -ban, передние → -ben.', 'Венгерские города обычно с -on/-en: Budapesten, Szegeden.'],
+      uk: ['Де? -ban/-ben (a szobában). Куди? -ba/-be (az iskolába). Звідки? -ból/-ből (a házból).', 'Варіант обирається за гармонією голосних: задні → -ban, передні → -ben.', 'Угорські міста зазвичай з -on/-en: Budapesten, Szegeden.'],
+      cz: ['Kde? -ban/-ben (a szobában). Kam? -ba/-be (az iskolába). Odkud? -ból/-ből (a házból).', 'Varianta podle vokálové harmonie: zadní → -ban, přední → -ben.', 'Maďarská města mají obvykle -on/-en: Budapesten, Szegeden.'],
+    },
+    ex: [['hol?', '-ban / -ben'], ['hová?', '-ba / -be'], ['honnan?', '-ból / -ből']],
+  },
+  hu_surf: {
+    title: T('На поверхности: -on, -ra, -ról', 'На поверхні: -on, -ra, -ról', 'Na povrchu: -on, -ra, -ról'),
+    pts: {
+      ru: ['Где? -on/-en/-ön (az asztalon). Куда? -ra/-re (az asztalra). Откуда? -ról/-ről (a polcról).', '-ön — после ö, ü, ő, ű: a földön.', '-ról/-ről ещё значит «о чём»: Magyarországról.'],
+      uk: ['Де? -on/-en/-ön (az asztalon). Куди? -ra/-re (az asztalra). Звідки? -ról/-ről (a polcról).', '-ön — після ö, ü, ő, ű: a földön.', '-ról/-ről ще означає «про що»: Magyarországról.'],
+      cz: ['Kde? -on/-en/-ön (az asztalon). Kam? -ra/-re (az asztalra). Odkud? -ról/-ről (a polcról).', '-ön po ö, ü, ő, ű: a földön.', '-ról/-ről znamená i „o čem“: Magyarországról.'],
+    },
+    ex: [['hol?', '-on / -en / -ön'], ['hová?', '-ra / -re'], ['honnan?', '-ról / -ről']],
+  },
+  hu_near: {
+    title: T('Рядом: -nál, -hoz, -tól', 'Поруч: -nál, -hoz, -tól', 'U někoho: -nál, -hoz, -tól'),
+    pts: {
+      ru: ['У кого? -nál/-nél (az orvosnál). К кому? -hoz/-hez/-höz (a barátomhoz). От кого? -tól/-től (Pétertől).', '-höz — после ö, ü, ő, ű: a fülhöz.', 'Это падежи людей и мест «возле», а не «внутри».'],
+      uk: ['У кого? -nál/-nél (az orvosnál). До кого? -hoz/-hez/-höz (a barátomhoz). Від кого? -tól/-től (Pétertől).', '-höz — після ö, ü, ő, ű: a fülhöz.', 'Це відмінки людей і місць «біля», а не «всередині».'],
+      cz: ['U koho? -nál/-nél (az orvosnál). Ke komu? -hoz/-hez/-höz (a barátomhoz). Od koho? -tól/-től (Pétertől).', '-höz po ö, ü, ő, ű: a fülhöz.', 'Jsou to pády osob a míst „u“, ne „uvnitř“.'],
+    },
+    ex: [['hol?', '-nál / -nél'], ['hová?', '-hoz / -hez / -höz'], ['honnan?', '-tól / -től']],
+  },
+  hu_past: {
+    title: T('Прошедшее время: -t / -tt', 'Минулий час: -t / -tt', 'Minulý čas: -t / -tt'),
+    pts: {
+      ru: ['Знак прошедшего -t / -tt + окончание лица: tanultam, tanultál, tanult, tanultunk, tanultatok, tanultak.', '-tt после гласной и многих согласных: jött, ettem (eszik → ettem).', 'van → volt: voltam, voltál, volt.'],
+      uk: ['Знак минулого -t / -tt + закінчення особи: tanultam, tanultál, tanult, tanultunk, tanultatok, tanultak.', '-tt після голосної та багатьох приголосних: jött, ettem (eszik → ettem).', 'van → volt: voltam, voltál, volt.'],
+      cz: ['Znak minulosti -t / -tt + osobní koncovka: tanultam, tanultál, tanult, tanultunk, tanultatok, tanultak.', '-tt po samohlásce a mnoha souhláskách: jött, ettem (eszik → ettem).', 'van → volt: voltam, voltál, volt.'],
+    },
+    ex: [['én', 'tanultam'], ['te', 'tanultál'], ['ő', 'tanult'], ['mi', 'tanultunk'], ['ők', 'tanultak']],
+  },
+  hu_fut: {
+    title: T('Будущее: fog + инфинитив', 'Майбутнє: fog + інфінітив', 'Budoucnost: fog + infinitiv'),
+    pts: {
+      ru: ['fogok, fogsz, fog, fogunk, fogtok, fognak + инфинитив: fogok menni.', 'Часто будущее — просто настоящее время со словом «завтра»: Holnap jövök.', 'van → lesz: leszek, leszel, lesz.'],
+      uk: ['fogok, fogsz, fog, fogunk, fogtok, fognak + інфінітив: fogok menni.', 'Часто майбутнє — просто теперішній час зі словом «завтра»: Holnap jövök.', 'van → lesz: leszek, leszel, lesz.'],
+      cz: ['fogok, fogsz, fog, fogunk, fogtok, fognak + infinitiv: fogok menni.', 'Často stačí přítomný čas se slovem „zítra“: Holnap jövök.', 'van → lesz: leszek, leszel, lesz.'],
+    },
+    ex: [['én', 'fogok menni'], ['te', 'fogsz'], ['ő', 'fog'], ['lesz', 'leszek, leszel']],
+  },
+};
+
+export const MOBS = [
+  ['g_hu_van', '🦉', '#5a4a8a', 'Сова-бытие', 'Сова-буття', 'Sova bytí'],
+  ['g_hu_art', '🎩', '#3a3a4a', 'Дух артиклей', 'Дух артиклів', 'Duch členů'],
+  ['g_hu_plur', '🐑', '#c8c2b2', 'Отара', 'Отара', 'Stádo'],
+  ['g_hu_konj', '🎶', '#5a7aa8', 'Певчий дрозд', 'Співочий дрізд', 'Zpěvný drozd'],
+  ['g_hu_acc', '🎯', '#d8402e', 'Лучник', 'Лучник', 'Lukostřelec'],
+  ['g_hu_neg', '🙅', '#6a6a6a', 'Дух-отказник', 'Дух-відмовник', 'Duch odmítač'],
+  ['g_hu_poss', '🔑', '#d9a43a', 'Ключник', 'Ключник', 'Klíčník'],
+  ['g_hu_case', '🗺️', '#4a7a5a', 'Картограф', 'Картограф', 'Kartograf'],
+  ['g_hu_time', '⏳', '#8a6a3a', 'Песочные часы', 'Пісочний годинник', 'Přesýpací hodiny'],
+];

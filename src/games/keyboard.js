@@ -1,5 +1,14 @@
 // Экранная клавиатура изучаемого языка + физическая клавиатура. Общая для игр с печатью.
-import { ROWS, VARIANTS, keyLetter, norm } from '../learn/lang.js';
+import { ROWS, VARIANTS, PHYS, keyLetter, norm } from '../learn/lang.js';
+
+// Буквы с диакритикой и ряд «нужных букв»: над клавиатурой — только те из них, что есть в текущем слове
+const ACCENTED = new Set(Object.values(VARIANTS).join(''));
+const live = new Set(); // открытые клавиатуры (typeLine сообщает им слово)
+let lastNeed = [];
+export function needLetters(words) {
+  lastNeed = [...new Set([].concat(words).join('').toLowerCase())].filter((c) => ACCENTED.has(c));
+  for (const kb of live) kb.need(lastNeed);
+}
 export { keyLetter };
 
 // onKey получает 'a'..'z', ' ' или 'back'
@@ -7,10 +16,10 @@ export function keyboard(el, onKey) {
   el.classList.add('kbd');
   const last = ROWS.length - 1;
   // пробел и ⌫ — в последнем ряду; у букв с вариантами (á, ö, ř…) точка-подсказка, варианты по долгому нажатию
-  el.innerHTML = ROWS.map((r, i) => `<div class="krow">${i === last ? '<button class="key space" data-k=" ">␣</button>' : ''}${[...r].map((c) => `<button class="key${VARIANTS[c] ? ' has-var' : ''}" data-k="${c}">${c}</button>`).join('')}${i === last ? '<button class="key wide" data-k="back">⌫</button>' : ''}</div>`).join('') +
+  el.innerHTML = '<div class="kacc" hidden></div>' + ROWS.map((r, i) => `<div class="krow">${i === last ? '<button class="key space" data-k=" ">␣</button>' : ''}${[...r].map((c) => `<button class="key${VARIANTS[c] ? ' has-var' : ''}" data-k="${c}">${c}</button>`).join('')}${i === last ? '<button class="key wide" data-k="back">⌫</button>' : ''}</div>`).join('') +
     '<div class="kvar" hidden></div>';
-  const pop = el.querySelector('.kvar');
-  const btn = (k) => el.querySelector(`.key[data-k="${k === ' ' ? ' ' : k}"]`) || pop.querySelector(`[data-k="${k}"]`);
+  const pop = el.querySelector('.kvar'), acc = el.querySelector('.kacc');
+  const btn = (k) => el.querySelector(`.krow .key[data-k="${k === ' ' ? ' ' : k}"]`) || acc.querySelector(`[data-k="${k}"]`) || pop.querySelector(`[data-k="${k}"]`);
   const press = (k) => {
     const b = btn(k);
     if (b) { b.classList.add('down'); setTimeout(() => b.classList.remove('down'), 110); }
@@ -31,7 +40,7 @@ export function keyboard(el, onKey) {
     const b = e.target.closest('.key');
     if (!b) return;
     e.preventDefault();
-    if (b.parentElement === pop) { closePop(); press(b.dataset.k); return; }
+    if (b.parentElement === pop || b.parentElement === acc) { closePop(); press(b.dataset.k); return; }
     closePop();
     if (VARIANTS[b.dataset.k]) {
       held = b;
@@ -56,17 +65,26 @@ export function keyboard(el, onKey) {
     press(k);
   };
   addEventListener('keydown', onDoc);
-  return {
-    destroy: () => removeEventListener('keydown', onDoc),
+  const api = {
+    // ряд нужных букв: крупные кнопки, на ПК в углу — клавиша национальной раскладки
+    need(letters) {
+      acc.innerHTML = letters.map((c) => `<button class="key" data-k="${c}">${PHYS[c] ? `<sup>${PHYS[c][0]}</sup>` : ''}${c}</button>`).join('');
+      acc.hidden = !letters.length;
+    },
+    destroy: () => { live.delete(api); removeEventListener('keydown', onDoc); },
     mark(k, cls) { const b = btn(k); if (b) { b.classList.add(cls); setTimeout(() => b.classList.remove(cls), 400); } },
     // «Фонарь»: использованные буквы гаснут до следующего слова
     used(k, ok) { btn(k)?.classList.add(ok ? 'hit' : 'miss'); },
     reset() { el.querySelectorAll('.key').forEach((b) => b.classList.remove('hit', 'miss')); },
   };
+  live.add(api);
+  api.need(lastNeed);
+  return api;
 }
 
 // Строка ввода одного слова: буквы проверяются сразу, пробелы проставляются сами
 export function typeLine(el, word, { onRight, onWrong, onDone }) {
+  needLetters(word);
   const letters = [...word];
   let pos = 0;
   // пробел — промежуток, апостроф, дефис и точка вписаны заранее: их нет на клавиатуре

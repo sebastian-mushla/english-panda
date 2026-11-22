@@ -4,7 +4,7 @@ import { THEMES } from '../learn/words.js';
 import { shuffle, esc, wait, flash } from './kit.js';
 import { wordHint } from '../learn/hints.js';
 import { norm } from '../learn/lang.js';
-import { keyboard } from './keyboard.js';
+import { keyboard, needLetters } from './keyboard.js';
 
 const LIVES = 6, ROUNDS = 4;
 
@@ -37,6 +37,7 @@ export default function lantern(el, ctx) {
   function next() {
     if (!list.length) return ctx.finish(true);
     cur = list.shift();
+    needLetters(cur.t);
     letters = [...cur.t];
     open = letters.map((c) => c === ' ');
     lives = LIVES;

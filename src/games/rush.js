@@ -2,7 +2,7 @@
 import { t } from '../i18n.js';
 import { shuffle, meaning, esc, wait, flash } from './kit.js';
 import { wordHint } from '../learn/hints.js';
-import { keyboard } from './keyboard.js';
+import { keyboard, needLetters } from './keyboard.js';
 import { norm } from '../learn/lang.js';
 
 const GOAL = 8, LIVES = 3, FALL_MS = 12000, EVERY_MS = 3400, MAX_ON = 3;
@@ -39,6 +39,7 @@ export default function rush(el, ctx) {
   }
 
   function setHint() {
+    needLetters(leaves.map((l) => l.w.t)); // ряд нужных букв — для всех листьев на экране
     const lead = leaves[0];
     if (!lead) return ctx.setHint(null);
     ctx.setHint('leaf' + lead.id, (step) => {
