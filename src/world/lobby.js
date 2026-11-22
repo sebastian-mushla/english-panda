@@ -22,7 +22,7 @@ const ART_ZONES = ['bamboo', 'falls', 'village', 'tea', 'gate', 'terraces', 'lak
 const ART_BG = ZONES.filter((z) => ART_ZONES.includes(z.id)).map((z) => (z.x0 === 0
   ? { src: 'assets/zones/' + z.id + '.webp', f: 0.6, x: 0, w: 2900, first: true }
   : { src: 'assets/zones/' + z.id + '.webp', f: 0.6, x: Math.round(z.x0 * 0.6 - 500), w: Math.round((z.x1 - z.x0) * 0.6 + 2000) }));
-let artImgs = [], layerEls = [], rasterLayers = [], rasterS = 0, overlay, playerEl, handlers = {}, zoneId = '', lastPhaseCam = -1e9, season = 'spring', lastPhase = null;
+let PHONE = false, artImgs = [], layerEls = [], rasterLayers = [], rasterS = 0, overlay, playerEl, handlers = {}, zoneId = '', lastPhaseCam = -1e9, season = 'spring', lastPhase = null;
 
 export function initLobby(h) {
   handlers = h;
@@ -39,7 +39,9 @@ export function initLobby(h) {
   // все фоны зон — в одном слое; картинка загружается, только когда рядом камера, и выгружается вдали
   // (21 широкая картинка сразу не помещалась в память телефона)
   root.querySelectorAll('.layer[data-raster]')[2].insertAdjacentHTML('afterend', `<div class="layer artbg" data-f="0.6">${ART_BG.map((b) =>
-    `<img class="${b.first ? 'first' : ''}" data-src="${b.src}" data-x="${b.x}" data-w="${b.w}" alt="" decoding="async" style="left:calc(var(--s)*${b.x}px);width:calc(var(--s)*${b.w}px)">`).join('')}</div>`);
+    `<img class="${b.first ? 'first' : ''}" data-src="${b.src}" data-x="${b.x}" data-w="${b.w}" alt="" decoding="async" style="left:calc(var(--s)*${b.x}px);width:calc(var(--s)*${b.w}px)">`).join('')}
+    ${ART_BG.slice(1).map((b) => `<i class="artseam" style="left:calc(var(--s)*${b.x - 170}px)"></i>`).join('')}
+</div>`);
   artImgs = [...root.querySelectorAll('.artbg img')];
   const rEls = root.querySelectorAll('.layer[data-raster]');
   rasterLayers = scene.layers.map((L, i) => ({ f: L.f, w: L.w, raw: L.raw, el: rEls[i], q: Q[L.f] }));
@@ -50,6 +52,7 @@ export function initLobby(h) {
   $('#tint').after(lightsRoot);
   lightsRoot.querySelectorAll('.lightlayer').forEach((el, i) => rasterLayers.push({ ...scene.lights[i], el, q: phone ? 0.35 : 0.5 }));
   document.body.classList.toggle('phone', phone);
+  PHONE = phone;
   overlay = document.createElement('div');
   overlay.id = 'overlay';
   overlay.className = 'layer';
@@ -120,7 +123,8 @@ function applyCam(force) {
   }
   const mm = $('#mm-view');
   if (mm) { mm.style.left = (cam / W * 100) + '%'; mm.style.width = (viewW / W * 100) + '%'; }
-  if (force || Math.abs(cam - lastPhaseCam) > 3) {
+  // небо, свет и зона пересчитываются не каждый кадр: на телефоне раз в ~40 единиц пути
+  if (force || Math.abs(cam - lastPhaseCam) > (PHONE ? 40 : 3)) {
     lastPhaseCam = cam;
     const center = cam + viewW / 2;
     lastPhase = applyPhase(center, viewW);
@@ -249,7 +253,8 @@ function renderOverlay() {
               : !CH5_OPEN ? [CH5_X, 'zone.fog3', 'soon', 'fogText4']
                 : [FOG_X, 'zone.fog4', 'soon', 'fogText6'];
   const fsx = fx + 300;
-  h += `<div class="fogwall" style="--x:${fx - 20};--fw:${W - fx + 200}"></div>
+  // туман: короткий градиент и сплошная заливка дальше (широкий градиент на весь остаток мира рвался на телефоне)
+  h += `<div class="fogwall" style="--x:${fx - 20};--fw:1700"></div><div class="fogsolid" style="--x:${fx + 1670};--fw:${Math.max(0, W - fx - 1500)}"></div>
     <div class="fogsign" style="--x:${fsx};--y:${groundY(fsx)}"><b>${t(label)}</b><span>${t(sub)}</span><small>${t(text)}</small></div>`;
   const px = standX(cur);
   h += `<div class="player" style="--x:${px};--y:${walkY(px)}">${pandaSVG(state.equip)}</div>`;

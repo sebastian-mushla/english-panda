@@ -307,3 +307,10 @@ body.phone .node .stone, body.phone .node.current .stone, body.phone .node.locke
 body.phone .node.entrance .ent-img, body.phone .node.entrance.current .ent-img, body.phone .node.entrance .ent { filter: none; }
 body.phone .node.locked .stone, body.phone .node.entrance.locked .ent-img { opacity: .7; }
 body.phone .node.entrance .ent-img { -webkit-mask-image: none; mask-image: none; }
+
+/* Туман закрытой главы: градиент + дешёвая сплошная заливка */
+.fogsolid { top: 0 !important; width: calc(var(--s) * var(--fw) * 1px); height: 100%; pointer-events: none; background: rgba(236,243,240,.96); }
+/* Швы между фонами зон: на телефоне без масок закрываем стык полосой тумана */
+.artseam { display: none; position: absolute; top: 0; height: 100%; width: calc(var(--s) * 340px);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--mist) 45%, transparent) 50%, transparent); }
+body.phone .artseam { display: block; }

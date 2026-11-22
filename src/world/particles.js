@@ -48,7 +48,8 @@ export function setParticleMood(s, n, inside = false) {
 let lastDraw = 0, accDx = 0;
 export function stepParticles(dxPx, t) {
   accDx += dxPx;
-  if (document.hidden || t - lastDraw < 15) return;
+  // на телефоне частицы рисуем ~30 раз в секунду: при 120 Гц экран иначе не успевает за прокруткой
+  if (document.hidden || t - lastDraw < (document.body.classList.contains('phone') ? 32 : 15)) return;
   lastDraw = t;
   dxPx = accDx;
   accDx = 0;

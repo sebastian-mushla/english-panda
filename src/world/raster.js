@@ -68,15 +68,25 @@ export function updateRaster(camX, viewW) {
   cam = camX; view = viewW;
   for (const L of layers) {
     const [k0, k1] = range(L, -2.2, 3.2);
-    for (const [i, cv] of L.chunks) if (i < k0 || i > k1) { if (cv) free(cv); L.chunks.delete(i); }
+    const cov = covered(L);
+    for (const [i, cv] of L.chunks) if (cov || i < k0 || i > k1) { if (cv) free(cv); L.chunks.delete(i); }
   }
   pump();
 }
 
 // Следующий нужный кусок: ближайший к центру экрана
+// Телефон: слои дальше фона-картинки (f ≤ 0.6) полностью закрыты нарисованными фонами зон —
+// там, где фоны есть (главы 1–4 и туман C2), эти слои не растрируем вообще: меньше памяти и работы
+const ART_FROM = 0, ART_TO = 27700, ART_FROM2 = 33300;
+export function covered(L) {
+  if (!document.body.classList.contains('phone') || L.f > 0.6 || L.light) return false;
+  const c = cam + view / 2;
+  return (c > ART_FROM + view && c < ART_TO - view * 1.5) || c > ART_FROM2 + view * 1.5;
+}
 function nextTask() {
   let best = null;
   for (const L of layers) {
+    if (covered(L)) continue;
     const [k0, k1] = range(L, -0.8, 1.8);
     for (let i = k0; i <= k1; i++) {
       if (L.chunks.has(i)) continue;
