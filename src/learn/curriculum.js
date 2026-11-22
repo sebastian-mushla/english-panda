@@ -210,10 +210,10 @@ export function levelWords(def) {
 }
 
 export function isUnlocked(n) {
-  if (ADMIN_OPEN) return true;
   if (levelDef(n)?.ch === 3 && !CH3_OPEN) return false; // глава 3 — только для английского и чешского
   if (levelDef(n)?.ch === 4 && !CH4_OPEN) return false; // глава 4 — английский и чешский
   if (levelDef(n)?.ch === 5 && !CH5_OPEN) return false; // глава 5 «C1» — английский и чешский
+  if (ADMIN_OPEN) return true; // админ: все уровни открытых для языка глав
   return n === 1 || !!state.levels[n - 1]?.stars?.[0];
 }
 

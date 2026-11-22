@@ -581,3 +581,6 @@
 /* Скоропись: на телефоне листья компактнее, поле выше (клавиатура стала на ряд ниже) */
 @media (max-width: 600px) { .leaf { width: 92px; padding: 8px 6px 10px; } .leaf .emo { font-size: 1.5rem; } .leaf b { font-size: .8rem; } }
 .stage-fail { margin: auto; display: grid; gap: 14px; justify-items: center; text-align: center; color: var(--cream); max-width: 420px; font-weight: 700; }
+
+/* Большой экран компьютера: весь экран игры увеличен (--gz считает main.js), чтобы не было мелко */
+body:not(.phone) #game { zoom: var(--gz, 1); inset: auto; left: 0; top: 0; width: calc(100vw / var(--gz, 1)); height: calc(100vh / var(--gz, 1)); }

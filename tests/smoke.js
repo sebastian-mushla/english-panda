@@ -4,11 +4,14 @@
 import { state, TARGET, setLanguages } from '../src/state.js';
 
 const ALL = ['en-ru', 'en-uk', 'en-cz', 'cz-ru', 'cz-uk', 'cz-cz', 'ru-uk', 'hu-ru'];
+// ?smoke=cz-uk,hu-ru — несколько пар через запятую
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export async function runSmoke(arg) {
-  let queue = arg === 'all' ? JSON.parse(sessionStorage.getItem('ep.smokeq') || 'null') || [...ALL] : [arg];
+  let queue = JSON.parse(sessionStorage.getItem('ep.smokeq') || 'null') || (arg === 'all' ? [...ALL] : arg.split(','));
   const pair = queue[0], [T, N] = pair.split('-');
+  // режим админа нужен, чтобы пройти все уровни, а не только открытые в сохранении
+  if (localStorage.getItem('ep.admin.open') !== '1') { localStorage.setItem('ep.admin.open', '1'); sessionStorage.setItem('ep.smokeq', JSON.stringify(queue)); return location.reload(); }
   if (TARGET !== T || state.lang !== N) { sessionStorage.setItem('ep.smokeq', JSON.stringify(queue)); return setLanguages(N, T); }
   const box = document.createElement('pre');
   box.id = 'smoke';
@@ -25,7 +28,7 @@ export async function runSmoke(arg) {
   let n = 0;
   log(`▶ ${pair}`);
   for (const l of cur.LEVELS) {
-    if (!cur.isUnlocked(l.n) && l.n !== 1 && !localStorage.getItem('ep.admin.open')) continue;
+    if (!cur.isUnlocked(l.n)) continue; // с режимом админа открыты все уровни глав, доступных этому языку
     const parts = l.phases ? l.phases.map((_, i) => i) : [null];
     for (const ph of parts) {
       const stages = ph == null ? l.stages : l.phases[ph].stages;
@@ -37,9 +40,9 @@ export async function runSmoke(arg) {
         try { play.runPlay(p, { onExit() {}, onNext() {} }); } catch (e) { errs.push(e.message); }
         await wait(90);
         document.querySelector('#game .go')?.click();
-        await wait(200);
-        const area = document.querySelector('#game .g-stage-area');
-        const empty = !area || !area.textContent.trim();
+        // ждём, пока игра отрисуется (первая загрузка модуля бывает дольше), до ~1,2 с
+        let area, empty = true;
+        for (let k = 0; k < 6 && empty; k++) { await wait(200); area = document.querySelector('#game .g-stage-area'); empty = !area || !area.textContent.trim(); }
         const fail = errs.length > before || window.__stageErrors.length || empty;
         if (fail) bad.push(`ур. ${l.n}${ph != null ? '.' + (ph + 1) : ''} ${st}: ${errs.slice(before).concat(window.__stageErrors).join(' | ') || 'пустой экран'}`);
         document.querySelector('#game .g-x')?.click();
@@ -55,7 +58,7 @@ export async function runSmoke(arg) {
   all.push(res);
   sessionStorage.setItem('ep.smokeres', JSON.stringify(all));
   window.__SMOKE = all;
-  if (arg === 'all' && queue.length > 1) {
+  if (queue.length > 1) {
     queue = queue.slice(1);
     sessionStorage.setItem('ep.smokeq', JSON.stringify(queue));
     const [T2, N2] = queue[0].split('-');
