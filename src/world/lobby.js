@@ -171,11 +171,14 @@ function showArtFix(id) {
 
 // зона для фона телефона: с запасом, чтобы фон не прыгал туда-сюда на самой границе зон
 let artZone = '';
+// узкие зоны врат (≈700 единиц) на телефоне показывают фон предыдущей зоны: иначе у экзамена
+// фон менялся три раза подряд (чайный дом → врата → террасы)
+const ART_MERGE = { gate: 'tea', sgate: 'monastery', agate: 'academy', wgate: 'hermit' };
 function artZoneAt(c) {
-  const z = zoneAt(c);
+  const z0 = zoneAt(c), z = ART_MERGE[z0.id] ? { ...ZONES.find((q) => q.id === ART_MERGE[z0.id]), x1: z0.x1 } : z0;
   if (!artZone || z.id === artZone) return (artZone = z.id);
-  const old = ZONES.find((q) => q.id === artZone);
-  if (old && c > old.x0 - 250 && c < old.x1 + 250) return artZone;
+  const old = ZONES.find((q) => q.id === artZone), oldEnd = ZONES.find((q) => ART_MERGE[q.id] === artZone)?.x1 ?? old?.x1;
+  if (old && c > old.x0 - 450 && c < oldEnd + 450) return artZone;
   return (artZone = z.id);
 }
 
