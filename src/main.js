@@ -51,6 +51,9 @@ function runStage(n, phase, stage) {
   runPlay(play, { onExit: back, onNext: back });
 }
 
+// автотест всех этапов: ?smoke=en-ru или ?smoke=all (только localhost)
+const smoke = ADMIN_HOST && new URLSearchParams(location.search).get('smoke');
+if (smoke) setTimeout(() => import('../tests/smoke.js').then((m) => m.runSmoke(smoke)), 800);
 if (ADMIN_HOST) import('./ui/admin.js').then((m) => m.initAdmin({ start, startPhase, runStage, focus }));
 
 function startReview(list) {

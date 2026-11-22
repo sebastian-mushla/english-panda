@@ -125,9 +125,32 @@ export function runPlay(play, { onExit, onNext }) {
     root.querySelector('.g-instr').innerHTML = `<span>${t('gi.' + name)}</span>`;
     area.className = 'g-stage-area st-' + name;
     area.innerHTML = '';
-    const mod = await GAMES[name]();
-    mounted = mod.default(area, ctx) || null;
+    let mod;
+    try {
+      mod = await GAMES[name]();
+    } catch (e) {
+      // модуль игры не загрузился: обычно сайт обновился, пока игра была открыта, и новые файлы
+      // не совпадают со старыми в памяти браузера — перезагружаем страницу один раз
+      console.error(e);
+      if (!sessionStorage.getItem('ep.reloaded')) { sessionStorage.setItem('ep.reloaded', '1'); location.reload(); return; }
+      return stageFailed(e);
+    }
+    sessionStorage.removeItem('ep.reloaded');
+    try {
+      mounted = mod.default(area, ctx) || null;
+    } catch (e) {
+      console.error(e);
+      stageFailed(e);
+    }
   }
+
+  // игра упала: не оставляем пустой экран — сообщение и кнопка «пропустить этап»
+  function stageFailed(e) {
+    window.__stageErrors = [...(window.__stageErrors || []), name0() + ': ' + (e?.message || e)];
+    area.innerHTML = `<div class="stage-fail"><p>${t('stageFail')}</p><button class="btn red">${t('skipStage')} ▶</button></div>`;
+    area.querySelector('button').addEventListener('click', () => nextStage());
+  }
+  const name0 = () => stages[si];
 
   function nextStage() {
     mounted?.destroy?.();
