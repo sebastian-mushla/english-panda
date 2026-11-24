@@ -427,7 +427,6 @@ dialog .df{display:flex;justify-content:flex-end;gap:8px;padding:10px 16px;backg
     <label class="chk"><input type="radio" name="pr" value="range"> Od&nbsp;<input type="number" id="pFrom" min="1" style="width:64px">&nbsp;do&nbsp;<input type="number" id="pTo" min="1" style="width:64px"></label>
     <div class="f" style="margin-top:10px"><label>Kopií každé</label><input type="number" id="pCopies" min="1" max="9999" value="1" style="width:80px"></div>
     <div class="psum" id="pSum"></div>
-    <div class="f" id="pBatchRow"><label>Etiket v jedné dávce</label><input type="number" id="pBatch" min="10" max="1000" step="10" value="100" style="width:80px"></div>
     <div class="msg" id="pMsg"></div>
   </div>
   <div class="df">
@@ -453,7 +452,7 @@ dialog .df{display:flex;justify-content:flex-end;gap:8px;padding:10px 16px;backg
 <script>
 // the editor's own source, taken before any script touches the DOM: saved templates are copies of it
 const PAGE_SRC = document.documentElement.outerHTML;
-const APP_VERSION = '1.17 · 24. 11. 2026';
+const APP_VERSION = '1.18 · 24. 11. 2026';
 // any unexpected error is shown instead of silently freezing the page
 addEventListener('error', e => showFatal(e.message));
 addEventListener('unhandledrejection', e => showFatal(e.reason?.message || String(e.reason)));
@@ -1555,10 +1554,8 @@ $('#pIpTest').onclick = async () => {
   try { await ipFetch(`http://${host}/`, {}, 4000); rememberIp(host); m.className = 'msg ok'; m.textContent = `Tiskárna ${host} odpovídá. Můžete tisknout.`; }
   catch (e) { m.className = 'msg err'; m.innerHTML = ipError(host, e); }
 };
-const batchSize = () => Math.max(10, Math.min(1000, +$('#pBatch').value || 100));
 function updateGoLabel(){
-  const pb = S.pb, n = printMethod() === 'browser' ? Math.ceil(pickRecs().length * copies() / batchSize()) : 1;
-  $('#pGo').textContent = pb ? `Tisknout dávku ${pb.i + 1} / ${pb.chunks.length}` : n > 1 ? `Tisknout dávku 1 / ${n}` : 'Tisk';
+  $('#pGo').textContent = 'Tisk';
   // plain-words total, so "current record × 600 copies" can't be mistaken for the whole table
   const r = pickRecs(), c = copies(), sum = $('#pSum'), one = r.length === 1 && S.data.rows.length > 1;
   const zaz = r.length === 1 ? 'záznam' : r.length < 5 ? 'záznamy' : 'záznamů', kop = c === 1 ? 'kopie' : c < 5 ? 'kopie' : 'kopií';
@@ -1569,13 +1566,13 @@ function updateGoLabel(){
     + (same ? ` — pořád stejná etiketa č. ${r[0] + 1}` : '')
     + (cnt ? ` — počítadlo ${valueOfSeq(cnt, 0)} až ${valueOfSeq(cnt, r.length * c - 1)}` : '');
 }
-function resetBatches(){ S.pb = null; updateGoLabel(); }
+function resetBatches(){ updateGoLabel(); }
 // any change of records, copies or batch size starts the batches over
-['#pFrom', '#pTo', '#pCopies', '#pBatch'].forEach(sel => $(sel).addEventListener('input', resetBatches));
+['#pFrom', '#pTo', '#pCopies'].forEach(sel => $(sel).addEventListener('input', resetBatches));
 $$('[name=pr]').forEach(r => r.addEventListener('change', resetBatches));
 function updatePm(){
   const pm = printMethod(), m = $('#pMsg'), L = S.tpl.label;
-  $('#pBatchRow').hidden = pm !== 'browser'; $('#pIpRow').hidden = pm !== 'ip';
+  $('#pIpRow').hidden = pm !== 'ip';
   resetBatches();
   m.className = 'msg';
   if (pm === 'ip') {
@@ -1584,7 +1581,7 @@ function updatePm(){
     m.innerHTML = 'Tiskárny (název + IP) se ukládají přímo do šablony, takže je mají všichni, kdo šablonu otevřou. Etikety jdou rovnou do tiskárny jako ZPL (http://IP/pstprnt). Funguje jen tam, kde je tiskárna z tohoto PC dostupná v síti. Zkuste nejdřív <b>Otestovat</b>. Tiskárna tisk nepotvrzuje, takže uvidíte jen „odesláno“.';
     return;
   }
-  m.innerHTML = `Otevře se okno tisku prohlížeče, každá etiketa = jedna stránka ${L.w} × ${L.h} mm. V něm zvolte tiskárnu <b>ZDesigner</b>, Okraje: <b>Žádné</b>, Měřítko: <b>100 %</b>. Ve vlastnostech ovladače musí být nastavena stejná velikost etikety.<br>Velké role se tisknou po dávkách: ovladač Windows u dlouhých úloh z prohlížeče někdy vytiskne jen začátek. Pro 500+ etiket je nejspolehlivější <b>Na IP tiskárny</b>, pokud je tiskárna v síti dostupná.`;
+  m.innerHTML = `Otevře se okno tisku prohlížeče, každá etiketa = jedna stránka ${L.w} × ${L.h} mm. V něm zvolte tiskárnu <b>ZDesigner</b>, Okraje: <b>Žádné</b>, Měřítko: <b>100 %</b>. Ve vlastnostech ovladače musí být nastavena stejná velikost etikety.<br>Pokud ovladač u velké role vytiskne jen začátek, vytiskněte ji po částech (rozsah od–do) nebo použijte <b>Na IP tiskárny</b>.`;
 }
 $$('[name=pm]').forEach(r => r.onchange = () => { try { localStorage.setItem('ld.pm', printMethod()); } catch {} updatePm(); });
 
@@ -1665,28 +1662,10 @@ $('#pGo').onclick = async () => {
     return;
   }
   if (printMethod() === 'browser') {
-    // long jobs are split into batches; each click on Tisk prints the next batch
-    const key = JSON.stringify([recs, copies(), batchSize()]);
-    if (!S.pb || S.pb.key !== key) {
-      const pages = recs.flatMap(r => Array(copies()).fill(r)), chunks = [];
-      for (let i = 0; i < pages.length; i += batchSize()) chunks.push(pages.slice(i, i + batchSize()));
-      S.pb = { key, chunks, i: 0, total: pages.length };
-    }
-    const pb = S.pb, part = pb.chunks[pb.i], from = pb.i * batchSize() + 1, to = from + part.length - 1;
-    m.className = 'msg'; m.textContent = `Připravuji etikety ${from}–${to}…`;
-    try {
-      await printBrowser(part, 1, pb.i * batchSize());
-      pb.i++;
-      if (pb.i >= pb.chunks.length) {
-        m.className = 'msg ok';
-        m.textContent = pb.chunks.length > 1 ? `Hotovo: všech ${pb.chunks.length} dávek (${pb.total} etiket) odesláno do okna tisku.` : `Odesláno do okna tisku: ${pb.total} etiket. Pokud jste tisk zrušili, stiskněte Tisk znovu.`;
-        S.pb = null;
-      } else {
-        m.className = 'msg ok';
-        m.textContent = `Dávka ${pb.i} z ${pb.chunks.length} (etikety ${from}–${to}) odeslána. Až tiskárna dotiskne, stiskněte „Tisknout dávku ${pb.i + 1} / ${pb.chunks.length}“.`;
-      }
-    } catch (e) { m.className = 'msg err'; m.textContent = 'Tisk se nepodařilo připravit: ' + e.message; }
-    updateGoLabel();
+    const total = recs.length * copies();
+    m.className = 'msg'; m.textContent = `Připravuji ${total} etiket…`;
+    try { await printBrowser(recs, copies()); m.className = 'msg ok'; m.textContent = `Odesláno do okna tisku: ${total} etiket. Pokud jste tisk zrušili, stiskněte Tisk znovu.`; }
+    catch (e) { m.className = 'msg err'; m.textContent = 'Tisk se nepodařilo připravit: ' + e.message; }
     return;
   }
 };
