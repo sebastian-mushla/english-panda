@@ -1,0 +1,1707 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Label Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bwip-js@4.5.1/dist/bwip-js-min.js"></script>
+<style>
+:root{
+  --chrome:#0b6aa8; --chrome-hi:#1a86cc; --ctx:#2a9ee6;
+  --ribbon:#f5f6f7; --panel:#fff; --work:#e4e6e9; --ruler:#f7f8f9;
+  --ink:#1f2328; --muted:#5f6670; --line:#d4d8dd; --hover:#dcecf9; --press:#c3dff5;
+  --sel:#2b86d9; --danger:#c42b1c;
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  font-size:12px; color:var(--ink);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--work);overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--sel);outline-offset:1px}
+[hidden]{display:none!important}
+
+#app{display:grid;grid-template-rows:30px 26px 96px 1fr 26px;grid-template-columns:minmax(0,1fr);height:100vh;width:100vw;overflow:hidden}
+
+/* title bar */
+.title{background:var(--chrome);color:#fff;display:flex;align-items:center;gap:2px;padding:0 6px}
+.title .qa{background:none;border:0;color:#fff;width:28px;height:26px;display:grid;place-items:center;border-radius:2px}
+.title .qa:hover{background:rgba(255,255,255,.15)}
+.title .qa svg{width:16px;height:16px}
+.title .name{flex:1;text-align:center;font-size:12px;opacity:.95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title .appicon{width:22px;height:22px;margin-right:4px}
+
+/* tabs */
+.tabs{background:var(--chrome);display:flex;align-items:flex-end;padding-left:4px;gap:1px}
+.tabs button{background:none;border:0;color:#fff;padding:4px 14px 5px;font-size:12px}
+.tabs button:hover{background:rgba(255,255,255,.12)}
+.tabs button.on{background:var(--ribbon);color:var(--chrome)}
+.tabs button.file{background:var(--chrome-hi)}
+.tabs .ctx{background:var(--ctx);margin-left:12px}
+.tabs .ctx[hidden]{display:none}
+
+/* ribbon */
+.ribbon{background:var(--ribbon);border-bottom:1px solid var(--line);display:flex;padding:4px 4px 0;overflow-x:auto;overflow-y:hidden;min-width:0}
+.rpage{display:none;gap:0}
+.rpage.on{display:flex}
+.grp{display:flex;flex-direction:column;border-right:1px solid var(--line);padding:0 6px;min-width:max-content}
+.grp .body{flex:1;display:flex;gap:2px;align-items:flex-start}
+.grp .cap{text-align:center;color:var(--muted);font-size:11px;padding:2px 0 3px}
+.big{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;background:none;border:1px solid transparent;border-radius:2px;padding:3px 5px;min-width:46px;height:68px;font-size:11.5px;line-height:1.15;text-align:center}
+.big svg{width:30px;height:30px;flex:none}
+.big:hover,.sm:hover,.ico:hover{background:var(--hover);border-color:#b7d6f0}
+.big:active,.sm:active,.ico:active,.ico.on{background:var(--press)}
+.col{display:flex;flex-direction:column;gap:1px}
+.sm{display:flex;align-items:center;gap:5px;background:none;border:1px solid transparent;border-radius:2px;padding:1px 6px 1px 3px;height:22px;font-size:12px;white-space:nowrap}
+.sm svg{width:16px;height:16px}
+.ico{width:24px;height:22px;display:grid;place-items:center;background:none;border:1px solid transparent;border-radius:2px;padding:0}
+.ico svg{width:16px;height:16px}
+.ico.fmt{font-size:14px;line-height:1;color:var(--ink)}
+.ico.fmt s,.ico.fmt u{text-underline-offset:2px}
+.ico:disabled,.sm:disabled,.big:disabled{opacity:.4;pointer-events:none}
+.row{display:flex;gap:2px;align-items:center}
+.field-s{height:22px;border:1px solid #c5cad0;background:#fff;padding:0 4px;border-radius:0}
+.recnav{display:flex;align-items:center;gap:2px}
+.recnav .count{min-width:74px;text-align:center}
+
+/* main */
+.main{display:grid;grid-template-columns:136px minmax(0,1fr) 332px;min-height:0;min-width:0}
+@media (max-width:1100px){.main{grid-template-columns:112px minmax(0,1fr) 280px}.f{grid-template-columns:100px minmax(0,1fr)}}
+.status{min-width:0;overflow:hidden}
+.status>*{flex-shrink:0}
+.tools{background:var(--panel);border-right:1px solid var(--line);padding:10px 4px;display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:4px}
+.tool{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:1px solid transparent;border-radius:2px;padding:6px 2px;font-size:11.5px;text-align:center;line-height:1.15}
+.tool svg{width:26px;height:26px}
+.tool:hover{background:var(--hover);border-color:#b7d6f0}
+.tool.on{background:var(--press);border-color:var(--sel)}
+
+.center{display:grid;grid-template-rows:1fr 24px;min-width:0;min-height:0}
+.view{min-height:0;display:none}
+.view.on{display:grid}
+.ws{grid-template-columns:22px 1fr;grid-template-rows:22px 1fr;background:var(--work)}
+.ws .corner{background:var(--ruler);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.ws canvas.rt,.ws canvas.rl{background:var(--ruler);display:block}
+.ws canvas.rt{border-bottom:1px solid var(--line);width:100%;height:22px}
+.ws canvas.rl{border-right:1px solid var(--line);width:22px;height:100%}
+.scroll{overflow:auto;position:relative}
+.stage{padding:48px;display:inline-block;min-width:100%;min-height:100%}
+.stage.center-it{display:flex;align-items:flex-start;justify-content:center}
+.label{position:relative;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.18),0 4px 14px rgba(0,0,0,.12);border-radius:6px;isolation:isolate;flex:none}
+.label.grid{background-image:radial-gradient(circle,#c9ced4 1px,transparent 1.2px);background-size:var(--g) var(--g)}
+.label.placing{cursor:crosshair}
+
+.obj{position:absolute;cursor:move;user-select:none}
+.obj .inner{position:absolute;left:0;top:0;transform-origin:0 0;color:#000}
+.obj.noprint{opacity:.35}
+.obj.inv{mix-blend-mode:difference}
+.obj.inv .inner{color:#fff}
+.obj.inv canvas,.obj.inv img{filter:invert(1)}
+.obj.sel{outline:1px dashed var(--sel);outline-offset:0}
+.obj.out{outline:2px dashed var(--danger);outline-offset:1px}
+.obj.out .tag{background:var(--danger)}
+.obj .tag{position:absolute;left:-1px;top:-17px;background:var(--sel);color:#fff;font-size:10.5px;padding:1px 5px;white-space:nowrap;pointer-events:none;border-radius:2px 2px 0 0}
+.obj .h{position:absolute;width:9px;height:9px;background:#fff;border:1px solid var(--sel);border-radius:50%;margin:-4.5px 0 0 -4.5px;z-index:2}
+.txt{font-family:"Roboto Condensed","Arial Narrow",Arial,sans-serif;font-weight:700;line-height:1;white-space:pre}
+.txt.block{white-space:pre-wrap;overflow:hidden;word-break:break-word}
+.hr{font-family:"Roboto Condensed","Arial Narrow",sans-serif;font-weight:700;text-align:center;line-height:1.1}
+.bcerr{background:repeating-linear-gradient(45deg,#fde7e7 0 6px,#fff 6px 12px);border:1px solid var(--danger);color:var(--danger);display:grid;place-items:center;font-size:11px;padding:4px;text-align:center}
+.shape{border:0 solid currentColor}
+.shape.fill{background:currentColor}
+
+.doctabs{background:var(--work);border-top:1px solid var(--line);display:flex;gap:2px;padding-left:22px}
+.doctabs button{border:1px solid transparent;border-top:0;background:none;padding:2px 12px;color:var(--chrome);font-weight:600}
+.doctabs button.on{background:#fff;border-color:var(--line)}
+
+/* data view */
+.dataview{grid-template-rows:auto 1fr;background:#fff}
+.dbar{display:flex;gap:10px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--muted)}
+.dtable{overflow:auto}
+.dtable table{border-collapse:collapse;min-width:100%}
+.dtable th,.dtable td{border:1px solid #e1e4e8;padding:3px 8px;white-space:nowrap;text-align:left;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.dtable th{background:#f3f5f7;position:sticky;top:0;font-weight:600;z-index:1}
+.dtable th small{display:block;color:var(--muted);font-weight:400}
+.dtable td.n{color:var(--muted);background:#f8f9fa;text-align:right}
+.dtable tr.cur td{background:#dcecf9}
+.dtable tbody tr{cursor:pointer}
+.dtable tbody tr:hover td{background:#eef6fd}
+.empty{display:grid;place-items:center;height:100%;color:var(--muted);text-align:center;line-height:1.6}
+.empty button{margin-top:8px}
+
+/* properties */
+.props{background:var(--panel);border-left:2px solid var(--chrome-hi);display:grid;grid-template-rows:28px auto 1fr;min-height:0}
+.props .ph{background:var(--chrome-hi);color:#fff;display:flex;align-items:center;padding:0 8px;gap:6px;font-size:12.5px}
+.props .ph svg{width:14px;height:14px}
+.ptabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:4px 6px 0}
+.ptabs button{background:none;border:0;border-bottom:2px solid transparent;padding:4px 8px 5px;color:var(--ink)}
+.ptabs button.on{border-color:var(--chrome-hi);color:var(--chrome)}
+.pbody{overflow:auto;padding:10px 12px 20px}
+.sec{color:var(--chrome);font-size:12.5px;margin:14px 0 6px;padding-bottom:3px;border-bottom:1px solid #e6e9ec}
+.pbody>.sec:first-child,.pbody>.pset:first-child>.sec{margin-top:0}
+.pset{border:0;margin:0;padding:0;min-width:0}
+.pset[disabled]{opacity:.45}
+.pset.sub[disabled]{opacity:.6}
+.pset[disabled] .pset[disabled]{opacity:1}
+.f{display:grid;grid-template-columns:118px 1fr;align-items:center;gap:6px;margin:5px 0}
+.f.stack{grid-template-columns:1fr}
+.f>label{color:#3b4048}
+.f input[type=text],.f input[type=number],.f select,.f textarea{width:100%;height:24px;border:1px solid #c5cad0;padding:0 6px;background:#fff}
+.f textarea{height:96px;padding:5px 6px;resize:vertical;font-family:Consolas,"Cascadia Mono",monospace}
+.f .unit{display:flex;align-items:center;gap:4px}
+.f .unit span{color:var(--muted);width:18px}
+.chk{display:flex;align-items:center;gap:6px;margin:6px 0}
+.seg{display:flex;border:1px solid #c5cad0;width:max-content}
+.seg button{border:0;border-right:1px solid #c5cad0;background:#fff;height:24px;min-width:30px;padding:0 8px}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--press);color:var(--chrome)}
+.hint{color:var(--muted);font-size:11.5px;line-height:1.45;margin:4px 0}
+.preview-val{background:#f3f5f7;border:1px solid #e1e4e8;padding:5px 7px;font-family:Consolas,monospace;word-break:break-all;min-height:26px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.chips button{border:1px solid #c5cad0;background:#fff;padding:3px 8px;font-size:12px;border-radius:2px;display:inline-flex;align-items:baseline;gap:5px}
+.chips button small{color:var(--muted);font-size:10px}
+.chips button:hover{background:var(--hover)}
+
+/* status */
+.status{background:#eef0f2;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:0 8px;color:#3b4048}
+.status .sp{flex:1}
+.status select{height:20px;border:1px solid #c5cad0;background:#fff;max-width:280px}
+.status input[type=range]{width:120px}
+.status .dot{width:8px;height:8px;border-radius:50%;background:#9aa1a9;display:inline-block}
+.status .dot.ok{background:#2e9d4f}
+
+/* menu + dialogs */
+.menu{position:fixed;top:56px;left:4px;background:#fff;border:1px solid #c5cad0;box-shadow:0 6px 24px rgba(0,0,0,.18);min-width:240px;padding:4px 0;z-index:50}
+.menu[hidden]{display:none}
+.menu button{display:flex;gap:10px;align-items:center;width:100%;background:none;border:0;padding:7px 14px;text-align:left}
+.menu button:hover{background:var(--hover)}
+.menu button svg{width:18px;height:18px}
+.menu kbd{margin-left:auto;color:var(--muted);font:inherit;font-size:11px}
+.menu hr{border:0;border-top:1px solid var(--line);margin:4px 0}
+
+dialog{border:1px solid #9fb6c9;padding:0;box-shadow:0 12px 40px rgba(0,0,0,.28);min-width:420px;max-width:min(720px,94vw)}
+dialog::backdrop{background:rgba(20,30,40,.35)}
+dialog .dh{background:var(--chrome);color:#fff;padding:7px 12px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+dialog .dh button{background:none;border:0;color:#fff;font-size:16px;line-height:1}
+dialog .db{padding:14px 16px}
+dialog .df{display:flex;justify-content:flex-end;gap:8px;padding:10px 16px;background:var(--ribbon);border-top:1px solid var(--line)}
+.btn{height:26px;padding:0 14px;border:1px solid #adb5bd;background:#fff;border-radius:2px}
+.btn:hover{background:var(--hover)}
+.btn.pri{background:var(--chrome-hi);border-color:var(--chrome);color:#fff}
+.btn.pri:hover{background:var(--chrome)}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.presets button{border:1px solid #c5cad0;background:#fff;padding:6px 10px;border-radius:2px;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:72px}
+.presets button:hover{background:var(--hover)}
+.presets i{display:block;border:1.5px solid #555;border-radius:2px;background:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+.zpl{width:100%;height:320px;font-family:Consolas,"Cascadia Mono",monospace;font-size:12px;border:1px solid #c5cad0;padding:8px;white-space:pre}
+.msg{margin-top:10px;padding:7px 10px;border-left:3px solid var(--chrome-hi);background:#eef6fd;line-height:1.45}
+.msg.err{border-color:var(--danger);background:#fdeeee}
+.msg.ok{border-color:#2e9d4f;background:#edf7f0}
+.msg:empty{display:none}
+.psum{margin:6px 0 2px;padding:6px 10px;background:var(--ribbon);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.psum.warn{background:#fff6e5;border-color:#e0b252}
+.toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#2b2f35;color:#fff;padding:8px 14px;border-radius:3px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="title">
+    <svg class="appicon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M6 9v6M8.5 9v6M10 9v6M12.5 9v6M15 9h3M15 12h3M15 15h2"/></svg>
+    <button class="qa" data-act="open" title="Otevřít šablonu (Ctrl+O)" data-i="open"></button>
+    <button class="qa" data-act="save" title="Uložit šablonu (Ctrl+S)" data-i="save"></button>
+    <button class="qa" data-act="undo" title="Zpět (Ctrl+Z)" data-i="undo"></button>
+    <button class="qa" data-act="redo" title="Znovu (Ctrl+Y)" data-i="redo"></button>
+    <div class="name" id="docname">Nová etiketa — Label Designer</div>
+    <div id="appver" style="width:120px;text-align:right;opacity:.75;font-size:11px" title="Verze aplikace"></div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="file" id="fileBtn">Soubor</button>
+    <button class="on" data-rtab="home">Domů</button>
+    <button data-rtab="data">Data</button>
+    <button data-rtab="view">Zobrazení</button>
+    <button class="ctx" id="ctxTab" hidden>Text</button>
+  </div>
+
+  <div class="ribbon">
+    <!-- HOME -->
+    <div class="rpage on" data-rpage="home">
+      <div class="grp"><div class="body">
+        <button class="big" data-act="paste" data-i="paste">Vložit</button>
+        <div class="col">
+          <button class="sm" data-act="cut"><span data-i="cut"></span>Vyjmout</button>
+          <button class="sm" data-act="copy"><span data-i="copy"></span>Kopírovat</button>
+          <button class="sm" data-act="dup"><span data-i="dup"></span>Duplikovat</button>
+        </div></div><div class="cap">Schránka</div></div>
+      <div class="grp"><div class="body"><div class="col">
+          <div class="row">
+            <select class="field-s" id="rbFont" style="width:170px"><option>Písmo tiskárny</option></select>
+            <input class="field-s" id="rbSize" type="number" min="4" max="200" step="1" style="width:58px" title="Velikost, pt" list="sizeList">
+            <datalist id="sizeList"><option value="6"><option value="7"><option value="8"><option value="9"><option value="10"><option value="11"><option value="12"><option value="14"><option value="16"><option value="18"><option value="20"><option value="24"><option value="28"><option value="32"><option value="36"><option value="40"><option value="48"><option value="60"><option value="72"><option value="96"></datalist>
+            <button class="ico" data-act="fontUp" title="Zvětšit písmo (Cmd+Shift+>)" data-i="fontUp"></button>
+            <button class="ico" data-act="fontDn" title="Zmenšit písmo (Cmd+Shift+<)" data-i="fontDn"></button>
+          </div>
+          <div class="row" style="margin-top:3px">
+            <button class="ico fmt" data-fmt="bold" title="Tučné (Cmd+B)"><b>B</b></button>
+            <button class="ico fmt" data-fmt="italic" title="Kurzíva (Cmd+I)"><i style="font-family:Georgia,serif">I</i></button>
+            <button class="ico fmt" data-fmt="underline" title="Podtržení (Cmd+U)"><u>U</u></button>
+            <button class="ico fmt" data-fmt="strike" title="Přeškrtnutí (Cmd+Shift+X)"><s>S</s></button>
+            <span style="width:8px"></span>
+            <button class="ico" data-talign="left" title="Zarovnat vlevo (Cmd+L)" data-i="tl"></button>
+            <button class="ico" data-talign="center" title="Na střed (Cmd+E)" data-i="tc"></button>
+            <button class="ico" data-talign="right" title="Zarovnat vpravo" data-i="tr"></button>
+            <button class="ico" data-talign="justify" title="Do bloku (Cmd+J)" data-i="tj"></button>
+            <span style="width:8px"></span>
+            <button class="ico" data-act="invert" title="Inverze (bílá na černé)" data-i="inverse"></button>
+          </div>
+        </div></div><div class="cap">Písmo</div></div>
+      <div class="grp"><div class="body">
+        <button class="big" data-act="print" data-i="print">Tisk</button>
+      </div><div class="cap">Akce</div></div>
+      <div class="grp"><div class="body">
+        <button class="big" data-act="docprops" data-i="docprops">Vlastnosti<br>etikety</button>
+      </div><div class="cap">Správa</div></div>
+      <div class="grp"><div class="body"><div class="col">
+          <div class="row">
+            <button class="ico" data-align="l" title="Vlevo" data-i="al"></button>
+            <button class="ico" data-align="c" title="Na střed (vodorovně)" data-i="ac"></button>
+            <button class="ico" data-align="r" title="Vpravo" data-i="ar"></button>
+          </div>
+          <div class="row">
+            <button class="ico" data-align="t" title="Nahoru" data-i="at"></button>
+            <button class="ico" data-align="m" title="Na střed (svisle)" data-i="am"></button>
+            <button class="ico" data-align="b" title="Dolů" data-i="ab"></button>
+          </div>
+          <div class="row">
+            <button class="ico" data-act="rotate" title="Otočit o 90°" data-i="rot"></button>
+          </div>
+        </div></div><div class="cap">Zarovnat</div></div>
+      <div class="grp"><div class="body">
+        <button class="big" data-act="front" data-i="front">Do<br>popředí</button>
+        <button class="big" data-act="back" data-i="back">Do<br>pozadí</button>
+        <button class="big" data-act="del" data-i="del">Odstranit</button>
+      </div><div class="cap">Objekty</div></div>
+    </div>
+
+    <!-- DATA -->
+    <div class="rpage" data-rpage="data">
+      <div class="grp"><div class="body">
+        <button class="big" data-act="importXls" data-i="excel">Import<br>Excel / CSV</button>
+        <div class="col">
+          <div class="row">List <select class="field-s" id="sheetSel" style="width:140px" disabled></select></div>
+          <label class="row" style="margin-top:4px"><input type="checkbox" id="hdrChk" checked> První řádek — záhlaví</label>
+        </div>
+      </div><div class="cap">Zdroj dat</div></div>
+      <div class="grp"><div class="body"><div class="col" style="justify-content:center;height:68px">
+        <div class="recnav">
+          <button class="ico" data-act="recFirst" title="První záznam" data-i="first"></button>
+          <button class="ico" data-act="recPrev" title="Předchozí" data-i="prev"></button>
+          <span class="count" id="recCount">žádná data</span>
+          <button class="ico" data-act="recNext" title="Další" data-i="next"></button>
+          <button class="ico" data-act="recLast" title="Poslední" data-i="last"></button>
+        </div>
+        </div></div><div class="cap">Záznam pro náhled</div></div>
+      <div class="grp"><div class="body">
+        <button class="big" data-act="showData" data-i="table">Tabulka<br>dat</button>
+        <button class="big" data-act="clearData" data-i="del">Vymazat<br>data</button>
+      </div><div class="cap">Data</div></div>
+    </div>
+
+    <!-- VIEW -->
+    <div class="rpage" data-rpage="view">
+      <div class="grp"><div class="body">
+        <button class="big" data-act="zoomIn" data-i="zoomIn">Přiblížit</button>
+        <button class="big" data-act="zoomOut" data-i="zoomOut">Oddálit</button>
+        <button class="big" data-act="zoomFit" data-i="fit">Přizpůsobit<br>oknu</button>
+        <button class="big" data-act="zoom100" data-i="z100">100 %</button>
+      </div><div class="cap">Lupa</div></div>
+      <div class="grp"><div class="body"><div class="col">
+        <label class="sm"><input type="checkbox" id="gridChk"> Zobrazit mřížku</label>
+        <label class="sm"><input type="checkbox" id="snapChk" checked> Přichytit k mřížce</label>
+        <div class="row">Krok mřížky <select class="field-s" id="gridStep"><option value="0.5">0,5 mm</option><option value="1" selected>1 mm</option><option value="2">2 mm</option><option value="5">5 mm</option></select></div>
+      </div></div><div class="cap">Mřížka</div></div>
+      <div class="grp"><div class="body">
+        <button class="big" data-act="showZpl" data-i="code">Zobrazit<br>ZPL</button>
+      </div><div class="cap">Kód</div></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="tools" id="tools">
+      <button class="tool" data-tool="text"><span data-i="T"></span>Text</button>
+      <button class="tool" data-tool="code128"><span data-i="barcode"></span>Čárový kód</button>
+      <button class="tool" data-tool="qrcode"><span data-i="qr"></span>QR kód</button>
+      <button class="tool" data-tool="datamatrix"><span data-i="dm"></span>DataMatrix</button>
+      <button class="tool" data-tool="rect"><span data-i="rect"></span>Obdél&shy;ník</button>
+      <button class="tool" data-tool="line"><span data-i="line"></span>Čára</button>
+      <button class="tool" data-tool="ellipse"><span data-i="ellipse"></span>Elipsa</button>
+      <button class="tool" data-tool="inverse"><span data-i="inverse"></span>Negativ</button>
+    </div>
+
+    <div class="center">
+      <div class="view ws on" id="wsView">
+        <div class="corner"></div>
+        <canvas class="rt" id="rTop"></canvas>
+        <canvas class="rl" id="rLeft"></canvas>
+        <div class="scroll" id="scroll"><div class="stage center-it" id="stage"><div class="label" id="label"></div></div></div>
+      </div>
+      <div class="view dataview" id="dataView">
+        <div class="dbar" id="dbar"></div>
+        <div class="dtable" id="dtable"></div>
+      </div>
+      <div class="doctabs">
+        <button class="on" data-view="ws">Návrh etikety</button>
+        <button data-view="data" id="dataTabBtn">Data</button>
+      </div>
+    </div>
+
+    <aside class="props">
+      <div class="ph"><span data-i="list"></span><span id="propTitle">Vlastnosti — Etiketa</span></div>
+      <div class="ptabs" id="ptabs"></div>
+      <div class="pbody" id="pbody"></div>
+    </aside>
+  </div>
+
+  <div class="status">
+    <span id="stLabel"></span>
+    <span class="sp"></span>
+    <span id="stPos"></span>
+    <button class="ico" data-act="zoomFit" title="Přizpůsobit oknu" data-i="fit"></button>
+    <button class="ico" data-act="zoomOut" title="Oddálit" data-i="minus"></button>
+    <input type="range" id="zoomRange" min="25" max="600" step="5" aria-label="Lupa">
+    <button class="ico" data-act="zoomIn" title="Přiblížit" data-i="plus"></button>
+    <span id="zoomPct" style="min-width:40px;text-align:right"></span>
+  </div>
+</div>
+
+<div class="menu" id="fileMenu" hidden>
+  <button data-act="new"><span data-i="new"></span>Nová etiketa<kbd>Ctrl+N</kbd></button>
+  <button data-act="open"><span data-i="open"></span>Otevřít šablonu…<kbd>Ctrl+O</kbd></button>
+  <button data-act="save"><span data-i="save"></span>Uložit<kbd>Ctrl+S</kbd></button>
+  <button data-act="saveAs"><span data-i="save"></span>Uložit jako…</button>
+  <button data-act="saveJson"><span data-i="save"></span>Exportovat jako JSON…</button>
+  <hr>
+  <button data-act="importXls"><span data-i="excel"></span>Import Excel / CSV…</button>
+  <button data-act="showZpl"><span data-i="code"></span>Zobrazit ZPL</button>
+  <button data-act="print"><span data-i="print"></span>Tisk…<kbd>Ctrl+P</kbd></button>
+</div>
+
+<dialog id="dlgDoc">
+  <div class="dh"><span id="dlgDocTitle">Vlastnosti etikety</span><button data-close aria-label="Zavřít">×</button></div>
+  <div class="db">
+    <div class="hint" style="margin-bottom:6px">Časté rozměry (šířka × výška, mm):</div>
+    <div class="presets" id="presets"></div>
+    <div class="grid2">
+      <div class="f"><label>Šířka</label><div class="unit"><input type="number" id="dW" step="0.5" min="5"><span>mm</span></div></div>
+      <div class="f"><label>Výška</label><div class="unit"><input type="number" id="dH" step="0.5" min="5"><span>mm</span></div></div>
+      <div class="f"><label>Rozlišení</label><select id="dDpi"><option value="203">203 dpi (8 bodů/mm)</option><option value="300">300 dpi (12 bodů/mm)</option><option value="600">600 dpi (24 bodů/mm)</option></select></div>
+      <div class="f"><label>Rychlost</label><select id="dSpeed"><option value="2">2 palců/s</option><option value="3">3 palců/s</option><option value="4">4 palců/s</option><option value="5">5 palců/s</option><option value="6">6 palců/s</option></select></div>
+      <div class="f"><label>Tmavost (±)</label><input type="number" id="dDark" min="-30" max="30" step="1"></div>
+      <div class="f"><label>Posun X / Y</label><div class="unit"><input type="number" id="dOx" step="0.1" style="width:60px"><input type="number" id="dOy" step="0.1" style="width:60px"><span>mm</span></div></div>
+    </div>
+    <div class="hint">Tmavost se přičítá k hodnotě nastavené v tiskárně. Posun přesune celý tisk, pokud etiketa netiskne na střed.</div>
+  </div>
+  <div class="df"><button class="btn" data-close>Zrušit</button><button class="btn pri" id="dOk">Hotovo</button></div>
+</dialog>
+
+<dialog id="dlgPrint">
+  <div class="dh"><span>Tisk</span><button data-close aria-label="Zavřít">×</button></div>
+  <div class="db">
+    <div class="sec" style="margin-top:0">Způsob tisku</div>
+    <label class="chk"><input type="radio" name="pm" value="browser" checked> Přes prohlížeč (ovladač tiskárny) — doporučeno</label>
+    <label class="chk"><input type="radio" name="pm" value="ip"> Na IP tiskárny v síti (ZPL, bez ovladače)</label>
+    <div id="pIpRow">
+      <div class="f"><label>Tiskárna</label><select id="pIpSel"></select></div>
+      <div class="f"><label>Název</label><input type="text" id="pIpName" placeholder="např. Sklad – regál A" autocomplete="off"></div>
+      <div class="f"><label>IP tiskárny</label><div class="unit"><input type="text" id="pIp" placeholder="např. 10.20.30.40" list="ipList" autocomplete="off" spellcheck="false"><button class="btn" id="pIpTest" type="button">Otestovat</button></div></div>
+      <div class="row" style="gap:6px;justify-content:flex-end"><button class="btn" id="pIpDel" type="button">Odstranit</button><button class="btn" id="pIpSave" type="button">Uložit do šablony</button></div>
+    </div>
+    <datalist id="ipList"></datalist>
+    <div class="sec">Které záznamy</div>
+    <label class="chk"><input type="radio" name="pr" value="cur" checked> Aktuální záznam <span id="pCurN" class="hint"></span></label>
+    <label class="chk"><input type="radio" name="pr" value="all"> Všechny záznamy <span id="pAllN" class="hint"></span></label>
+    <label class="chk"><input type="radio" name="pr" value="range"> Od&nbsp;<input type="number" id="pFrom" min="1" style="width:64px">&nbsp;do&nbsp;<input type="number" id="pTo" min="1" style="width:64px"></label>
+    <div class="f" style="margin-top:10px"><label>Kopií každé</label><input type="number" id="pCopies" min="1" max="9999" value="1" style="width:80px"></div>
+    <div class="psum" id="pSum"></div>
+    <div class="f" id="pBatchRow"><label>Etiket v jedné dávce</label><input type="number" id="pBatch" min="10" max="1000" step="10" value="100" style="width:80px"></div>
+    <div class="msg" id="pMsg"></div>
+  </div>
+  <div class="df">
+    <button class="btn" id="pZpl">Zobrazit ZPL</button>
+    <button class="btn" id="pDl">Stáhnout .zpl</button>
+    <span style="flex:1"></span>
+    <button class="btn" data-close>Zavřít</button>
+    <button class="btn pri" id="pGo">Tisk</button>
+  </div>
+</dialog>
+
+<dialog id="dlgZpl">
+  <div class="dh"><span>Kód ZPL</span><button data-close aria-label="Zavřít">×</button></div>
+  <div class="db"><textarea class="zpl" id="zplText" readonly spellcheck="false"></textarea>
+  <div class="hint">Toto se posílá do tiskárny. Soubor .zpl lze poslat do tiskárny i ručně, nástrojem výrobce tiskárny.</div></div>
+  <div class="df"><button class="btn" id="zCopy">Kopírovat</button><button class="btn" id="zDl">Stáhnout .zpl</button><button class="btn pri" data-close>Zavřít</button></div>
+</dialog>
+
+<input type="file" id="fJson" accept=".html,.htm,.json,text/html,application/json" hidden>
+<input type="file" id="fXls" accept=".xlsx,.xls,.xlsm,.csv,.ods" hidden>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+// the editor's own source, taken before any script touches the DOM: saved templates are copies of it
+const PAGE_SRC = document.documentElement.outerHTML;
+const APP_VERSION = '1.17 · 24. 11. 2026';
+// any unexpected error is shown instead of silently freezing the page
+addEventListener('error', e => showFatal(e.message));
+addEventListener('unhandledrejection', e => showFatal(e.reason?.message || String(e.reason)));
+function showFatal(msg){
+  const t = document.getElementById('toast'); if (!t) return;
+  t.textContent = 'Chyba: ' + msg + ' — uložte šablonu (Cmd+S) a obnovte stránku (Cmd+Shift+R).';
+  t.style.background = '#c42b1c'; t.classList.add('on');
+  clearTimeout(showFatal.t); showFatal.t = setTimeout(() => { t.classList.remove('on'); t.style.background = ''; }, 8000);
+}
+/* ---------- icons ---------- */
+const P = (d, extra='') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
+const B = '#1a6fb0';
+const ICONS = {
+  open:P('<path d="M3 7h6l2 2h10v10H3z"/>'),
+  save:P('<path d="M4 4h13l3 3v13H4z"/><path d="M8 4v5h8V4M8 20v-6h8v6"/>'),
+  undo:P('<path d="M9 7 4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-3"/>'),
+  redo:P('<path d="m15 7 5 5-5 5"/><path d="M20 12H9a5 5 0 0 0 0 10h3"/>'),
+  new:P('<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>'),
+  paste:P(`<rect x="5" y="4" width="14" height="17" rx="1.5" stroke="${B}"/><rect x="9" y="2.5" width="6" height="3.5" rx="1"/><path d="M9 11h6M9 14h6M9 17h4"/>`),
+  cut:P('<circle cx="6" cy="18" r="2.5"/><circle cx="16" cy="18" r="2.5"/><path d="M7.8 16.2 17 4M14.2 16.2 5 4"/>'),
+  copy:P('<rect x="8" y="8" width="12" height="13" rx="1"/><path d="M16 8V4H4v13h4"/>'),
+  dup:P('<rect x="4" y="4" width="11" height="11" rx="1"/><rect x="9" y="9" width="11" height="11" rx="1" stroke="'+B+'"/>'),
+  fontUp:P('<path d="M3 19 8 6l5 13M5 15h6M17 9V3M14 6h6"/>'),
+  fontDn:P('<path d="M3 19 8 6l5 13M5 15h6M14 6h6"/>'),
+  tl:P('<path d="M4 6h16M4 10h10M4 14h16M4 18h10"/>'),
+  tc:P('<path d="M4 6h16M7 10h10M4 14h16M7 18h10"/>'),
+  tr:P('<path d="M4 6h16M10 10h10M4 14h16M10 18h10"/>'),
+  tj:P('<path d="M4 6h16M4 10h16M4 14h16M4 18h16"/>'),
+  inverse:P('<rect x="3" y="5" width="18" height="14" fill="currentColor"/><path d="M8 9v6M11 9v6M14 9v6M16.5 9v6" stroke="#fff"/>'),
+  print:P(`<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="1.5" stroke="${B}"/><path d="M7 14h10v7H7z"/><circle cx="17.5" cy="12" r=".6" fill="currentColor"/>`),
+  docprops:P(`<rect x="4" y="3" width="16" height="18" rx="1.5"/><circle cx="12" cy="12" r="3" stroke="${B}"/><path d="M12 7v2M12 15v2M7 12h2M15 12h2" stroke="${B}"/>`),
+  al:P('<path d="M4 3v18"/><rect x="7" y="6" width="12" height="4"/><rect x="7" y="14" width="7" height="4"/>'),
+  ac:P('<path d="M12 3v18"/><rect x="5" y="6" width="14" height="4"/><rect x="8" y="14" width="8" height="4"/>'),
+  ar:P('<path d="M20 3v18"/><rect x="5" y="6" width="12" height="4"/><rect x="10" y="14" width="7" height="4"/>'),
+  at:P('<path d="M3 4h18"/><rect x="6" y="7" width="4" height="12"/><rect x="14" y="7" width="4" height="7"/>'),
+  am:P('<path d="M3 12h18"/><rect x="6" y="5" width="4" height="14"/><rect x="14" y="8" width="4" height="8"/>'),
+  ab:P('<path d="M3 20h18"/><rect x="6" y="5" width="4" height="12"/><rect x="14" y="10" width="4" height="7"/>'),
+  rot:P('<path d="M20 11a8 8 0 1 1-2.3-5.7L20 7.5"/><path d="M20 3v4.5h-4.5"/>'),
+  front:P(`<rect x="3" y="3" width="11" height="11" rx="1"/><rect x="9" y="9" width="12" height="12" rx="1" fill="${B}" stroke="${B}"/>`),
+  back:P(`<rect x="9" y="9" width="12" height="12" rx="1"/><rect x="3" y="3" width="11" height="11" rx="1" fill="${B}" stroke="${B}"/>`),
+  del:P('<path d="M5 5l14 14M19 5 5 19" stroke-width="2"/>'),
+  excel:P('<rect x="8" y="3" width="13" height="18" rx="1.5"/><path d="M12 8h6M12 12h6M12 16h6"/><rect x="3" y="7" width="9" height="10" rx="1" fill="#1d7044" stroke="#1d7044"/><path d="m5.5 9.5 4 5M9.5 9.5l-4 5" stroke="#fff"/>'),
+  table:P(`<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18M3 14h18M9 4v16" /><path d="M3 4h18v5H3z" fill="${B}" stroke="${B}" opacity=".35"/>`),
+  first:P('<path d="M6 5v14M18 6l-7 6 7 6"/>'), prev:P('<path d="m15 6-7 6 7 6"/>'),
+  next:P('<path d="m9 6 7 6-7 6"/>'), last:P('<path d="M18 5v14M6 6l7 6-7 6"/>'),
+  zoomIn:P('<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5M8 10.5h5M10.5 8v5"/>'),
+  zoomOut:P('<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5M8 10.5h5"/>'),
+  fit:P('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><rect x="8" y="8" width="8" height="8"/>'),
+  z100:P('<path d="M5 8v8M9 8v8h4V8zM15 8v8h4V8z" stroke-width="1.3"/>'),
+  code:P('<path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>'),
+  T:P('<path d="M5 5h14M12 5v15M9 20h6" stroke-width="1.8"/>'),
+  barcode:P('<path d="M4 5v14M6.5 5v14M8 5v14M11 5v14M13.5 5v14M15 5v14M17.5 5v14M20 5v14" />'),
+  qr:P('<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="5.5" y="5.5" width="2" height="2" fill="currentColor"/><rect x="16.5" y="5.5" width="2" height="2" fill="currentColor"/><rect x="5.5" y="16.5" width="2" height="2" fill="currentColor"/><path d="M14 14h3v3M20 14v1M14 20h3M20 18v3h-1"/>'),
+  dm:P('<path d="M3 3v18h18"/><path d="M6 3h3M12 3h3M18 3h3v3M21 9v3M21 15v3"/><rect x="7" y="7" width="3" height="3" fill="currentColor"/><rect x="13" y="10" width="3" height="3" fill="currentColor"/><rect x="8" y="14" width="3" height="3" fill="currentColor"/>'),
+  rect:P('<rect x="4" y="5" width="16" height="14"/><circle cx="4" cy="5" r="1.4" fill="#fff"/><circle cx="20" cy="19" r="1.4" fill="#fff"/>'),
+  line:P('<path d="M4 20 20 4"/><circle cx="4" cy="20" r="1.4" fill="#fff"/><circle cx="20" cy="4" r="1.4" fill="#fff"/>'),
+  ellipse:P('<ellipse cx="12" cy="12" rx="8.5" ry="7"/>'),
+  list:P('<path d="M4 6h16M4 12h16M4 18h16"/>'),
+  refresh:P('<path d="M20 11a8 8 0 1 0-2 5.3"/><path d="M20 4v7h-7"/>'),
+  minus:P('<path d="M5 12h14"/>'), plus:P('<path d="M5 12h14M12 5v14"/>'),
+};
+document.getElementById('appver').textContent = 'v' + APP_VERSION;
+document.querySelectorAll('[data-i]').forEach(el => {
+  const svg = ICONS[el.dataset.i]; if (!svg) return;
+  if (el.tagName === 'SPAN') el.outerHTML = svg; else el.insertAdjacentHTML('afterbegin', svg);
+});
+
+/* ---------- state ---------- */
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const PRESETS = [[50,70],[100,60],[100,150],[100,50],[58,40],[50,30],[70,50],[40,25]];
+const TYPES = {
+  text:'Text', code128:'Code 128', code39:'Code 39', ean13:'EAN-13', qrcode:'QR kód', datamatrix:'DataMatrix',
+  rect:'Obdélník', line:'Čára', ellipse:'Elipsa', inverse:'Negativ'
+};
+const BARCODES = ['code128','code39','ean13','qrcode','datamatrix'];
+const is2D = t => t === 'qrcode' || t === 'datamatrix';
+const isBC = t => BARCODES.includes(t);
+
+const S = {
+  tpl: null, sel: null, zoom: 2.5, tool: null, ptab: 'src', view: 'ws',
+  data: { wb: null, sheet: '', rows: [], headers: [], hdr: true, file: '' },
+  rec: 0, hist: [], fut: [], lastPush: 0, clip: null, fileHandle: null,
+  grid: false, snap: true, gstep: 1, printers: [], printer: null,
+};
+const newTpl = (w=50, h=70, dpi=300) => ({ v:1, name:'Nová etiketa', label:{ w, h, dpi, speed:4, dark:0, ox:0, oy:0, z0:'image' }, objects:[], seq:1 });
+
+/* ---------- utils ---------- */
+const r2 = v => Math.round(v*100)/100;
+const kpx = () => S.zoom * 96 / 25.4;           // px per mm on screen
+const dots = mm => Math.round(mm * S.tpl.label.dpi / 25.4);
+const mmPerDot = () => 25.4 / S.tpl.label.dpi;
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const colName = i => { let s=''; i++; while (i>0) { const m=(i-1)%26; s=String.fromCharCode(65+m)+s; i=Math.floor((i-1)/26);} return s; };
+const colIdx = s => { s=s.toUpperCase(); let n=0; for (const c of s) n=n*26+(c.charCodeAt(0)-64); return n-1; };
+const get = (o,p) => p.split('.').reduce((a,k)=>a?.[k], o);
+const set = (o,p,v) => { const ks=p.split('.'); let a=o; ks.slice(0,-1).forEach(k=>a=a[k]??=({})); a[ks.at(-1)]=v; };
+function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('on'),2200); }
+const snapv = (v, ev) => (S.snap && !ev?.altKey) ? Math.round(v / S.gstep) * S.gstep : r2(v);
+
+/* ---------- history ---------- */
+function push(force){
+  const now = Date.now();
+  if (!force && now - S.lastPush < 700) { S.lastPush = now; return; }
+  S.lastPush = now;
+  S.hist.push(JSON.stringify(S.tpl)); if (S.hist.length > 200) S.hist.shift();
+  S.fut = [];
+}
+function undo(){ if(!S.hist.length) return; S.fut.push(JSON.stringify(S.tpl)); S.tpl=JSON.parse(S.hist.pop()); S.lastPush=0; afterLoad(false); }
+function redo(){ if(!S.fut.length) return; S.hist.push(JSON.stringify(S.tpl)); S.tpl=JSON.parse(S.fut.pop()); S.lastPush=0; afterLoad(false); }
+function autosave(){ clearTimeout(autosave.t); autosave.t = setTimeout(() => { try { localStorage.setItem('ld.tpl', JSON.stringify(S.tpl)); } catch {} }, 400); }
+
+/* ---------- data ---------- */
+function cellOf(key, rec){
+  const row = S.data.rows[rec];
+  key = String(key).trim();
+  // a header name wins (so {bin} or {kod} means that column), a bare letter like {A} or {AB} is the Excel column
+  let i = S.data.headers.findIndex(h => String(h).trim().toLowerCase() === key.toLowerCase());
+  if (i < 0 && /^[A-Za-z]{1,3}$/.test(key)) i = colIdx(key);
+  if (!row) return null;
+  return i >= 0 ? String(row[i] ?? '') : '';
+}
+// position of the label inside the print job; the counter follows it, so copies get their own numbers
+let SEQ = null;
+const hasCounter = () => S.tpl.objects.some(o => !o.noprint && o.src?.mode === 'counter');
+const counterText = (s, n) => String((+s.start||0) + n*(+s.step||1)).padStart(+s.pad||0, '0');
+function valueOfSeq(o, n){ const keep = SEQ; SEQ = n; try { return valueOf(o, 0); } finally { SEQ = keep; } }
+function valueOf(o, rec = S.rec){
+  const s = o.src; let v;
+  switch (s.mode) {
+    case 'col': { const c = cellOf(s.col, rec); v = c === null ? `[${s.col}]` : c; break; }
+    case 'tpl': v = (s.tpl||'').replace(/\{([^}]+)\}/g, (_, k) => { const c = cellOf(k, rec); return c === null ? `[${k}]` : c; }); break;
+    case 'counter': v = counterText(s, SEQ ?? rec); break;
+    default: v = s.value ?? '';
+  }
+  return (s.prefix||'') + v + (s.suffix||'');
+}
+function loadSheet(){
+  const d = S.data, ws = d.wb.Sheets[d.sheet];
+  const arr = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:'', blankrows:false });
+  const width = Math.max(0, ...arr.map(r => r.length));
+  if (d.hdr && arr.length) { d.headers = arr[0].map(String); d.rows = arr.slice(1); }
+  else { d.headers = []; d.rows = arr; }
+  while (d.headers.length < width) d.headers.push('');
+  S.rec = 0; renderAll();
+}
+async function importXls(file){
+  try {
+    const wb = XLSX.read(await file.arrayBuffer(), { type:'array' });
+    S.data.wb = wb; S.data.sheet = wb.SheetNames[0]; S.data.file = file.name;
+    const sel = $('#sheetSel'); sel.disabled = false;
+    sel.innerHTML = wb.SheetNames.map(n => `<option>${esc(n)}</option>`).join('');
+    loadSheet();
+    requestAnimationFrame(() => render()); setTimeout(() => render(), 300);
+    toast(`Načteno řádků: ${S.data.rows.length} ze souboru „${file.name}»`);
+  } catch (e) { toast('Soubor nelze přečíst: ' + e.message); }
+}
+// insert buttons: named after the column headers once a table is loaded, plain letters before that
+const colChips = () => {
+  const named = S.data.rows.length && S.data.headers.some(h => String(h).trim());
+  const n = named ? S.data.headers.length : 8;
+  return Array.from({ length: n }, (_, i) => {
+    const letter = colName(i), h = named ? String(S.data.headers[i] ?? '').trim() : '';
+    const key = h && !/[{}]/.test(h) ? h : letter;
+    return `<button data-ins="{${esc(key)}}" title="Sloupec ${letter}${h ? ' — ' + esc(h) : ''}">${h ? `${esc(h)}<small>${letter}</small>` : `{${letter}}`}</button>`;
+  }).join('');
+};
+const colOptions = () => {
+  const n = Math.max(S.data.headers.length, 8);
+  return Array.from({length:n}, (_, i) => ({ v: colName(i), t: colName(i) + (S.data.headers[i] ? ' — ' + S.data.headers[i] : '') }));
+};
+
+/* ---------- objects ---------- */
+function makeObj(type, x, y){
+  const L = S.tpl.label, id = S.tpl.seq++;
+  const o = { id, type, name: `${TYPES[type]} ${id}`, x, y, w:0, h:0, rot:0, inv:false, noprint:false,
+    src:{ mode:'fixed', value:'', col:'A', tpl:'{A}', prefix:'', suffix:'', start:1, step:1, pad:0 } };
+  if (type === 'text') { o.src.value = 'Text'; o.text = { font:'Z0', pt:14, ws:100, bold:false, italic:false, align:'left', block:false, lines:1 }; o.w = Math.min(30, L.w - x); }
+  o.anchor = 'left';
+  if (isBC(type)) {
+    o.src.value = type === 'ean13' ? '590123412345' : type === 'code39' ? 'ABC123' : '0101 0';
+    o.bc = { mod: L.dpi >= 300 ? 3 : 2, ratio:3, mag: L.dpi >= 300 ? 6 : 4, ecl:'M', hr:true };
+    o.h = 12;
+  }
+  if (type === 'rect' || type === 'inverse') { o.w = 25; o.h = 15; o.stroke = 0.4; o.fill = type === 'inverse'; o.round = 0; }
+  if (type === 'inverse') { o.inv = true; }
+  if (type === 'ellipse') { o.w = 20; o.h = 14; o.stroke = 0.4; o.fill = false; }
+  if (type === 'line') { o.w = 30; o.h = 0.4; o.stroke = 0.4; }
+  return o;
+}
+const selObj = () => S.tpl.objects.find(o => o.id === S.sel);
+
+/* ---------- fonts ---------- */
+// 'Z0' = printer's built-in scalable font; any other value is a computer font printed as a picture
+const isPcFont = t => !!t && !!t.font && t.font !== 'Z0';
+const PC_LH = 1.15;
+const FONT_CANDIDATES = ['Arial','Arial Narrow','Arial Black','Bahnschrift','Calibri','Cambria','Candara','Century Gothic','Consolas',
+  'Constantia','Corbel','Courier New','Franklin Gothic Medium','Georgia','Impact','Lucida Console','Lucida Sans Unicode','Segoe UI',
+  'Tahoma','Times New Roman','Trebuchet MS','Verdana','Helvetica','Helvetica Neue','Avenir Next','Futura','Gill Sans','Menlo',
+  'DIN Alternate','DIN Condensed','Roboto Condensed'];
+function fontAvailable(f){
+  const c = document.createElement('canvas').getContext('2d'), s = 'mmmmmmmmmmlliWW0@#';
+  return ['monospace','serif','sans-serif'].some(base => {
+    c.font = `40px ${base}`; const w0 = c.measureText(s).width;
+    c.font = `40px "${f}", ${base}`; return c.measureText(s).width !== w0;
+  });
+}
+S.fonts = FONT_CANDIDATES.filter(fontAvailable);
+try { for (const f of JSON.parse(localStorage.getItem('ld.fonts') || '[]')) if (!S.fonts.includes(f)) S.fonts.push(f); } catch {}
+S.fonts.sort((a, b) => a.localeCompare(b));
+const fontOptions = () => `<optgroup label="Písma tiskárny"><option value="Z0">Písmo tiskárny</option></optgroup>`
+  + `<optgroup label="Písma počítače">${S.fonts.map(f => `<option value="${esc(f)}" style="font-family:'${esc(f)}'">${esc(f)}</option>`).join('')}</optgroup>`;
+const fontSelect = p => `<select data-p="${p}" data-re>${fontOptions()}</select>`;
+async function loadFonts(){
+  if (!window.queryLocalFonts) { toast('Tento prohlížeč neumí načíst seznam písem. Použijte Chrome nebo Edge.'); return; }
+  try {
+    const fams = [...new Set((await queryLocalFonts()).map(f => f.family))];
+    const added = fams.filter(f => !S.fonts.includes(f));
+    S.fonts = [...new Set([...S.fonts, ...fams])].sort((a, b) => a.localeCompare(b));
+    try { localStorage.setItem('ld.fonts', JSON.stringify(S.fonts)); } catch {}
+    renderChrome(); renderProps(); toast(`Přidáno písem: ${added.length}`);
+  } catch (e) { toast('Přístup k písmům byl zamítnut.'); }
+}
+// anchored objects keep o.x at their anchor point (left edge, centre or right edge) and grow away from it
+const canAnchor = o => ((o.type === 'text' && !o.text.block) || isBC(o.type)) && !((o.rot||0) % 360);
+const anchorOff = o => canAnchor(o) ? ({ center:.5, right:1 }[o.anchor] || 0) * (o._bw || 0) : 0;
+const leftOf = o => o.x - anchorOff(o);
+const ANCHORS = [['left','Doprava →'],['center','← Na obě strany →'],['right','← Doleva']];
+const anchorUI = o => `<div class="f stack"><div class="seg">${ANCHORS.map(([a, t]) => `<button data-anchor="${a}" class="${canAnchor(o) && (o.anchor||'left')===a?'on':''}">${t}</button>`).join('')}</div></div>`
+  + (canAnchor(o) ? `<p class="hint">Když je hodnota delší, ${TYPES[o.type].toLowerCase()} se prodlužuje jen zvoleným směrem. Pevný bod: ${({left:'levý okraj',center:'střed',right:'pravý okraj'})[o.anchor||'left']}.</p>` : '');
+
+/* ---------- render ---------- */
+const labelEl = $('#label');
+// barcode rendering is the slow part, so the same symbol is generated once and reused
+const BC_CACHE = new Map();
+function bcCanvas(o, v){
+  const key = `${o.type}|${o.type === 'qrcode' ? o.bc.ecl : ''}|${v}`;
+  const hit = BC_CACHE.get(key);
+  if (hit) { if (hit instanceof Error) throw hit; return hit; }
+  if (BC_CACHE.size > 600) BC_CACHE.clear();
+  try { const cv = bcDraw(o, v); BC_CACHE.set(key, cv); return cv; }
+  catch (e) { const err = e instanceof Error ? e : new Error(String(e)); BC_CACHE.set(key, err); throw err; }
+}
+function bcDraw(o, v){
+  const cv = document.createElement('canvas');
+  const opts = { bcid: o.type, text: v, scale: 1, includetext: false };
+  if (!is2D(o.type)) opts.height = 1;
+  if (o.type === 'qrcode') opts.eclevel = o.bc.ecl;
+  bwipjs.toCanvas(cv, opts);
+  return cv;
+}
+function buildContent(o, inner, k){
+  const v = valueOf(o);
+  if (o.type === 'text') {
+    const t = o.text, px = t.pt * 25.4/72 * k, ws = (t.ws || 100) / 100;
+    const d = document.createElement('div');
+    d.className = 'txt' + (t.block ? ' block' : '');
+    d.style.fontSize = px + 'px';
+    if (isPcFont(t)) Object.assign(d.style, { fontFamily: `"${t.font}"`, fontWeight: t.bold ? 700 : 400, fontStyle: t.italic ? 'italic' : 'normal', lineHeight: PC_LH,
+      textDecoration: [t.underline && 'underline', t.strike && 'line-through'].filter(Boolean).join(' ') || 'none' });
+    d.textContent = v || ' ';
+    if (t.block) { d.style.width = o.w*k / ws + 'px'; d.style.textAlign = t.align; d.style.maxHeight = px * (t.lines||1) + 'px'; }
+    if (ws === 1) { inner.append(d); return; }
+    // horizontal font stretch: scale the glyphs, then size a wrapper to the scaled width
+    const wrap = document.createElement('div');
+    wrap.append(d); inner.append(wrap);
+    d.style.display = 'inline-block'; d.style.transform = `scaleX(${ws})`; d.style.transformOrigin = '0 0';
+    wrap.style.width = d.offsetWidth * ws + 'px'; wrap.style.height = d.offsetHeight + 'px'; wrap.style.overflow = 'visible';
+  } else if (isBC(o.type)) {
+    try {
+      const src = bcCanvas(o, v), cv = document.createElement('canvas');
+      cv.width = src.width; cv.height = src.height; cv.getContext('2d').drawImage(src, 0, 0);
+      if (is2D(o.type)) {
+        const s = cv.width * o.bc.mag * mmPerDot() * k;
+        cv.style.width = s + 'px'; cv.style.height = cv.height * o.bc.mag * mmPerDot() * k + 'px';
+        o._mods = cv.width;
+      } else {
+        const w = cv.width * o.bc.mod * mmPerDot() * k;
+        cv.style.width = w + 'px'; cv.style.height = o.h * k + 'px';
+        o._mods = cv.width;
+      }
+      cv.style.imageRendering = 'pixelated'; cv.style.display = 'block';
+      inner.append(cv);
+      if (!is2D(o.type) && o.bc.hr) {
+        const t = document.createElement('div'); t.className = 'hr';
+        t.style.fontSize = Math.max(2.2, o.bc.mod * mmPerDot() * 9) * k + 'px';
+        t.textContent = v; inner.append(t);
+      }
+    } catch (e) {
+      const d = document.createElement('div'); d.className = 'bcerr';
+      d.style.width = Math.max(18, o.w || 25)*k + 'px'; d.style.height = Math.max(8, o.h || 10)*k + 'px';
+      d.textContent = o.type === 'ean13' ? 'EAN-13: je třeba 12–13 číslic' : 'Tato data nelze zakódovat';
+      d.title = String(e.message || e).replace(/^bwipp\.\w+#\d+: /, '');
+      inner.append(d);
+    }
+  } else {
+    const d = document.createElement('div');
+    const sw = Math.max(1, (o.stroke||0.3) * k);
+    d.style.width = o.w*k + 'px'; d.style.height = o.h*k + 'px';
+    if (o.type === 'line') { d.className = 'shape fill'; }
+    else {
+      d.className = 'shape' + (o.fill ? ' fill' : '');
+      d.style.borderWidth = sw + 'px';
+      if (o.type === 'ellipse') d.style.borderRadius = '50%';
+      else if (o.round) d.style.borderRadius = Math.min(o.w,o.h)/2 * (o.round/8) * k + 'px';
+    }
+    inner.append(d);
+  }
+}
+const HANDLES = [['nw',0,0],['n',.5,0],['ne',1,0],['e',1,.5],['se',1,1],['s',.5,1],['sw',0,1],['w',0,.5]];
+function render(){
+  const L = S.tpl.label, k = kpx();
+  labelEl.style.width = L.w*k + 'px'; labelEl.style.height = L.h*k + 'px';
+  labelEl.style.setProperty('--g', S.gstep*k + 'px');
+  labelEl.classList.toggle('grid', S.grid);
+  labelEl.innerHTML = '';
+  for (const o of S.tpl.objects) {
+    const el = document.createElement('div');
+    el.className = 'obj' + (o.inv ? ' inv' : '') + (o.noprint ? ' noprint' : '') + (o.id === S.sel ? ' sel' : '');
+    el.dataset.id = o.id;
+    el.style.left = o.x*k + 'px'; el.style.top = o.y*k + 'px';
+    const inner = document.createElement('div'); inner.className = 'inner';
+    el.append(inner); labelEl.append(el);
+    try { buildContent(o, inner, k); }
+    catch (e) {   // one broken object must not stop the rest of the label from drawing
+      inner.innerHTML = `<div class="bcerr" style="width:${20*k}px;height:${8*k}px">Objekt nelze vykreslit</div>`;
+      inner.firstChild.title = e.message; console.error(e);
+    }
+    const W = inner.offsetWidth, H = inner.offsetHeight, rot = o.rot || 0;
+    const sw = rot % 180 ? H : W, sh = rot % 180 ? W : H;
+    el.style.width = sw + 'px'; el.style.height = sh + 'px';
+    inner.style.transform = { 0:'', 90:`translate(${H}px,0) rotate(90deg)`, 180:`translate(${W}px,${H}px) rotate(180deg)`, 270:`translate(0,${W}px) rotate(270deg)` }[rot];
+    o._bw = sw / k; o._bh = sh / k;
+    el.style.left = leftOf(o)*k + 'px';
+    const lx = leftOf(o), eps = 0.05;
+    o._out = lx < -eps || o.y < -eps || lx + o._bw > L.w + eps || o.y + o._bh > L.h + eps;
+    if (o._out) el.classList.add('out');
+    if (o.id === S.sel) {
+      const tag = document.createElement('div'); tag.className = 'tag'; tag.textContent = TYPES[o.type]; el.append(tag);
+      for (const [d, fx, fy] of HANDLES) {
+        if (o.type === 'line' && (o.w >= o.h ? !['e','w'].includes(d) : !['n','s'].includes(d))) continue;
+        const h = document.createElement('div'); h.className = 'h'; h.dataset.h = d;
+        h.style.left = fx*100 + '%'; h.style.top = fy*100 + '%';
+        h.style.cursor = d + '-resize'; el.append(h);
+      }
+    }
+  }
+  drawRulers();
+  autosave();
+}
+function renderAll(){ render(); renderProps(); renderChrome(); renderData(); }
+
+/* ---------- rulers ---------- */
+const rTop = $('#rTop'), rLeft = $('#rLeft'), scrollEl = $('#scroll');
+function drawRulers(){
+  if (S.view !== 'ws') return;
+  const k = kpx(), dpr = devicePixelRatio || 1, lr = labelEl.getBoundingClientRect();
+  const o = selObj();
+  for (const [cv, horiz] of [[rTop, true], [rLeft, false]]) {
+    const r = cv.getBoundingClientRect(); if (!r.width || !r.height) continue;
+    cv.width = r.width*dpr; cv.height = r.height*dpr;
+    const c = cv.getContext('2d'); c.scale(dpr, dpr);
+    c.fillStyle = '#f7f8f9'; c.fillRect(0, 0, r.width, r.height);
+    const org = horiz ? lr.left - r.left : lr.top - r.top;
+    const len = horiz ? r.width : r.height, size = horiz ? r.height : r.width;
+    const Lmm = horiz ? S.tpl.label.w : S.tpl.label.h;
+    c.fillStyle = '#dbe9f6'; c.fillRect(horiz ? org : 0, horiz ? 0 : org, horiz ? Lmm*k : size, horiz ? size : Lmm*k);
+    if (o) {
+      c.fillStyle = '#a9cdef';
+      const a = (horiz ? leftOf(o) : o.y)*k + org, b = (horiz ? o._bw : o._bh)*k;
+      c.fillRect(horiz ? a : 0, horiz ? 0 : a, horiz ? b : size, horiz ? size : b);
+    }
+    c.strokeStyle = '#7a828c'; c.fillStyle = '#4a5058'; c.lineWidth = 1;
+    c.font = '9.5px Segoe UI, system-ui, sans-serif';
+    const step = k < 1.6 ? 5 : k < 3 ? 2 : 1, lblEvery = k < 1.2 ? 50 : k < 3 ? 20 : 10;
+    const from = Math.floor(-org / k / step) * step, to = Math.ceil((len - org) / k);
+    c.beginPath();
+    for (let mm = from; mm <= to; mm += step) {
+      const p = Math.round(org + mm*k) + .5;
+      const t = mm % 10 === 0 ? 9 : mm % 5 === 0 ? 6 : 3;
+      if (horiz) { c.moveTo(p, size); c.lineTo(p, size - t); } else { c.moveTo(size, p); c.lineTo(size - t, p); }
+      if (mm % lblEvery === 0) {
+        if (horiz) c.fillText(mm, p + 2, 10);
+        else { c.save(); c.translate(10, p + 2); c.rotate(-Math.PI/2); c.fillText(mm, -c.measureText(mm).width - 2 + 0, 0); c.restore(); }
+      }
+    }
+    c.stroke();
+  }
+}
+scrollEl.addEventListener('scroll', drawRulers);
+addEventListener('focus', () => { if (S.tpl) render(); });
+addEventListener('resize', drawRulers);
+
+/* ---------- chrome / ribbon state ---------- */
+function renderChrome(){
+  const o = selObj(), L = S.tpl.label;
+  $('#docname').textContent = `${S.tpl.name} — Label Designer`;
+  $('#stLabel').textContent = `${L.w} × ${L.h} mm · ${L.dpi} dpi`;
+  $('#zoomRange').value = Math.round(S.zoom*100); $('#zoomPct').textContent = Math.round(S.zoom*100) + '%';
+  const ctx = $('#ctxTab'); ctx.hidden = !o; if (o) ctx.textContent = TYPES[o.type];
+  const isText = o?.type === 'text';
+  $$('[data-fmt]').forEach(b => { b.disabled = !isText; b.classList.toggle('on', isText && isPcFont(o.text) && !!o.text[b.dataset.fmt]); });
+  $('#rbSize').disabled = !isText; $('#rbFont').disabled = !isText;
+  $('#rbFont').innerHTML = fontOptions(); $('#rbFont').value = isText ? (o.text.font || 'Z0') : 'Z0';
+  $('#rbSize').value = isText ? o.text.pt : '';
+  $$('[data-talign]').forEach(b => {
+    const free = isText && !o.text.block;   // single-line text: buttons choose the grow direction
+    b.disabled = !isText || (free && b.dataset.talign === 'justify');
+    b.classList.toggle('on', isText && (free ? (o.anchor||'left') : o.text.align) === b.dataset.talign);
+  });
+  $$('[data-act=fontUp],[data-act=fontDn]').forEach(b => b.disabled = !isText);
+  $$('[data-align],[data-act=rotate],[data-act=front],[data-act=back],[data-act=del],[data-act=cut],[data-act=copy],[data-act=dup],[data-act=invert]').forEach(b => b.disabled = !o);
+  $('[data-act=invert]').classList.toggle('on', !!o?.inv);
+  $('[data-act=paste]').disabled = !S.clip;
+  const n = S.data.rows.length;
+  $('#recCount').textContent = n ? `${S.rec+1} z ${n}` : 'žádná data';
+  $('#dataTabBtn').textContent = n ? `Data (${n})` : 'Data';
+  $$('.tool').forEach(b => b.classList.toggle('on', b.dataset.tool === S.tool));
+  labelEl.classList.toggle('placing', !!S.tool);
+}
+
+/* ---------- properties panel ---------- */
+const fld = (label, html, cls='') => `<div class="f ${cls}"><label>${label}</label>${html}</div>`;
+const num = (p, step=0.1, min='', unit='mm', extra='') => `<div class="unit"><input type="number" data-p="${p}" step="${step}" ${min!==''?`min="${min}"`:''} ${extra}>${unit?`<span>${unit}</span>`:''}</div>`;
+const sel = (p, opts, re=true) => `<select data-p="${p}" ${re?'data-re':''}>${opts.map(o => `<option value="${esc(o.v ?? o)}">${esc(o.t ?? o)}</option>`).join('')}</select>`;
+const chk = (p, label, re=true) => `<label class="chk"><input type="checkbox" data-p="${p}" ${re?'data-re':''}> ${label}</label>`;
+function renderProps(){
+  const o = selObj(), tabsEl = $('#ptabs'), body = $('#pbody');
+  if (!o) {
+    $('#propTitle').textContent = 'Vlastnosti — Etiketa';
+    tabsEl.innerHTML = '<button class="on">Etiketa</button>';
+    const L = S.tpl.label;
+    body.innerHTML = `
+      <div class="sec">Rozměr</div>
+      ${fld('Název', `<input type="text" data-p="T:name">`)}
+      ${fld('Šířka', num('L:w', 0.5, 5))}
+      ${fld('Výška', num('L:h', 0.5, 5))}
+      ${fld('Rozlišení', sel('L:dpi', [{v:203,t:'203 dpi'},{v:300,t:'300 dpi'},{v:600,t:'600 dpi'}]))}
+      <div class="sec">Tisk</div>
+      ${fld('Rychlost', sel('L:speed', [2,3,4,5,6].map(v => ({v, t:v+' palců/s'})), false))}
+      ${fld('Písmo tiskárny', sel('L:z0', [{v:'image', t:'jako obrázek (přesně)'}, {v:'font', t:'písmem tiskárny'}], false))}
+      <p class="hint">Platí pro tisk na IP a soubor .zpl. „Jako obrázek“ vytiskne text přesně jako v editoru. „Písmem tiskárny“ je rychlejší, ale tiskárna má jiné písmo, takže text bývá širší.</p>
+      ${fld('Tmavost (±)', num('L:dark', 1, -30, ''))}
+      ${fld('Posun X', num('L:ox', 0.1))}
+      ${fld('Posun Y', num('L:oy', 0.1))}
+      <div class="sec">Jak začít</div>
+      <p class="hint">Vyberte nástroj vlevo a klikněte na etiketu, tím objekt vložíte. Chcete-li dosazovat hodnoty z Excelu, otevřete kartu „Data“ → „Import Excel“ a u objektu v části „Zdroj“ zvolte „Sloupec Excelu“.</p>`;
+    S.tpl.label.z0 ??= 'image';
+    fillInputs(body, null);
+    return;
+  }
+  if (o.type === 'text') o.text.font ??= 'Z0';
+  $('#propTitle').textContent = `Vlastnosti — ${o.name}`;
+  // every object gets the same tabs and sections in the same order; what doesn't apply is greyed out
+  const TABS = [['src','Zdroj'], ['style','Styl'], ['pos','Poloha'], ['gen','Obecné']];
+  if (!TABS.some(t => t[0] === S.ptab)) S.ptab = 'src';
+  tabsEl.innerHTML = TABS.map(([k, t]) => `<button data-ptab="${k}" class="${k===S.ptab?'on':''}">${t}</button>`).join('');
+  const T = o.type === 'text', BC = isBC(o.type), D2 = is2D(o.type), SH = ['rect','ellipse','inverse','line'].includes(o.type);
+  const box = (title, on, inner, why = '') => `<fieldset class="pset" ${on ? '' : 'disabled'}><div class="sec">${title}</div>${inner}${!on && why ? `<p class="hint">${why}</p>` : ''}</fieldset>`;
+  const part = (on, inner) => `<fieldset class="pset sub" ${on ? '' : 'disabled'}>${inner}</fieldset>`;
+  const kind = T ? 'text' : BC ? 'čárový kód' : 'tvar';
+  let h = '';
+  if (S.ptab === 'src') {
+    const s = o.src, data = T || BC, noData = 'Tvary nemají data — jsou to jen grafické prvky.';
+    let d = fld('Typ dat', sel('src.mode', [
+      {v:'fixed',t:'Pevná hodnota'},{v:'col',t:'Sloupec Excelu'},{v:'tpl',t:'Šablona ze sloupců'},{v:'counter',t:'Počítadlo'}]));
+    if (s.mode === 'fixed') d += `<div class="f stack"><textarea data-p="src.value" spellcheck="false"></textarea></div>`;
+    if (s.mode === 'col') {
+      d += fld('Sloupec', sel('src.col', colOptions(), false));
+      if (data && !S.data.rows.length) d += `<p class="hint">Tabulka ještě není načtena — na etiketě uvidíte [${esc(s.col)}]. Načtěte soubor: <button class="btn" data-act="importXls" style="height:22px">Import Excel…</button></p>`;
+    }
+    if (s.mode === 'tpl') {
+      d += `<div class="f stack"><textarea data-p="src.tpl" spellcheck="false"></textarea></div>
+        <p class="hint">Název sloupce pište do složených závorek: <b>{A}</b>, <b>{B}</b> nebo podle záhlaví, např. <b>{bin}</b>. Kliknutím vložíte:</p>
+        <div class="chips">${colChips()}</div>`;
+    }
+    if (s.mode === 'counter') d += fld('Začít od', num('src.start', 1, '', '')) + fld('Krok', num('src.step', 1, '', '')) + fld('Min. číslic', num('src.pad', 1, 0, ''));
+    h += box('Data', data, d, noData)
+      + box('Přidat k hodnotě', data, fld('Předpona', `<input type="text" data-p="src.prefix">`) + fld('Přípona', `<input type="text" data-p="src.suffix">`))
+      + box(`Hodnota pro záznam ${S.data.rows.length ? S.rec+1 : ''}`, data, `<div class="preview-val">${data ? esc(valueOf(o)) || '&nbsp;' : '&nbsp;'}</div>`);
+  }
+  if (S.ptab === 'style') {
+    const alignSeg = `<div class="seg">${['left','center','right','justify'].map(a => `<button data-seg="text.align" data-v="${a}" title="${a}">${ICONS[{left:'tl',center:'tc',right:'tr',justify:'tj'}[a]]}</button>`).join('')}</div>`;
+    h += box('Písmo', T,
+        fld('Písmo', fontSelect('text.font'))
+      + `<p class="hint" style="margin-top:-2px"><button class="btn" data-act="loadFonts" style="height:22px">Načíst další písma…</button></p>`
+      + part(T && isPcFont(o.text), `<div class="row" style="gap:14px">${chk('text.bold', 'Tučné')}${chk('text.italic', 'Kurzíva')}${chk('text.underline', 'Podtržení')}${chk('text.strike', 'Přeškrtnutí')}</div>`)
+      + (T && isPcFont(o.text) ? `<p class="hint">Písmo z počítače se tiskne jako obrázek. Na jiném PC musí být stejné písmo nainstalované.</p>` : '')
+      + fld('Velikost', num('text.pt', 1, 4, 'pt'))
+      + fld('Šířka písma', num('text.ws', 5, 20, '%', 'max="400"'))
+      + chk('text.block', 'Text v rámečku (zalamování)')
+      + part(T && o.text.block, fld('Zarovnání', alignSeg) + fld('Šířka rámečku', num('w', 0.5, 1)) + fld('Max. řádků', num('text.lines', 1, 1, '')))
+      + (T && !o.text.block ? `<p class="hint">Zarovnání a rámeček platí jen pro text v rámečku.</p>` : ''),
+      'Jen pro text.');
+    const sizeHint = BC && o._mods ? `<p class="hint">${D2 ? 'Strana' : 'Šířka'} kódu ≈ ${r2(o._mods * (D2 ? o.bc.mag : o.bc.mod) * mmPerDot())} mm.</p>` : '';
+    h += box('Čárový kód', BC,
+        fld('Typ', BC ? sel('type', BARCODES.map(v => ({v, t:TYPES[v]}))) : `<select><option></option></select>`)
+      + fld('Velikost modulu', num(D2 ? 'bc.mag' : 'bc.mod', 1, 1, 'bodů'))
+      + part(o.type === 'qrcode', fld('Oprava chyb', sel('bc.ecl', [{v:'L',t:'L — 7 %'},{v:'M',t:'M — 15 %'},{v:'Q',t:'Q — 25 %'},{v:'H',t:'H — 30 %'}])))
+      + part(BC && !D2, chk('bc.hr', 'Tisknout text pod kódem'))
+      + sizeHint,
+      'Jen pro čárové kódy.');
+    h += box('Obrys', SH,
+        fld('Tloušťka čáry', num(o.type === 'line' ? (o.w >= o.h ? 'h' : 'w') : 'stroke', 0.1, 0.1))
+      + part(SH && o.type !== 'line', chk('fill', 'Vyplnit'))
+      + part(o.type === 'rect', fld('Zaoblení', num('round', 1, 0, '0–8'))),
+      'Jen pro obdélník, elipsu, čáru a negativ.');
+    h += box('Efekty', o.type !== 'inverse', chk('inv', 'Inverze (bílá na černé)'), 'Negativ je inverzní sám o sobě.');
+  }
+  if (S.ptab === 'pos') {
+    const xl = canAnchor(o) && o.anchor !== 'left' ? `X (${o.anchor === 'right' ? 'pravý okraj' : 'střed'})` : 'X';
+    h += box('Pozice', true, fld(xl, num('x', 0.1)) + fld('Y', num('y', 0.1)));
+    h += box('Rozměr', true,
+        part(SH || (T && o.text.block), fld('Šířka', num('w', 0.1, 0.1)))
+      + part(SH || (BC && !D2), fld('Výška', num('h', 0.1, 0.1)))
+      + part(o.type === 'line', fld('Směr čáry', `<div class="seg"><button data-linedir="h" class="${o.w>=o.h?'on':''}">Vodorovně</button><button data-linedir="v" class="${o.w<o.h?'on':''}">Svisle</button></div>`))
+      + (!SH ? `<p class="hint">Velikost ${T ? 'textu' : 'kódu'} určuje ${T ? 'písmo' : 'modul'} ve Stylu nebo tažení za roh.</p>` : ''));
+    h += box('Směr růstu', canAnchor(o), anchorUI(o),
+      SH ? 'Tvary mají pevnou velikost.' : T && o.text.block ? 'Text v rámečku se řídí zarovnáním.' : 'Funguje jen bez otočení.');
+    h += box('Otočení', T || (BC && o.type !== 'qrcode'),
+      fld('Úhel', `<div class="seg">${[0,90,180,270].map(a => `<button data-seg="rot" data-v="${a}">${a}°</button>`).join('')}</div>`),
+      o.type === 'qrcode' ? 'QR kód tiskárna tiskne jen bez otočení.' : 'Tvary otočíte tlačítkem na pásu karet (prohodí šířku a výšku).');
+    h += `<p class="hint">Měří se od levého horního rohu etikety. Šipky posouvají o 0,1 mm, se Shiftem o 1 mm. Alt při tažení vypne přichytávání.</p>`;
+  }
+  if (S.ptab === 'gen') {
+    h += box('Objekt', true, fld('Jméno', `<input type="text" data-p="name">`) + fld('Typ objektu', `<input type="text" value="${esc(TYPES[o.type])} (${kind})" disabled>`) + chk('noprint', 'Netisknout (jen na obrazovce)'));
+  }
+  body.innerHTML = h;
+  fillInputs(body, o);
+  // greyed size fields still show the object's real size
+  body.querySelectorAll('fieldset[disabled] [data-p="w"]').forEach(i => i.value = r2(o._bw || 0));
+  body.querySelectorAll('fieldset[disabled] [data-p="h"]').forEach(i => i.value = r2(o._bh || 0));
+}
+function target(p, o){
+  if (p.startsWith('L:')) return [S.tpl.label, p.slice(2)];
+  if (p.startsWith('T:')) return [S.tpl, p.slice(2)];
+  return [o, p];
+}
+function fillInputs(body, o){
+  body.querySelectorAll('[data-p]').forEach(el => {
+    const [t, p] = target(el.dataset.p, o), v = get(t, p);
+    if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? '';
+  });
+  body.querySelectorAll('[data-seg]').forEach(b => b.classList.toggle('on', String(get(o, b.dataset.seg)) === b.dataset.v));
+}
+const pbody = $('#pbody');
+function onPropInput(e){
+  const el = e.target; if (!el.dataset.p) return;
+  const o = selObj(), [t, p] = target(el.dataset.p, o);
+  let v = el.type === 'checkbox' ? el.checked : el.type === 'number' ? (el.value === '' ? 0 : +el.value) : el.value;
+  if (['L:dpi','L:speed'].includes(el.dataset.p)) v = +v;
+  push();
+  const keep = o && ['text.block','type','text.font','text.bold','text.italic','text.underline','text.strike'].includes(p) ? leftOf(o) : null;
+  if (p === 'type' && o) { o.type = v; if (!o.name.match(/\D \d+$/) || true) o.name = `${TYPES[v]} ${o.id}`; }
+  else set(t, p, v);
+  if (keep !== null) { render(); o.x = r2(keep + anchorOff(o)); }
+  render(); renderChrome();
+  if (el.dataset.re !== undefined || e.type === 'change' && el.tagName === 'SELECT') renderProps();
+  else { const pv = pbody.querySelector('.preview-val'); if (pv && o) pv.textContent = valueOf(o) || ' '; }
+}
+pbody.addEventListener('input', e => { if (e.target.tagName !== 'SELECT' && e.target.type !== 'checkbox') onPropInput(e); });
+pbody.addEventListener('change', e => { if (e.target.tagName === 'SELECT' || e.target.type === 'checkbox') onPropInput(e); });
+pbody.addEventListener('click', e => {
+  const o = selObj();
+  const an = e.target.closest('[data-anchor]');
+  if (an && o) { push(true); setAnchor(o, an.dataset.anchor); renderAll(); return; }
+  const seg = e.target.closest('[data-seg]');
+  if (seg && o) { push(true); const left = leftOf(o); set(o, seg.dataset.seg, isNaN(seg.dataset.v) ? seg.dataset.v : +seg.dataset.v); render(); o.x = r2(left + anchorOff(o)); renderAll(); return; }
+  const ins = e.target.closest('[data-ins]');
+  if (ins && o) {
+    const ta = pbody.querySelector('textarea[data-p="src.tpl"]'); const pos = ta.selectionStart ?? ta.value.length;
+    ta.value = ta.value.slice(0, pos) + ins.dataset.ins + ta.value.slice(ta.selectionEnd ?? pos);
+    ta.dispatchEvent(new Event('input', { bubbles:true })); ta.focus(); return;
+  }
+  const ld = e.target.closest('[data-linedir]');
+  if (ld && o) { push(true); const len = Math.max(o.w, o.h), t = Math.min(o.w, o.h); if (ld.dataset.linedir === 'h') { o.w = len; o.h = t; } else { o.w = t; o.h = len; } renderAll(); }
+});
+$('#ptabs').addEventListener('click', e => { const b = e.target.closest('[data-ptab]'); if (b) { S.ptab = b.dataset.ptab; renderProps(); } });
+$('#ctxTab').addEventListener('click', () => { S.ptab = 'style'; renderProps(); });
+
+/* ---------- data view ---------- */
+function renderData(){
+  const d = S.data, n = d.rows.length;
+  $('#dbar').innerHTML = n
+    ? `<b style="color:var(--ink)">${esc(d.file)}</b> list „${esc(d.sheet)}“, ${n} řádků. Kliknutím na řádek ho zobrazíte na etiketě. <span style="flex:1"></span><button class="btn" data-act="importXls">Načíst jiný soubor…</button>`
+    : '';
+  const t = $('#dtable');
+  if (!n) { t.innerHTML = `<div class="empty"><div>Tabulka není načtena.<br>Načtěte Excel nebo CSV — každý řádek bude jedna etiketa.<br><button class="btn pri" data-act="importXls">Import Excel / CSV…</button></div></div>`; return; }
+  if (S.view !== 'data') return;
+  const w = Math.max(d.headers.length, ...d.rows.slice(0, 50).map(r => r.length));
+  const cols = Array.from({length:w}, (_, i) => i);
+  const max = Math.min(n, 2000);
+  let h = `<table><thead><tr><th>#</th>${cols.map(i => `<th>${colName(i)}${d.headers[i] ? `<small>${esc(d.headers[i])}</small>` : ''}</th>`).join('')}</tr></thead><tbody>`;
+  for (let r = 0; r < max; r++) h += `<tr data-r="${r}" class="${r===S.rec?'cur':''}"><td class="n">${r+1}</td>${cols.map(i => `<td>${esc(d.rows[r][i])}</td>`).join('')}</tr>`;
+  h += '</tbody></table>';
+  if (n > max) h += `<p class="hint" style="padding:8px">Zobrazeno prvních ${max} řádků z ${n}. Tisk bere všechny.</p>`;
+  t.innerHTML = h;
+}
+$('#dtable').addEventListener('click', e => {
+  const tr = e.target.closest('tr[data-r]'); if (!tr) return;
+  S.rec = +tr.dataset.r; $$('#dtable tr.cur').forEach(x => x.classList.remove('cur')); tr.classList.add('cur');
+  render(); renderChrome(); renderProps();
+});
+function setView(v){
+  S.view = v;
+  $('#wsView').classList.toggle('on', v === 'ws'); $('#dataView').classList.toggle('on', v === 'data');
+  $$('.doctabs [data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+  if (v === 'data') renderData(); else requestAnimationFrame(drawRulers);
+}
+$$('.doctabs [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
+
+/* ---------- canvas interaction ---------- */
+function labelPt(e){ const r = labelEl.getBoundingClientRect(), k = kpx(); return { x:(e.clientX - r.left)/k, y:(e.clientY - r.top)/k }; }
+// After the system file dialog (Excel import) Chromium can lose pointer events for a while,
+// so a press is accepted from pointerdown or mousedown (whichever arrives first) and a plain click still selects.
+let lastPD = null;
+function onPress(e, kind){
+  if (e.button !== 0) return;
+  // the mousedown that Chromium sends right after a handled pointerdown is the same press: skip it
+  if (kind === 'mouse' && lastPD && e.timeStamp - lastPD.t < 500 && e.clientX === lastPD.x && e.clientY === lastPD.y) { lastPD = null; return; }
+  lastPD = kind === 'pointer' ? { t: e.timeStamp, x: e.clientX, y: e.clientY } : null;
+  const L = S.tpl.label;
+  if (S.tool) {
+    const p = labelPt(e); push(true);
+    const o = makeObj(S.tool, snapv(p.x, e), snapv(p.y, e));
+    if (o.type === 'text' || isBC(o.type)) { /* auto size */ } else { o.w = Math.min(o.w, Math.max(2, L.w - o.x)); }
+    S.tpl.objects.push(o); S.sel = o.id; S.tool = null; S.ptab = o.type === 'text' || isBC(o.type) ? 'src' : 'style';
+    renderAll(); return;
+  }
+  const h = e.target.closest('.h'), objEl = h ? e.target.closest('.obj') : hitObj(e);
+  if (!objEl) { if (S.sel) { S.sel = null; renderAll(); } return; }
+  const o = S.tpl.objects.find(x => x.id === +objEl.dataset.id);
+  if (S.sel !== o.id) { S.sel = o.id; renderAll(); }
+  e.preventDefault();
+  const start = labelPt(e), o0 = JSON.parse(JSON.stringify(o)), bw = o._bw, bh = o._bh;
+  let moved = false;
+  const MOVE = kind === 'pointer' ? 'pointermove' : 'mousemove', UP = kind === 'pointer' ? 'pointerup' : 'mouseup';
+  const move = ev => {
+    const p = labelPt(ev), dx = p.x - start.x, dy = p.y - start.y;
+    if (!moved && Math.hypot(dx, dy) * kpx() < 3) return;
+    if (!moved) { push(true); moved = true; }
+    if (!h) {
+      o.x = snapv(o0.x + dx, ev); o.y = snapv(o0.y + dy, ev);
+      const el = labelEl.querySelector(`.obj[data-id="${o.id}"]`); const k = kpx();
+      el.style.left = leftOf(o)*k + 'px'; el.style.top = o.y*k + 'px'; drawRulers();
+      $('#stPos').textContent = `X ${r2(o.x)}  Y ${r2(o.y)} mm`;
+      return;
+    }
+    const d = h.dataset.h;
+    let x = o0.x, y = o0.y, w = bw, hh = bh;
+    if (d.includes('e')) w = Math.max(1, snapv(o0.x + bw + dx, ev) - o0.x);
+    if (d.includes('s')) hh = Math.max(0.2, snapv(o0.y + bh + dy, ev) - o0.y);
+    if (d.includes('w')) { const nx = Math.min(snapv(o0.x + dx, ev), o0.x + bw - 1); w = o0.x + bw - nx; x = nx; }
+    if (d.includes('n')) { const ny = Math.min(snapv(o0.y + dy, ev), o0.y + bh - 0.2); hh = o0.y + bh - ny; y = ny; }
+    applyResize(o, o0, x, y, w, hh, bw, bh, d);
+    if (!frame) frame = requestAnimationFrame(() => { frame = 0; render(); $('#stPos').textContent = `Š ${r2(o._bw)}  V ${r2(o._bh)} mm`; });
+  };
+  let frame = 0;
+  const up = () => {
+    cancelAnimationFrame(frame); frame = 0;
+    removeEventListener(MOVE, move); removeEventListener(UP, up); removeEventListener('pointercancel', up); removeEventListener('blur', up);
+    $('#stPos').textContent = '';
+    if (moved) { render(); renderProps(); }
+  };
+  // listen on the whole window: works outside the label and needs no pointer capture
+  addEventListener(MOVE, move); addEventListener(UP, up); addEventListener('pointercancel', up); addEventListener('blur', up);
+}
+labelEl.addEventListener('pointerdown', e => onPress(e, 'pointer'));
+labelEl.addEventListener('mousedown', e => onPress(e, 'mouse'));
+labelEl.addEventListener('click', e => {
+  if (S.tool || e.target.closest('.h')) return;
+  const el = hitObj(e);
+  if (el && S.sel !== +el.dataset.id) { S.sel = +el.dataset.id; renderAll(); }
+});
+// hollow rectangles/ellipses are only grabbable near their outline, so objects inside stay clickable
+// Which object is under the pointer, worked out from the objects' own positions in mm.
+// The browser's hit-testing (elementsFromPoint) can be stale right after the system file dialog,
+// so it is not used here. Topmost object wins; hollow frames are only grabbed near their outline.
+function hitObj(e){
+  const p = labelPt(e), k = kpx(), tol = 6 / k, pad = 2 / k;
+  const objs = S.tpl.objects;
+  for (let i = objs.length - 1; i >= 0; i--) {
+    const o = objs[i], lx = leftOf(o), w = o._bw || 0, h = o._bh || 0;
+    if (p.x < lx - pad || p.y < o.y - pad || p.x > lx + w + pad || p.y > o.y + h + pad) continue;
+    if (['rect','ellipse'].includes(o.type) && !o.fill) {
+      const ix = p.x - o.x, iy = p.y - o.y;
+      if (ix > tol && iy > tol && ix < o.w - tol && iy < o.h - tol) continue;
+    }
+    return labelEl.querySelector(`.obj[data-id="${o.id}"]`);
+  }
+  return null;
+}
+function applyResize(o, o0, x, y, w, h, bw, bh, d){
+  const sw = (o.rot||0) % 180 !== 0;
+  const uw = sw ? h : w, uh = sw ? w : h;   // size in un-rotated space
+  o.x = r2(x); o.y = r2(y);
+  if (canAnchor(o)) o.x = o0.x;   // anchored objects resize away from their anchor point
+  if (o.type === 'text') {
+    if (o.text.block && (d === 'e' || d === 'w')) o.w = r2(uw);
+    else if (o.text.block && !['n','s'].includes(d)) o.w = r2(uw);
+    else if (!o.text.block) { const f = (['e','w'].includes(d) ? uw / (sw?bh:bw) : uh / (sw?bw:bh)); o.text.pt = Math.max(4, Math.round(o0.text.pt * f)); }
+    else { const f = uh / (sw?bw:bh); o.text.pt = Math.max(4, Math.round(o0.text.pt * f)); }
+  } else if (is2D(o.type)) {
+    const mods = o._mods || 21; o.bc.mag = Math.max(1, Math.round(Math.max(uw, uh) / (mods * mmPerDot())));
+    if (d.includes('n')) o.y = r2(o0.y + bh - mods*o.bc.mag*mmPerDot());
+  } else if (isBC(o.type)) {
+    const hrmm = o.bc.hr ? (bh - o0.h) : 0;
+    if (!['e','w'].includes(d)) o.h = r2(Math.max(2, uh - (sw ? 0 : hrmm)));
+    if (!['n','s'].includes(d)) { const mods = o._mods || 60; o.bc.mod = Math.max(1, Math.min(10, Math.round(uw / (mods * mmPerDot())))); }
+  } else { o.w = r2(w); o.h = r2(h); }
+}
+
+/* ---------- actions ---------- */
+function addCopy(src, off = 2){ const c = JSON.parse(JSON.stringify(src)); c.id = S.tpl.seq++; c.x = r2(c.x + off); c.y = r2(c.y + off); c.name = `${TYPES[c.type]} ${c.id}`; S.tpl.objects.push(c); S.sel = c.id; }
+function toggleFmt(f){
+  const o = selObj(); if (o?.type !== 'text') return;
+  if (!isPcFont(o.text)) { toast(f === 'bold' ? 'Písmo tiskárny je vždy tučné. Pro tučné/kurzívu/podtržení zvolte písmo počítače.' : 'Písmo tiskárny to neumí. Zvolte písmo počítače, např. Arial.'); return; }
+  push(true); const left = leftOf(o); o.text[f] = !o.text[f]; render(); o.x = r2(left + anchorOff(o)); renderAll();
+}
+function setAnchor(o, a){ const left = leftOf(o); o.anchor = a; o.x = r2(left + anchorOff(o)); }
+function alignSel(a){
+  const o = selObj(); if (!o) return; push(true); const L = S.tpl.label;
+  const off = anchorOff(o);
+  if (a === 'l') o.x = r2(off); if (a === 'r') o.x = r2(L.w - o._bw + off); if (a === 'c') o.x = r2((L.w - o._bw)/2 + off);
+  if (a === 't') o.y = 0; if (a === 'b') o.y = r2(L.h - o._bh); if (a === 'm') o.y = r2((L.h - o._bh)/2);
+  renderAll();
+}
+function setZoom(z){
+  const c = scrollEl, cx = (c.scrollLeft + c.clientWidth/2) / c.scrollWidth, cy = (c.scrollTop + c.clientHeight/2) / c.scrollHeight;
+  S.zoom = Math.min(6, Math.max(.25, z)); render(); renderChrome();
+  c.scrollLeft = cx*c.scrollWidth - c.clientWidth/2; c.scrollTop = cy*c.scrollHeight - c.clientHeight/2; drawRulers();
+}
+function zoomFit(){
+  const L = S.tpl.label, c = scrollEl;
+  const z = Math.min((c.clientWidth - 110) / (L.w*96/25.4), (c.clientHeight - 110) / (L.h*96/25.4));
+  setZoom(Math.round(z*20)/20);
+}
+const ACT = {
+  undo, redo,
+  new: () => openDoc(true),
+  open: () => $('#fJson').click(),
+  save: () => saveTpl(false), saveAs: () => saveTpl(true), saveJson: () => saveJson(),
+  importXls: () => $('#fXls').click(),
+  print: openPrint, docprops: () => openDoc(false),
+  showZpl: () => showZpl(zplFor(S.data.rows.length ? [S.rec] : [0], 1)),
+  copy: () => { const o = selObj(); if (o) { S.clip = JSON.stringify(o); renderChrome(); toast('Zkopírováno'); } },
+  cut: () => { const o = selObj(); if (o) { S.clip = JSON.stringify(o); ACT.del(); } },
+  paste: () => { if (!S.clip) return; push(true); addCopy(JSON.parse(S.clip)); renderAll(); },
+  dup: () => { const o = selObj(); if (!o) return; push(true); addCopy(o); renderAll(); },
+  del: () => { if (!S.sel) return; push(true); S.tpl.objects = S.tpl.objects.filter(o => o.id !== S.sel); S.sel = null; renderAll(); },
+  front: () => { const o = selObj(); if (!o) return; push(true); S.tpl.objects = S.tpl.objects.filter(x => x !== o).concat(o); renderAll(); },
+  back: () => { const o = selObj(); if (!o) return; push(true); S.tpl.objects = [o, ...S.tpl.objects.filter(x => x !== o)]; renderAll(); },
+  rotate: () => { const o = selObj(); if (!o) return; push(true);
+    if (o.type === 'line' || ['rect','ellipse','inverse'].includes(o.type)) { [o.w, o.h] = [o.h, o.w]; } else o.rot = ((o.rot||0) + 90) % 360; renderAll(); },
+  invert: () => { const o = selObj(); if (!o) return; push(true); o.inv = !o.inv; renderAll(); },
+  fontUp: () => { const o = selObj(); if (o?.type !== 'text') return; push(); o.text.pt = Math.min(200, o.text.pt + 2); renderAll(); },
+  fontDn: () => { const o = selObj(); if (o?.type !== 'text') return; push(); o.text.pt = Math.max(4, o.text.pt - 2); renderAll(); },
+  zoomIn: () => setZoom(S.zoom * 1.25), zoomOut: () => setZoom(S.zoom / 1.25), zoomFit, zoom100: () => setZoom(1),
+  recFirst: () => setRec(0), recPrev: () => setRec(S.rec - 1), recNext: () => setRec(S.rec + 1), recLast: () => setRec(S.data.rows.length - 1),
+  showData: () => setView('data'),
+  clearData: () => { Object.assign(S.data, { wb:null, rows:[], headers:[], file:'', sheet:'' }); $('#sheetSel').innerHTML = ''; $('#sheetSel').disabled = true; S.rec = 0; renderAll(); },
+  loadFonts,
+};
+function setRec(i){ const n = S.data.rows.length; if (!n) return; S.rec = Math.max(0, Math.min(n-1, i)); render(); renderChrome(); renderProps(); if (S.view === 'data') renderData(); }
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (b && ACT[b.dataset.act]) { $('#fileMenu').hidden = true; ACT[b.dataset.act](); return; }
+  const fm = e.target.closest('[data-fmt]'); if (fm) { toggleFmt(fm.dataset.fmt); return; }
+  const a = e.target.closest('[data-align]'); if (a) { alignSel(a.dataset.align); return; }
+  const ta = e.target.closest('[data-talign]'); if (ta) { const o = selObj(); if (o?.type === 'text') { push(true); if (o.text.block) o.text.align = ta.dataset.talign; else setAnchor(o, ta.dataset.talign); renderAll(); } return; }
+  const t = e.target.closest('[data-tool]'); if (t) { S.tool = S.tool === t.dataset.tool ? null : t.dataset.tool; renderChrome(); return; }
+  const rt = e.target.closest('[data-rtab]'); if (rt) { $$('[data-rtab]').forEach(x => x.classList.toggle('on', x === rt)); $$('.rpage').forEach(p => p.classList.toggle('on', p.dataset.rpage === rt.dataset.rtab)); return; }
+  if (e.target.closest('#fileBtn')) { $('#fileMenu').hidden = !$('#fileMenu').hidden; return; }
+  if (!e.target.closest('#fileMenu')) $('#fileMenu').hidden = true;
+  if (e.target.matches('[data-close]')) e.target.closest('dialog').close();
+});
+$('#rbSize').addEventListener('input', e => { const o = selObj(); if (o?.type !== 'text' || !+e.target.value) return; push(); o.text.pt = +e.target.value; render(); renderProps(); });
+$('#rbFont').addEventListener('change', e => {
+  const o = selObj(); if (o?.type !== 'text') return;
+  push(true); const left = leftOf(o); o.text.font = e.target.value; render(); o.x = r2(left + anchorOff(o)); renderAll();
+});
+$('#zoomRange').addEventListener('input', e => setZoom(+e.target.value / 100));
+$('#gridChk').onchange = e => { S.grid = e.target.checked; render(); };
+$('#snapChk').onchange = e => { S.snap = e.target.checked; };
+$('#gridStep').onchange = e => { S.gstep = +e.target.value; render(); };
+$('#sheetSel').onchange = e => { S.data.sheet = e.target.value; loadSheet(); };
+$('#hdrChk').onchange = e => { S.data.hdr = e.target.checked; if (S.data.wb) loadSheet(); };
+scrollEl.addEventListener('wheel', e => { if (e.ctrlKey) { e.preventDefault(); setZoom(S.zoom * (e.deltaY < 0 ? 1.1 : 1/1.1)); } }, { passive:false });
+
+document.addEventListener('keydown', e => {
+  const typing = e.target.closest('input,textarea,select') && e.target.type !== 'checkbox' && e.target.type !== 'radio';
+  // e.code = physical key, so shortcuts also work with the Russian/Czech keyboard layout
+  const mod = e.ctrlKey || e.metaKey, k = e.code.startsWith('Key') ? e.code.slice(3).toLowerCase() : e.key.toLowerCase();
+  const inText = e.target.matches('textarea, input[type=text]');
+  if (mod && !inText && !document.querySelector('dialog[open]') && selObj()?.type === 'text') {
+    const f = { b:'bold', i:'italic', u:'underline' }[k] || (e.shiftKey && k === 'x' ? 'strike' : null);
+    if (f && (k !== 'x' || e.shiftKey)) { e.preventDefault(); toggleFmt(f); return; }
+    if (e.shiftKey && (e.code === 'Period' || e.code === 'BracketRight')) { e.preventDefault(); ACT.fontUp(); return; }
+    if (e.shiftKey && (e.code === 'Comma' || e.code === 'BracketLeft')) { e.preventDefault(); ACT.fontDn(); return; }
+    const al = { l:'left', e:'center', j:'justify' }[k];
+    if (al && !e.shiftKey) { e.preventDefault(); $(`[data-talign="${al}"]`).click(); return; }
+  }
+  if (mod && k === 's') { e.preventDefault(); saveTpl(e.shiftKey); return; }
+  if (mod && k === 'o') { e.preventDefault(); ACT.open(); return; }
+  if (mod && k === 'p') { e.preventDefault(); openPrint(); return; }
+  if (mod && k === 'n') { e.preventDefault(); ACT.new(); return; }
+  if (typing || document.querySelector('dialog[open]')) return;
+  if (mod && k === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+  if (mod && k === 'y') { e.preventDefault(); redo(); return; }
+  if (mod && k === 'c') { ACT.copy(); return; }
+  if (mod && k === 'x') { ACT.cut(); return; }
+  if (mod && k === 'v') { ACT.paste(); return; }
+  if (mod && k === 'd') { e.preventDefault(); ACT.dup(); return; }
+  if (e.key === 'Delete' || e.key === 'Backspace') { ACT.del(); return; }
+  if (e.key === 'Escape') { S.tool = null; S.sel = null; renderAll(); return; }
+  const o = selObj();
+  const arrows = { ArrowLeft:[-1,0], ArrowRight:[1,0], ArrowUp:[0,-1], ArrowDown:[0,1] };
+  if (o && arrows[e.key]) { e.preventDefault(); push(); const s = e.shiftKey ? 1 : 0.1; o.x = r2(o.x + arrows[e.key][0]*s); o.y = r2(o.y + arrows[e.key][1]*s); render(); renderProps(); }
+});
+
+/* ---------- files ---------- */
+const cleanTpl = () => ({ ...S.tpl, objects: S.tpl.objects.map(({_bw, _bh, _mods, _out, ...o}) => o) });
+const safeName = () => (S.tpl.name || 'etiketa').replace(/[\\/:*?"<>|]+/g, '_');
+// a saved template is a copy of this editor with the template embedded; double-clicking it opens the label
+// tag strings are assembled at runtime so that searching the page source never matches this code itself
+const EMB_OPEN = '<script id="embedded-tpl" ' + 'type="application/json">', EMB_CLOSE = '<' + '/script>';
+function embeddedJson(html){
+  const i = html.indexOf(EMB_OPEN); if (i < 0) return null;
+  const j = html.indexOf(EMB_CLOSE, i);
+  return j < 0 ? null : { start: i, end: j + EMB_CLOSE.length, json: html.slice(i + EMB_OPEN.length, j) };
+}
+function templateHtml(){
+  const json = JSON.stringify(cleanTpl()).replace(/</g, '\\u003c');
+  let src = PAGE_SRC;
+  const old = embeddedJson(src);
+  if (old) src = src.slice(0, old.start) + src.slice(old.end).replace(/^\s*/, '');
+  src = src.replace(/<title>[^<]*<\/title>/, () => `<title>${esc(S.tpl.name || 'Etiketa')}</title>`);
+  src = src.replace('<script>\n// the editor', () => `${EMB_OPEN}${json}${EMB_CLOSE}\n<script>\n// the editor`);
+  return '<!doctype html>\n' + src;
+}
+async function saveFile(as, name, text, type, ext, desc){
+  if (window.showSaveFilePicker) {
+    try {
+      if (as || !S.fileHandle || !S.fileHandle.name.toLowerCase().endsWith(ext)) S.fileHandle = await showSaveFilePicker({ suggestedName: name, types: [{ description: desc, accept: { [type]: [ext] } }] });
+      const w = await S.fileHandle.createWritable(); await w.write(text); await w.close();
+      toast('Šablona uložena: ' + S.fileHandle.name); return;
+    } catch (e) { if (e.name === 'AbortError') return; }
+  }
+  download(name, text, type); toast('Šablona stažena: ' + name);
+}
+const saveTpl = as => saveFile(as, safeName() + '.html', templateHtml(), 'text/html', '.html', 'Šablona etikety (otevře se v prohlížeči)');
+const saveJson = () => saveFile(true, safeName() + '.json', JSON.stringify(cleanTpl(), null, 2), 'application/json', '.json', 'Šablona etikety (JSON)');
+function download(name, text, type){ const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
+async function openJson(file, handle){
+  try {
+    const text = await file.text();
+    const isHtml = /\.html?$/i.test(file.name), emb = isHtml ? embeddedJson(text) : null;
+    if (isHtml && !emb) throw new Error('v tomto HTML není uložená šablona');
+    const t = JSON.parse(emb ? emb.json : text);
+    if (!t.label || !Array.isArray(t.objects)) throw new Error('toto není šablona etikety');
+    push(true); S.tpl = t; S.tpl.seq ??= Math.max(0, ...t.objects.map(o => o.id)) + 1;
+    S.fileHandle = handle || null; S.sel = null; afterLoad(true); toast('Otevřena šablona „' + t.name + '“');
+  } catch (e) { toast('Nelze otevřít: ' + e.message); }
+}
+$('#fJson').onchange = e => { const f = e.target.files[0]; if (f) openJson(f); e.target.value = ''; };
+$('#fXls').onchange = e => { const f = e.target.files[0]; if (f) importXls(f); e.target.value = ''; };
+addEventListener('dragover', e => e.preventDefault());
+addEventListener('drop', e => {
+  e.preventDefault(); const f = e.dataTransfer.files[0]; if (!f) return;
+  if (/\.(json|html?)$/i.test(f.name)) openJson(f); else importXls(f);
+});
+function afterLoad(fit){ if (!S.tpl.objects.some(o => o.id === S.sel)) S.sel = null; renderAll(); if (fit) requestAnimationFrame(zoomFit); }
+
+/* ---------- document dialog ---------- */
+let docIsNew = false;
+$('#presets').innerHTML = PRESETS.map(([w, h]) => `<button data-pw="${w}" data-ph="${h}"><i style="width:${w/4}px;height:${h/4}px"></i>${w} × ${h}</button>`).join('');
+$('#presets').onclick = e => { const b = e.target.closest('[data-pw]'); if (b) { $('#dW').value = b.dataset.pw; $('#dH').value = b.dataset.ph; } };
+function openDoc(isNew){
+  docIsNew = isNew; const L = isNew ? newTpl().label : S.tpl.label;
+  $('#dlgDocTitle').textContent = isNew ? 'Nová etiketa' : 'Vlastnosti etikety';
+  $('#dOk').textContent = isNew ? 'Vytvořit' : 'Hotovo';
+  $('#dW').value = L.w; $('#dH').value = L.h; $('#dDpi').value = isNew ? (S.tpl?.label.dpi || 300) : L.dpi;
+  $('#dSpeed').value = L.speed; $('#dDark').value = L.dark; $('#dOx').value = L.ox; $('#dOy').value = L.oy;
+  $('#dlgDoc').showModal();
+}
+$('#dOk').onclick = () => {
+  const w = +$('#dW').value, h = +$('#dH').value;
+  if (!(w >= 5 && h >= 5)) { toast('Zadejte šířku a výšku alespoň 5 mm'); return; }
+  push(true);
+  if (docIsNew) { S.tpl = newTpl(w, h, +$('#dDpi').value); S.sel = null; S.fileHandle = null; S.tpl.name = `Etiketa ${w}×${h}`; }
+  Object.assign(S.tpl.label, { w, h, dpi:+$('#dDpi').value, speed:+$('#dSpeed').value, dark:+$('#dDark').value||0, ox:+$('#dOx').value||0, oy:+$('#dOy').value||0 });
+  $('#dlgDoc').close(); afterLoad(true);
+};
+
+/* ---------- ZPL ---------- */
+const ROT = { 0:'N', 90:'R', 180:'I', 270:'B' };
+const zEsc = s => String(s).replace(/[\^~_\\]/g, c => '_' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'));
+// ZPL ASCII compression for ^GFA: repeated chars get a count prefix (G–Y = 1–19, g–z = 20–400),
+// ',' = rest of row is zeros, ':' = same row as the previous one. Cuts picture data ~10×.
+function acsCount(n){
+  let s = '';
+  if (n >= 20) { s += String.fromCharCode(102 + Math.floor(n / 20)); n %= 20; }
+  if (n > 1 || (n === 1 && s)) s += String.fromCharCode(70 + n);
+  return s;
+}
+function acsCompress(rows){
+  let out = '', prev = null;
+  for (const row of rows) {
+    if (row === prev) { out += ':'; continue; }
+    prev = row;
+    const body = row.replace(/0+$/, '');
+    if (!body) { out += ','; continue; }
+    for (let i = 0; i < body.length;) {
+      let j = i; while (j < body.length && body[j] === body[i] && j - i < 419) j++;
+      out += acsCount(j - i) + body[i]; i = j;
+    }
+    if (body.length < row.length) out += ',';
+  }
+  return out;
+}
+// draws text in a computer font at printer resolution and packs it as ^GFA hex
+function textBitmap(o, v){
+  // the printer font is drawn with the same face the editor shows (Roboto Condensed bold, line-height 1),
+  // so the printed label matches the screen instead of the printer's own, wider font
+  const t = o.text, pc = isPcFont(t), dpi = S.tpl.label.dpi, ws = (t.ws || 100) / 100;
+  const em = t.pt * dpi / 72, lh = Math.round(em * (pc ? PC_LH : 1));
+  const cv = document.createElement('canvas'), c = cv.getContext('2d');
+  const font = pc ? `${t.italic ? 'italic ' : ''}${t.bold ? 700 : 400} ${em}px "${t.font}", sans-serif`
+                  : `700 ${em}px "Roboto Condensed", "Arial Narrow", Arial, sans-serif`;
+  c.font = font;
+  let lines;
+  if (t.block) {
+    const maxW = dots(o.w) / ws; lines = [];
+    for (const para of String(v).split(/\r?\n/)) {
+      let cur = '';
+      for (const word of para.split(' ')) {
+        const tryL = cur ? cur + ' ' + word : word;
+        if (cur && c.measureText(tryL).width > maxW) { lines.push(cur); cur = word; } else cur = tryL;
+      }
+      lines.push(cur);
+    }
+    lines = lines.slice(0, t.lines || 1);
+  } else lines = [String(v).replace(/\r?\n/g, ' ')];
+  const textW = Math.max(1, ...lines.map(l => c.measureText(l).width)) * ws;
+  const W = Math.ceil(t.block ? dots(o.w) : textW + 2 + (pc && t.italic ? em * 0.2 : 0)), H = Math.max(1, lh * lines.length);
+  cv.width = W; cv.height = H;
+  c.font = font; c.fillStyle = '#000'; c.textBaseline = 'middle';
+  lines.forEach((l, i) => {
+    const lw = c.measureText(l).width * ws;
+    const x = !t.block || t.align === 'left' || t.align === 'justify' ? 0 : t.align === 'right' ? W - lw : (W - lw) / 2;
+    c.save(); c.translate(x, i*lh + lh/2); c.scale(ws, 1); c.fillText(l, 0, 0); c.restore();
+    const th = Math.max(1, Math.round(em * 0.06)), m = i*lh + lh/2;
+    if (pc && t.underline) c.fillRect(x, Math.round(m + em*0.36), lw, th);
+    if (pc && t.strike) c.fillRect(x, Math.round(m + em*0.04), lw, th);
+  });
+  let src = cv;
+  const rot = o.rot || 0;
+  if (rot) {
+    src = document.createElement('canvas');
+    src.width = rot % 180 ? H : W; src.height = rot % 180 ? W : H;
+    const r = src.getContext('2d');
+    r.translate(src.width/2, src.height/2); r.rotate(rot * Math.PI/180); r.drawImage(cv, -W/2, -H/2);
+  }
+  const w = src.width, h = src.height, px = src.getContext('2d').getImageData(0, 0, w, h).data;
+  const bpr = Math.ceil(w / 8), rows = [];
+  for (let yy = 0; yy < h; yy++) { let hex = ''; for (let b = 0; b < bpr; b++) {
+    let byte = 0;
+    for (let bit = 0; bit < 8; bit++) { const xx = b*8 + bit; if (xx < w && px[(yy*w + xx)*4 + 3] >= 128) byte |= 0x80 >> bit; }
+    hex += byte.toString(16).toUpperCase().padStart(2, '0');
+  } rows.push(hex); }
+  return { w, h, bpr, total: bpr * h, hex: acsCompress(rows) };
+}
+function zplObj(o, rec){
+  const L = S.tpl.label, D = mm => dots(mm), R = ROT[o.rot||0];
+  const v = valueOf(o, rec), FR = o.inv && o.type !== 'inverse' ? '^FR' : '';
+  const anc = canAnchor(o) ? (o.anchor || 'left') : 'left';
+  const ax = D(o.x + L.ox), y = D(o.y + L.oy);
+  let fo = `^FO${ax},${y}${FR}`, fb = '';
+  if (o.type === 'text' && (isPcFont(o.text) || L.z0 !== 'font')) {
+    // computer font (or printer font in 'image' mode): sent as a 1-bit picture, exactly as on screen
+    const g = textBitmap(o, v);
+    if (!g) return '';
+    const x = anc === 'right' ? ax - g.w : anc === 'center' ? ax - Math.round(g.w/2) : ax;
+    return `^FO${Math.max(0, x)},${y}${FR}^GFA,${g.total},${g.total},${g.bpr},${g.hex}^FS`;
+  }
+  if (anc !== 'left' && o.type === 'text') {
+    // printer can't measure text for us: use a one-line ^FB that ends (or is centred) on the anchor
+    const half = Math.max(1, Math.min(ax, D(L.w) - ax));
+    fo = anc === 'right' ? `^FO0,${y}${FR}` : `^FO${ax - half},${y}${FR}`;
+    fb = anc === 'right' ? `^FB${Math.max(1, ax)},1,0,R,0` : `^FB${half*2},1,0,C,0`;
+  } else if (anc !== 'left') {
+    // barcode: width = modules × module size, both known before printing
+    let wd = 0; try { wd = bcCanvas(o, v).width * (is2D(o.type) ? o.bc.mag : o.bc.mod); } catch {}
+    fo = `^FO${Math.max(0, ax - (anc === 'right' ? wd : Math.round(wd/2)))},${y}${FR}`;
+  }
+  switch (o.type) {
+    case 'text': {
+      const h = Math.max(10, Math.round(o.text.pt * L.dpi / 72)), w = Math.max(10, Math.round(h * (o.text.ws || 100) / 100));
+      let z = `${fo}^A0${R},${h},${w}${fb}`;
+      if (o.text.block) z += `^FB${D(o.w)},${o.text.lines||1},0,${{left:'L',center:'C',right:'R',justify:'J'}[o.text.align]},0`;
+      const data = o.text.block ? zEsc(v).replace(/\r?\n/g, '\\&') : zEsc(v.replace(/\r?\n/g, ' '));
+      return `${z}^FH^FD${data}^FS`;
+    }
+    case 'code128': return `${fo}^BY${o.bc.mod},3,${D(o.h)}^BC${R},${D(o.h)},${o.bc.hr?'Y':'N'},N,N,A^FH^FD${zEsc(v)}^FS`;
+    case 'code39':  return `${fo}^BY${o.bc.mod},3,${D(o.h)}^B3${R},N,${D(o.h)},${o.bc.hr?'Y':'N'},N^FH^FD${zEsc(v)}^FS`;
+    case 'ean13':   return `${fo}^BY${o.bc.mod},3,${D(o.h)}^BE${R},${D(o.h)},${o.bc.hr?'Y':'N'},N^FD${v.replace(/\D/g,'').slice(0,12)}^FS`;
+    case 'qrcode':  return `${fo}^BQN,2,${o.bc.mag}^FH^FD${o.bc.ecl}A,${zEsc(v)}^FS`;
+    case 'datamatrix': return `${fo}^BX${R},${o.bc.mag},200^FH^FD${zEsc(v)}^FS`;
+    case 'rect': case 'inverse': {
+      const w = D(o.w), h = D(o.h), t = o.fill ? Math.min(w, h) : Math.max(1, D(o.stroke));
+      return `${fo}${o.type === 'inverse' ? '^FR' : ''}^GB${w},${h},${t},B,${o.round||0}^FS`;
+    }
+    case 'ellipse': { const w = D(o.w), h = D(o.h), t = o.fill ? Math.min(w, h) : Math.max(1, D(o.stroke)); return `${fo}^GE${w},${h},${t},B^FS`; }
+    case 'line': { const w = Math.max(1, D(o.w)), h = Math.max(1, D(o.h)); return `${fo}^GB${w},${h},${Math.min(w, h)},B,0^FS`; }
+  }
+  return '';
+}
+function zplFor(recs, copies, seq0 = 0){
+  const L = S.tpl.label;
+  const block = (r, n) => [
+    '^XA', '^CI28', `^PW${dots(L.w)}`, `^LL${dots(L.h)}`, '^LH0,0', `^PR${L.speed}`, L.dark ? `^MD${L.dark}` : '',
+    ...S.tpl.objects.filter(o => !o.noprint).map(o => zplObj(o, r)),
+    n > 1 ? `^PQ${n},0,1,Y` : '', '^XZ'
+  ].filter(Boolean).join('\n');
+  if (!hasCounter()) return recs.map(r => block(r, copies)).join('\n');
+  // with a counter every copy is its own label with the next number
+  const out = []; let seq = seq0;
+  try { for (const r of recs) for (let k = 0; k < copies; k++) { SEQ = seq++; out.push(block(r, 1)); } }
+  finally { SEQ = null; }
+  return out.join('\n');
+}
+function showZpl(z){ $('#zplText').value = z; if (!$('#dlgZpl').open) $('#dlgZpl').showModal(); }
+$('#zCopy').onclick = async () => { try { await navigator.clipboard.writeText($('#zplText').value); toast('ZPL zkopírováno'); } catch { $('#zplText').select(); document.execCommand('copy'); toast('ZPL zkopírováno'); } };
+$('#zDl').onclick = () => download((S.tpl.name||'label') + '.zpl', $('#zplText').value, 'text/plain');
+
+function openPrint(){
+  const n = S.data.rows.length;
+  $('#pCurN').textContent = n ? `(č. ${S.rec+1})` : '(bez tabulky)';
+  $('#pAllN').textContent = n ? `(${n} ks)` : '';
+  $$('[name=pr]').forEach(r => r.disabled = !n && r.value !== 'cur');
+  // with a table loaded the usual job is the whole table, so that is the default
+  $(`[name=pr][value="${n ? 'all' : 'cur'}"]`).checked = true;
+  $('#pFrom').value = 1; $('#pTo').value = Math.max(1, n); $('#pFrom').max = $('#pTo').max = Math.max(1, n);
+  let pm = 'browser'; try { pm = localStorage.getItem('ld.pm') || 'browser'; } catch {}
+  ($(`[name=pm][value="${pm}"]`) || $('[name=pm][value="browser"]')).checked = true;
+  updatePm(); $('#dlgPrint').showModal();
+}
+const printMethod = () => $('[name=pm]:checked').value;
+
+// network printing: the printer's built-in web server takes raw ZPL at /pstprnt. Browsers can't open port 9100,
+// and the printer sends no CORS headers, so requests go "no-cors": they arrive, but the reply can't be read.
+const cleanHost = v => String(v || '').trim().replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+function savedIps(){ try { return JSON.parse(localStorage.getItem('ld.ips') || '[]'); } catch { return []; } }
+function rememberIp(ip){ try { localStorage.setItem('ld.ips', JSON.stringify([ip, ...savedIps().filter(x => x !== ip)].slice(0, 8))); } catch {} }
+async function ipFetch(url, opts = {}, ms = 5000){
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms);
+  try { return await fetch(url, { ...opts, mode: 'no-cors', cache: 'no-store', signal: ctl.signal }); }
+  finally { clearTimeout(t); }
+}
+const sendToIp = (host, zpl) => ipFetch(`http://${host}/pstprnt`, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: zpl }, 30000);
+function ipError(host, e){
+  const why = e.name === 'AbortError' ? 'neodpovídá (vypršel čas)' : 'není z tohoto PC dostupná';
+  return `Tiskárna ${esc(host)} ${why}. Nejspíš jste mimo síť tiskáren nebo ji odděluje server IT. ` +
+    `Zkontrolujte IP, nebo zvolte <b>Přes prohlížeč</b>. Pro IT: je potřeba přístup z PC na tiskárnu přes HTTP (port 80, /pstprnt).`;
+}
+// printers saved in the template itself ({name, ip}), so a saved .html carries its own printer list
+const tplPrinters = () => (S.tpl.printers ??= []);
+function fillIpSel(ip){
+  const list = tplPrinters(), sel = $('#pIpSel');
+  sel.innerHTML = list.map((p, i) => `<option value="${i}">${esc(p.name)} — ${esc(p.ip)}</option>`).join('') + '<option value="">+ Nová tiskárna…</option>';
+  const i = list.findIndex(p => p.ip === ip);
+  sel.value = i >= 0 ? String(i) : list.length ? '0' : '';
+  onIpSel();
+}
+function onIpSel(){
+  const p = tplPrinters()[$('#pIpSel').value];
+  $('#pIpName').value = p ? p.name : '';
+  $('#pIp').value = p ? p.ip : (savedIps()[0] || '');
+  $('#pIpDel').disabled = !p;
+}
+$('#pIpSel').onchange = onIpSel;
+$('#pIpSave').onclick = () => {
+  const m = $('#pMsg'), ip = cleanHost($('#pIp').value), name = $('#pIpName').value.trim() || ip;
+  if (!ip) { m.className = 'msg err'; m.textContent = 'Zadejte IP adresu tiskárny, např. 10.20.30.40.'; return; }
+  push(true);
+  const list = tplPrinters(), cur = $('#pIpSel').value, same = list.findIndex(p => p.ip === ip);
+  const i = cur !== '' ? +cur : same;
+  if (i >= 0) list[i] = { name, ip }; else list.push({ name, ip });
+  S.tpl.printer = ip; autosave(); fillIpSel(ip);
+  m.className = 'msg ok'; m.textContent = `Tiskárna „${name}“ je v šabloně. Aby zůstala i v souboru, uložte šablonu (Cmd+S).`;
+};
+$('#pIpDel').onclick = () => {
+  const list = tplPrinters(), i = $('#pIpSel').value; if (i === '') return;
+  push(true); const [p] = list.splice(+i, 1); autosave(); fillIpSel(S.tpl.printer);
+  const m = $('#pMsg'); m.className = 'msg'; m.textContent = `Tiskárna „${p.name}“ odstraněna ze šablony.`;
+};
+$('#pIpTest').onclick = async () => {
+  const m = $('#pMsg'), host = cleanHost($('#pIp').value);
+  if (!host) { m.className = 'msg err'; m.textContent = 'Zadejte IP adresu tiskárny, např. 10.20.30.40.'; return; }
+  m.className = 'msg'; m.textContent = `Zkouším spojení s ${host}…`;
+  try { await ipFetch(`http://${host}/`, {}, 4000); rememberIp(host); m.className = 'msg ok'; m.textContent = `Tiskárna ${host} odpovídá. Můžete tisknout.`; }
+  catch (e) { m.className = 'msg err'; m.innerHTML = ipError(host, e); }
+};
+const batchSize = () => Math.max(10, Math.min(1000, +$('#pBatch').value || 100));
+function updateGoLabel(){
+  const pb = S.pb, n = printMethod() === 'browser' ? Math.ceil(pickRecs().length * copies() / batchSize()) : 1;
+  $('#pGo').textContent = pb ? `Tisknout dávku ${pb.i + 1} / ${pb.chunks.length}` : n > 1 ? `Tisknout dávku 1 / ${n}` : 'Tisk';
+  // plain-words total, so "current record × 600 copies" can't be mistaken for the whole table
+  const r = pickRecs(), c = copies(), sum = $('#pSum'), one = r.length === 1 && S.data.rows.length > 1;
+  const zaz = r.length === 1 ? 'záznam' : r.length < 5 ? 'záznamy' : 'záznamů', kop = c === 1 ? 'kopie' : c < 5 ? 'kopie' : 'kopií';
+  const cnt = hasCounter() && r.length * c > 1 ? S.tpl.objects.find(o => !o.noprint && o.src?.mode === 'counter') : null;
+  const same = one && c > 1 && !cnt;
+  sum.className = 'psum' + (same ? ' warn' : '');
+  sum.textContent = `Vytiskne se: ${r.length} ${zaz} × ${c} ${kop} = ${r.length * c} etiket`
+    + (same ? ` — pořád stejná etiketa č. ${r[0] + 1}` : '')
+    + (cnt ? ` — počítadlo ${valueOfSeq(cnt, 0)} až ${valueOfSeq(cnt, r.length * c - 1)}` : '');
+}
+function resetBatches(){ S.pb = null; updateGoLabel(); }
+// any change of records, copies or batch size starts the batches over
+['#pFrom', '#pTo', '#pCopies', '#pBatch'].forEach(sel => $(sel).addEventListener('input', resetBatches));
+$$('[name=pr]').forEach(r => r.addEventListener('change', resetBatches));
+function updatePm(){
+  const pm = printMethod(), m = $('#pMsg'), L = S.tpl.label;
+  $('#pBatchRow').hidden = pm !== 'browser'; $('#pIpRow').hidden = pm !== 'ip';
+  resetBatches();
+  m.className = 'msg';
+  if (pm === 'ip') {
+    $('#ipList').innerHTML = savedIps().map(ip => `<option value="${esc(ip)}">`).join('');
+    fillIpSel(S.tpl.printer);
+    m.innerHTML = 'Tiskárny (název + IP) se ukládají přímo do šablony, takže je mají všichni, kdo šablonu otevřou. Etikety jdou rovnou do tiskárny jako ZPL (http://IP/pstprnt). Funguje jen tam, kde je tiskárna z tohoto PC dostupná v síti. Zkuste nejdřív <b>Otestovat</b>. Tiskárna tisk nepotvrzuje, takže uvidíte jen „odesláno“.';
+    return;
+  }
+  m.innerHTML = `Otevře se okno tisku prohlížeče, každá etiketa = jedna stránka ${L.w} × ${L.h} mm. V něm zvolte tiskárnu <b>ZDesigner</b>, Okraje: <b>Žádné</b>, Měřítko: <b>100 %</b>. Ve vlastnostech ovladače musí být nastavena stejná velikost etikety.<br>Velké role se tisknou po dávkách: ovladač Windows u dlouhých úloh z prohlížeče někdy vytiskne jen začátek. Pro 500+ etiket je nejspolehlivější <b>Na IP tiskárny</b>, pokud je tiskárna v síti dostupná.`;
+}
+$$('[name=pm]').forEach(r => r.onchange = () => { try { localStorage.setItem('ld.pm', printMethod()); } catch {} updatePm(); });
+
+// browser printing: render every record at 1 CSS px = 1/96 in, so the label's px size equals its size in mm,
+// then print the pages from a hidden frame with @page sized to the label
+async function printBrowser(recs, n, seq0 = 0){
+  const L = S.tpl.label, keep = { zoom: S.zoom, sel: S.sel, rec: S.rec }, pages = [], counter = hasCounter();
+  S.zoom = 1; S.sel = null;
+  let seq = seq0;
+  try {
+    // with a counter each copy is rendered on its own; otherwise one render serves all copies of a record
+    for (const r of recs) for (let k = 0; k < (counter ? n : 1); k++) {
+      S.rec = r; SEQ = seq; seq += counter ? 1 : n; render();
+      const c = labelEl.cloneNode(true), src = [...labelEl.querySelectorAll('canvas')];
+      [...c.querySelectorAll('canvas')].forEach((cv, i) => {
+        const img = document.createElement('img'); img.src = src[i].toDataURL(); img.style.cssText = cv.style.cssText; cv.replaceWith(img);
+      });
+      c.querySelectorAll('.noprint').forEach(e => e.remove());
+      c.querySelectorAll('.out').forEach(e => e.classList.remove('out'));
+      c.removeAttribute('id'); c.className = 'label';
+      c.style.transform = `translate(${L.ox}mm, ${L.oy}mm)`;
+      for (let k = 0; k < (counter ? 1 : n); k++) pages.push(c.outerHTML);
+    }
+  } finally { SEQ = null; Object.assign(S, keep); render(); }
+  const css = [...document.querySelectorAll('style')].map(x => x.textContent).join('\n');
+  const f = document.createElement('iframe');
+  f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  document.body.append(f);
+  const d = f.contentDocument;
+  d.open();
+  d.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(S.tpl.name)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap" rel="stylesheet">
+<style>${css}
+@page{size:${L.w}mm ${L.h}mm;margin:0}
+html,body{margin:0!important;padding:0;background:#fff!important;overflow:visible!important;height:auto!important}
+.page{width:${L.w}mm;height:${L.h}mm;overflow:hidden;position:relative;break-after:page}
+.page:last-child{break-after:auto}
+.page .label{box-shadow:none;border-radius:0;background:#fff}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+</style></head><body>${pages.map(x => `<div class="page">${x}</div>`).join('')}</body></html>`);
+  d.close();
+  await d.fonts.ready;
+  await Promise.all([...d.images].map(i => i.decode().catch(() => {})));
+  (window.__printHook || (w => w.print()))(f.contentWindow);
+  setTimeout(() => f.remove(), window.__printHook ? 60000 : 1000);
+  return pages.length;
+}
+function pickRecs(){
+  const n = S.data.rows.length, mode = $('[name=pr]:checked').value;
+  if (!n) return [0];
+  if (mode === 'cur') return [S.rec];
+  if (mode === 'all') return [...Array(n).keys()];
+  const a = Math.max(1, +$('#pFrom').value), b = Math.min(n, +$('#pTo').value);
+  return b >= a ? Array.from({ length: b - a + 1 }, (_, i) => a - 1 + i) : [];
+}
+const copies = () => Math.max(1, +$('#pCopies').value || 1);
+$('#pZpl').onclick = () => showZpl(zplFor(pickRecs(), copies()));
+$('#pDl').onclick = () => { const r = pickRecs(); download((S.tpl.name||'label') + '.zpl', zplFor(r, copies()), 'text/plain'); };
+$('#pGo').onclick = async () => {
+  const m = $('#pMsg'), recs = pickRecs();
+  if (!recs.length) { m.className = 'msg err'; m.textContent = 'Rozsah je prázdný: „od“ nesmí být větší než „do“.'; return; }
+  if (printMethod() === 'ip') {
+    try { await document.fonts.load('700 40px "Roboto Condensed"'); } catch {}
+    const host = cleanHost($('#pIp').value);
+    if (!host) { m.className = 'msg err'; m.textContent = 'Zadejte IP adresu tiskárny, např. 10.20.30.40.'; return; }
+    const btn = $('#pGo'); btn.disabled = true;
+    const total = recs.length * copies(), CH = 200;
+    try {
+      for (let i = 0; i < recs.length; i += CH) {
+        m.className = 'msg'; m.textContent = `Odesílám na ${host}: ${Math.min(i + CH, recs.length) * copies()} z ${total}…`;
+        await sendToIp(host, zplFor(recs.slice(i, i + CH), copies(), i * copies()));
+      }
+      rememberIp(host); if (S.tpl.printer !== host) { S.tpl.printer = host; autosave(); }
+      m.className = 'msg ok'; m.textContent = `Odesláno na ${host}: ${total} etiket. Tiskárna tisk nepotvrzuje — zkontrolujte, že tiskne.`;
+    } catch (e) {
+      m.className = 'msg err'; m.innerHTML = ipError(host, e);
+    } finally { btn.disabled = false; }
+    return;
+  }
+  if (printMethod() === 'browser') {
+    // long jobs are split into batches; each click on Tisk prints the next batch
+    const key = JSON.stringify([recs, copies(), batchSize()]);
+    if (!S.pb || S.pb.key !== key) {
+      const pages = recs.flatMap(r => Array(copies()).fill(r)), chunks = [];
+      for (let i = 0; i < pages.length; i += batchSize()) chunks.push(pages.slice(i, i + batchSize()));
+      S.pb = { key, chunks, i: 0, total: pages.length };
+    }
+    const pb = S.pb, part = pb.chunks[pb.i], from = pb.i * batchSize() + 1, to = from + part.length - 1;
+    m.className = 'msg'; m.textContent = `Připravuji etikety ${from}–${to}…`;
+    try {
+      await printBrowser(part, 1, pb.i * batchSize());
+      pb.i++;
+      if (pb.i >= pb.chunks.length) {
+        m.className = 'msg ok';
+        m.textContent = pb.chunks.length > 1 ? `Hotovo: všech ${pb.chunks.length} dávek (${pb.total} etiket) odesláno do okna tisku.` : `Odesláno do okna tisku: ${pb.total} etiket. Pokud jste tisk zrušili, stiskněte Tisk znovu.`;
+        S.pb = null;
+      } else {
+        m.className = 'msg ok';
+        m.textContent = `Dávka ${pb.i} z ${pb.chunks.length} (etikety ${from}–${to}) odeslána. Až tiskárna dotiskne, stiskněte „Tisknout dávku ${pb.i + 1} / ${pb.chunks.length}“.`;
+      }
+    } catch (e) { m.className = 'msg err'; m.textContent = 'Tisk se nepodařilo připravit: ' + e.message; }
+    updateGoLabel();
+    return;
+  }
+};
+
+/* ---------- boot ---------- */
+(function boot(){
+  try { document.fonts.load('700 40px "Roboto Condensed"'); } catch {}
+  let saved = null; try { saved = JSON.parse(localStorage.getItem('ld.tpl')); } catch {}
+  try { const emb = document.getElementById('embedded-tpl'); if (emb) saved = JSON.parse(emb.textContent); } catch {}
+  if (saved?.label && Array.isArray(saved.objects)) { S.tpl = saved; afterLoad(true); }
+  else {
+    S.tpl = newTpl(); afterLoad(true);
+    openDoc(true);
+  }
+})();
+</script>
+</body>
+</html>
